@@ -14,6 +14,9 @@
         <header>
             <h1>✨ Happy Words! ✨</h1>
             <p class="subtitle">Click the button to see something wonderful!</p>
+            <div class="streak-display">
+                🔥 <span id="streakCount">0</span> day streak!
+            </div>
         </header>
 
         <main>
@@ -22,9 +25,33 @@
                 <input type="text" id="studentName" placeholder="Type your name here..." maxlength="20">
                 <button class="start-button" onclick="startApp()">Let's Go! 🚀</button>
             </div>
+
+            <!-- Category Filter -->
+            <div class="category-filter hidden" id="categoryFilter">
+                <button class="category-btn" data-category="all" onclick="setCategory('all')">✨ All</button>
+                <button class="category-btn active" data-category="praise" onclick="setCategory('praise')">🌟 Praise</button>
+                <button class="category-btn" data-category="growth" onclick="setCategory('growth')">🌱 Growth</button>
+                <button class="category-btn" data-category="kindness" onclick="setCategory('kindness')">💝 Kindness</button>
+                <button class="category-btn" data-category="ican" onclick="setCategory('ican')">💪 I Can!</button>
+                <button class="category-btn" data-category="calm" onclick="setCategory('calm')">🧘 Calm</button>
+                <button class="category-btn" data-category="gratitude" onclick="setCategory('gratitude')">🙏 Gratitude</button>
+            </div>
+
             <div class="word-display hidden" id="wordDisplay">
-                <span class="emoji" id="emoji">🌈</span>
+                <div class="word-actions">
+                    <button class="action-btn" id="favoriteBtn" onclick="toggleFavorite()" title="Add to favorites">🤍</button>
+                    <button class="action-btn" onclick="speakCurrentMessage()" title="Read aloud">🔊</button>
+                </div>
+                <span class="emoji" id="emoji"></span>
                 <span class="word" id="word">You are AMAZING!</span>
+            </div>
+
+            <!-- Controls Container -->
+            <div class="controls-container hidden" id="controlsContainer">
+                <button class="control-btn" id="soundToggle" onclick="toggleSound()" title="Toggle Sound">🔊</button>
+                <button class="control-btn" onclick="showFavorites()" title="View Favorites">
+                    💖 <span id="favoritesCount">0</span>
+                </button>
             </div>
 
             <button class="magic-button hidden" id="magicButton" onclick="generateHappyWord()">
