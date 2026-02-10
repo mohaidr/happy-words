@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Words for Kids! 🌟</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✨ Happy Words! ✨</h1>
+            <p class="subtitle">Click the button to see something wonderful!</p>
+        </header>
+
+        <main>
+            <div class="name-input-container" id="nameContainer">
+                <label for="studentName">What's your name? 😊</label>
+                <input type="text" id="studentName" placeholder="Type your name here..." maxlength="20">
+                <button class="start-button" onclick="startApp()">Let's Go! 🚀</button>
+            </div>
+            <div class="word-display hidden" id="wordDisplay">
+                <span class="emoji" id="emoji">🌈</span>
+                <span class="word" id="word">You are AMAZING!</span>
+            </div>
+
+            <button class="magic-button hidden" id="magicButton" onclick="generateHappyWord()">
+                <span class="button-text">🎉 Show Me Magic! 🎉</span>
+            </button>
+
+            <button class="back-button hidden" id="backButton" onclick="goBack()">
+                ← Change Name
+            </button>
+        </main>
+
+        <div class="decorations">
+            <span class="star star1">⭐</span>
+            <span class="star star2">🌟</span>
+            <span class="star star3">✨</span>
+            <span class="star star4">💫</span>
+            <span class="star star5">⭐</span>
+        </div>
+
+        <footer>
+            <p>Made with 💖 for awesome kids!</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
