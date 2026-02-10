@@ -4,7 +4,7 @@ const happyMessages = [
     { emoji: "🌟", word: "{name}, you are a SUPERSTAR!", category: "praise" },
     { emoji: "🦋", word: "{name} is BEAUTIFUL inside and out!", category: "praise" },
     { emoji: "🚀", word: "{name} can do ANYTHING!", category: "praise" },
-    { emoji: "🌈", word: "{name} makes the world COLORFUL!", category: "praise" },
+    { emoji: "�", word: "{name} makes the world COLORFUL!", category: "praise" },
     { emoji: "💪", word: "{name} is SO STRONG!", category: "praise" },
     { emoji: "🎨", word: "{name} is SO CREATIVE!", category: "praise" },
     { emoji: "❤️", word: "{name} is LOVED!", category: "praise" },
@@ -60,7 +60,7 @@ const happyMessages = [
     { emoji: "🎹", word: "{name} is TALENTED!", category: "praise" },
     { emoji: "🔥", word: "{name} is ON FIRE today!", category: "praise" },
     { emoji: "🥇", word: "{name} is NUMBER ONE!", category: "praise" },
-    { emoji: "🌈", word: "{name} brings JOY everywhere!", category: "praise" },
+    { emoji: "�", word: "{name} brings JOY everywhere!", category: "praise" },
     { emoji: "💪", word: "{name} never gives up!", category: "praise" },
     { emoji: "🐝", word: "{name} works SO HARD!", category: "praise" },
     { emoji: "🎯", word: "{name} always does their BEST!", category: "praise" },
@@ -81,7 +81,7 @@ const happyMessages = [
     { emoji: "🎓", word: "{name} is a LEARNING MACHINE!", category: "growth" },
     { emoji: "💪", word: "Hard work is {name}'s superpower!", category: "growth" },
     { emoji: "🧠", word: "{name}'s brain grows when they try hard things!", category: "growth" },
-    { emoji: "🌈", word: "Every mistake makes {name} WISER!", category: "growth" },
+    { emoji: "🧠", word: "Every mistake makes {name} WISER!", category: "growth" },
     { emoji: "⭐", word: "{name} believes in themselves!", category: "growth" },
     { emoji: "🔑", word: "{name} never stops trying!", category: "growth" },
     { emoji: "🏔️", word: "{name} climbs mountains one step at a time!", category: "growth" },
@@ -98,7 +98,7 @@ const happyMessages = [
     { emoji: "💐", word: "{name} can spread KINDNESS everywhere!", category: "kindness" },
     { emoji: "🦸", word: "{name} is a KINDNESS superhero!", category: "kindness" },
     { emoji: "❤️", word: "{name}'s kindness makes the world BRIGHTER!", category: "kindness" },
-    { emoji: "🌈", word: "{name} can be someone's RAINBOW today!", category: "kindness" },
+    { emoji: "✨", word: "{name} can be someone's SUNSHINE today!", category: "kindness" },
     { emoji: "🎈", word: "{name} can cheer someone UP today!", category: "kindness" },
     { emoji: "🍪", word: "{name} can do something NICE today!", category: "kindness" },
     { emoji: "🌸", word: "{name}'s kindness blooms like FLOWERS!", category: "kindness" },
@@ -127,7 +127,7 @@ const happyMessages = [
     { emoji: "🧘", word: "{name} is peaceful and RELAXED!", category: "calm" },
     { emoji: "🌙", word: "{name}, everything will be OKAY!", category: "calm" },
     { emoji: "💫", word: "{name} is safe and LOVED!", category: "calm" },
-    { emoji: "🌈", word: "After the rain, {name} will see RAINBOWS!", category: "calm" },
+    { emoji: "☀️", word: "After the storm, {name} will see SUNSHINE!", category: "calm" },
     { emoji: "🍃", word: "{name} is light like a LEAF in the wind!", category: "calm" },
     { emoji: "⭐", word: "{name}, breathe in PEACE, breathe out WORRY!", category: "calm" },
     { emoji: "🌺", word: "{name} is stronger than any problem!", category: "calm" },
@@ -151,7 +151,7 @@ const happyMessages = [
     { emoji: "💖", word: "{name} is thankful for LOVE!", category: "gratitude" },
     { emoji: "🎵", word: "{name} is grateful for MUSIC!", category: "gratitude" },
     { emoji: "📖", word: "{name} appreciates good BOOKS!", category: "gratitude" },
-    { emoji: "🌈", word: "{name} is thankful for COLORS!", category: "gratitude" },
+    { emoji: "�", word: "{name} is thankful for BEAUTIFUL things!", category: "gratitude" },
     { emoji: "😊", word: "{name} is grateful for HAPPINESS!", category: "gratitude" }
 ];
 
@@ -605,6 +605,159 @@ function closeFavoritesModal() {
     if (modal) {
         modal.remove();
     }
+}
+
+// Print certificate function
+function printCertificate() {
+    const emojiElement = document.getElementById('emoji');
+    const wordElement = document.getElementById('word');
+    
+    const emoji = emojiElement.textContent;
+    const message = wordElement.textContent;
+    const date = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    // Create print window with certificate
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Certificate for ${studentName}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                body {
+                    font-family: 'Fredoka', sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background: #f0f0f0;
+                    padding: 20px;
+                }
+                .certificate {
+                    background: linear-gradient(135deg, #fff9e6 0%, #fff 50%, #fff9e6 100%);
+                    border: 8px solid #ffd700;
+                    border-radius: 20px;
+                    padding: 50px;
+                    max-width: 700px;
+                    width: 100%;
+                    text-align: center;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                    position: relative;
+                }
+                .certificate::before {
+                    content: '⭐';
+                    position: absolute;
+                    top: -20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: 40px;
+                }
+                .corner {
+                    position: absolute;
+                    font-size: 30px;
+                }
+                .corner-tl { top: 15px; left: 15px; }
+                .corner-tr { top: 15px; right: 15px; }
+                .corner-bl { bottom: 15px; left: 15px; }
+                .corner-br { bottom: 15px; right: 15px; }
+                .header {
+                    color: #764ba2;
+                    font-size: 2.5rem;
+                    margin-bottom: 10px;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+                }
+                .subheader {
+                    color: #666;
+                    font-size: 1.2rem;
+                    margin-bottom: 30px;
+                }
+                .emoji-display {
+                    font-size: 80px;
+                    margin: 20px 0;
+                }
+                .name {
+                    font-size: 3rem;
+                    color: #ff6b6b;
+                    margin: 20px 0;
+                    font-weight: 700;
+                }
+                .message {
+                    font-size: 1.8rem;
+                    color: #333;
+                    margin: 30px 0;
+                    line-height: 1.4;
+                    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    font-weight: 700;
+                }
+                .date {
+                    color: #888;
+                    font-size: 1rem;
+                    margin-top: 30px;
+                }
+                .footer {
+                    margin-top: 20px;
+                    color: #764ba2;
+                    font-size: 1.1rem;
+                }
+                .stars {
+                    margin: 15px 0;
+                    font-size: 1.5rem;
+                }
+                @media print {
+                    body {
+                        background: white;
+                    }
+                    .certificate {
+                        box-shadow: none;
+                        border: 8px solid #ffd700;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <span class="corner corner-tl">✨</span>
+                <span class="corner corner-tr">✨</span>
+                <span class="corner corner-bl">🌟</span>
+                <span class="corner corner-br">🌟</span>
+                
+                <h1 class="header">🏆 Certificate of Awesomeness 🏆</h1>
+                <p class="subheader">This special certificate is awarded to</p>
+                
+                <div class="emoji-display">${emoji}</div>
+                
+                <h2 class="name">${studentName}</h2>
+                
+                <p class="message">${message}</p>
+                
+                <div class="stars">⭐ 🌟 ⭐ 🌟 ⭐</div>
+                
+                <p class="footer">Keep being AMAZING!</p>
+                <p class="date">${date}</p>
+            </div>
+            <script>
+                window.onload = function() {
+                    window.print();
+                }
+            </script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    playSound('favorite');
 }
 
 // Allow Enter key to start app from name input
