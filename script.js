@@ -4,7 +4,7 @@ const happyMessages = [
     { emoji: "🌟", word: "{name}, you are a SUPERSTAR!", category: "praise" },
     { emoji: "🦋", word: "{name} is BEAUTIFUL inside and out!", category: "praise" },
     { emoji: "🚀", word: "{name} can do ANYTHING!", category: "praise" },
-    { emoji: "�", word: "{name} makes the world COLORFUL!", category: "praise" },
+    { emoji: "🌈", word: "{name} makes the world COLORFUL!", category: "praise" },
     { emoji: "💪", word: "{name} is SO STRONG!", category: "praise" },
     { emoji: "🎨", word: "{name} is SO CREATIVE!", category: "praise" },
     { emoji: "❤️", word: "{name} is LOVED!", category: "praise" },
@@ -60,7 +60,7 @@ const happyMessages = [
     { emoji: "🎹", word: "{name} is TALENTED!", category: "praise" },
     { emoji: "🔥", word: "{name} is ON FIRE today!", category: "praise" },
     { emoji: "🥇", word: "{name} is NUMBER ONE!", category: "praise" },
-    { emoji: "�", word: "{name} brings JOY everywhere!", category: "praise" },
+    { emoji: "🎉", word: "{name} brings JOY everywhere!", category: "praise" },
     { emoji: "💪", word: "{name} never gives up!", category: "praise" },
     { emoji: "🐝", word: "{name} works SO HARD!", category: "praise" },
     { emoji: "🎯", word: "{name} always does their BEST!", category: "praise" },
@@ -151,7 +151,7 @@ const happyMessages = [
     { emoji: "💖", word: "{name} is thankful for LOVE!", category: "gratitude" },
     { emoji: "🎵", word: "{name} is grateful for MUSIC!", category: "gratitude" },
     { emoji: "📖", word: "{name} appreciates good BOOKS!", category: "gratitude" },
-    { emoji: "�", word: "{name} is thankful for BEAUTIFUL things!", category: "gratitude" },
+    { emoji: "🌈", word: "{name} is thankful for BEAUTIFUL things!", category: "gratitude" },
     { emoji: "😊", word: "{name} is grateful for HAPPINESS!", category: "gratitude" }
 ];
 
@@ -358,6 +358,7 @@ function startApp() {
     document.getElementById('backButton').classList.remove('hidden');
     document.getElementById('controlsContainer').classList.remove('hidden');
     document.getElementById('categoryFilter').classList.remove('hidden');
+    document.getElementById('gameButton').classList.remove('hidden');
 
     playSound('magic');
     
@@ -548,6 +549,7 @@ function goBack() {
     const backButton = document.getElementById('backButton');
     const controlsContainer = document.getElementById('controlsContainer');
     const categoryFilter = document.getElementById('categoryFilter');
+    const gameButton = document.getElementById('gameButton');
 
     // Show name input, hide main app
     nameContainer.classList.remove('hidden');
@@ -556,6 +558,7 @@ function goBack() {
     backButton.classList.add('hidden');
     if (controlsContainer) controlsContainer.classList.add('hidden');
     if (categoryFilter) categoryFilter.classList.add('hidden');
+    if (gameButton) gameButton.classList.add('hidden');
 
     // Focus on the input
     document.getElementById('studentName').focus();
@@ -762,6 +765,9 @@ function printCertificate() {
 
 // Allow Enter key to start app from name input
 document.addEventListener('keydown', (e) => {
+    // Skip if game is running (handled by game's own listener)
+    if (gameRunning) return;
+    
     const nameContainer = document.getElementById('nameContainer');
     const isNameInputVisible = !nameContainer.classList.contains('hidden');
 
@@ -786,5 +792,299 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load voices for speech synthesis
     if ('speechSynthesis' in window) {
         speechSynthesis.getVoices();
+    }
+});
+
+// ==================== CAR GAME ====================
+
+// Game state
+let gameRunning = false;
+let gameAnimationId = null;
+let carPosition = 50; // percentage from left
+let obstacles = [];
+let gameScore = 0;
+let gameSpeed = 1;
+let highScore = 0;
+let lastObstacleTime = 0;
+let gameStartTime = 0;
+
+// Game constants
+const CAR_WIDTH = 50;
+const CAR_HEIGHT = 50;
+const OBSTACLE_WIDTH = 40;
+const OBSTACLE_HEIGHT = 40;
+const ROAD_WIDTH = 300;
+const ROAD_HEIGHT = 500;
+const LANE_LEFT = 65;   // Left lane position (px from left edge)
+const LANE_CENTER = 130; // Center lane
+const LANE_RIGHT = 195;  // Right lane
+const LANES = [LANE_LEFT, LANE_CENTER, LANE_RIGHT];
+
+// Obstacle types (emojis)
+const OBSTACLE_TYPES = ['🌲', '🪨', '🚕', '🚌', '🏍️', '🛻', '🚧', '🦆'];
+
+// Load high score from localStorage
+function loadHighScore() {
+    try {
+        highScore = parseInt(localStorage.getItem('happyWords_carHighScore')) || 0;
+    } catch (e) {
+        highScore = 0;
+    }
+}
+
+// Save high score to localStorage
+function saveHighScore() {
+    try {
+        localStorage.setItem('happyWords_carHighScore', highScore.toString());
+    } catch (e) {
+        console.log('Could not save high score');
+    }
+}
+
+// Start the car game
+function startCarGame() {
+    loadHighScore();
+    
+    // Hide main app elements
+    document.querySelector('.container').style.display = 'none';
+    
+    // Show game container
+    const gameContainer = document.getElementById('gameContainer');
+    gameContainer.classList.remove('hidden');
+    
+    // Reset game state
+    resetGame();
+    
+    // Start game loop
+    gameRunning = true;
+    gameStartTime = Date.now();
+    lastObstacleTime = Date.now();
+    gameLoop();
+    
+    playSound('magic');
+}
+
+// Reset game to initial state
+function resetGame() {
+    carPosition = 50;
+    obstacles = [];
+    gameScore = 0;
+    gameSpeed = 1;
+    
+    // Clear existing obstacles from DOM
+    const road = document.getElementById('gameRoad');
+    road.querySelectorAll('.obstacle').forEach(obs => obs.remove());
+    
+    // Reset car position
+    const car = document.getElementById('playerCar');
+    car.style.left = '50%';
+    
+    // Update displays
+    updateGameScore();
+    updateGameSpeed();
+}
+
+// Main game loop
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    const currentTime = Date.now();
+    
+    // Increase speed over time
+    const elapsedSeconds = (currentTime - gameStartTime) / 1000;
+    gameSpeed = Math.min(1 + Math.floor(elapsedSeconds / 10) * 0.5, 5);
+    updateGameSpeed();
+    
+    // Spawn obstacles
+    const spawnInterval = Math.max(800 - (gameSpeed * 100), 400);
+    if (currentTime - lastObstacleTime > spawnInterval) {
+        spawnObstacle();
+        lastObstacleTime = currentTime;
+    }
+    
+    // Move obstacles
+    moveObstacles();
+    
+    // Check collisions
+    if (checkCollision()) {
+        gameOver();
+        return;
+    }
+    
+    // Update score (based on time survived)
+    gameScore = Math.floor(elapsedSeconds * 10);
+    updateGameScore();
+    
+    // Continue loop
+    gameAnimationId = requestAnimationFrame(gameLoop);
+}
+
+// Spawn a new obstacle
+function spawnObstacle() {
+    const road = document.getElementById('gameRoad');
+    
+    // Pick random lane
+    const lane = LANES[Math.floor(Math.random() * LANES.length)];
+    
+    // Pick random obstacle type
+    const obstacleType = OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
+    
+    // Create obstacle element
+    const obstacle = document.createElement('div');
+    obstacle.className = 'obstacle';
+    obstacle.textContent = obstacleType;
+    obstacle.style.left = lane + 'px';
+    obstacle.style.top = '-50px';
+    
+    road.appendChild(obstacle);
+    
+    obstacles.push({
+        element: obstacle,
+        x: lane,
+        y: -50
+    });
+}
+
+// Move all obstacles down
+function moveObstacles() {
+    const speed = 5 * gameSpeed;
+    
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.y += speed;
+        obs.element.style.top = obs.y + 'px';
+        
+        // Remove if off screen
+        if (obs.y > ROAD_HEIGHT + 50) {
+            obs.element.remove();
+            obstacles.splice(i, 1);
+        }
+    }
+}
+
+// Check for collision between car and obstacles
+function checkCollision() {
+    const car = document.getElementById('playerCar');
+    const carRect = car.getBoundingClientRect();
+    
+    for (const obs of obstacles) {
+        const obsRect = obs.element.getBoundingClientRect();
+        
+        // Simple box collision with some padding for fairness
+        const padding = 10;
+        if (
+            carRect.left + padding < obsRect.right - padding &&
+            carRect.right - padding > obsRect.left + padding &&
+            carRect.top + padding < obsRect.bottom - padding &&
+            carRect.bottom - padding > obsRect.top + padding
+        ) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// Move car left
+function moveCarLeft() {
+    carPosition = Math.max(carPosition - 20, 20);
+    updateCarPosition();
+    playSound('click');
+}
+
+// Move car right
+function moveCarRight() {
+    carPosition = Math.min(carPosition + 20, 80);
+    updateCarPosition();
+    playSound('click');
+}
+
+// Update car visual position
+function updateCarPosition() {
+    const car = document.getElementById('playerCar');
+    car.style.left = carPosition + '%';
+}
+
+// Update score display
+function updateGameScore() {
+    document.getElementById('gameScore').textContent = gameScore;
+}
+
+// Update speed display
+function updateGameSpeed() {
+    document.getElementById('gameSpeed').textContent = gameSpeed.toFixed(1);
+}
+
+// Game over
+function gameOver() {
+    gameRunning = false;
+    
+    if (gameAnimationId) {
+        cancelAnimationFrame(gameAnimationId);
+    }
+    
+    // Check for high score
+    if (gameScore > highScore) {
+        highScore = gameScore;
+        saveHighScore();
+    }
+    
+    // Show game over modal
+    const modal = document.getElementById('gameOverModal');
+    document.getElementById('finalScore').textContent = gameScore;
+    document.getElementById('highScore').textContent = highScore;
+    modal.classList.remove('hidden');
+    
+    playSound('favorite');
+}
+
+// Restart the game
+function restartCarGame() {
+    // Hide game over modal
+    document.getElementById('gameOverModal').classList.add('hidden');
+    
+    // Reset and start again
+    resetGame();
+    gameRunning = true;
+    gameStartTime = Date.now();
+    lastObstacleTime = Date.now();
+    gameLoop();
+    
+    playSound('magic');
+}
+
+// Exit the car game
+function exitCarGame() {
+    gameRunning = false;
+    
+    if (gameAnimationId) {
+        cancelAnimationFrame(gameAnimationId);
+    }
+    
+    // Hide game elements
+    document.getElementById('gameContainer').classList.add('hidden');
+    document.getElementById('gameOverModal').classList.add('hidden');
+    
+    // Clear obstacles
+    const road = document.getElementById('gameRoad');
+    road.querySelectorAll('.obstacle').forEach(obs => obs.remove());
+    obstacles = [];
+    
+    // Show main app
+    document.querySelector('.container').style.display = '';
+    
+    playSound('click');
+}
+
+// Handle keyboard input for game
+document.addEventListener('keydown', (e) => {
+    if (!gameRunning) return;
+    
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        e.preventDefault();
+        moveCarLeft();
+    } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        e.preventDefault();
+        moveCarRight();
     }
 });

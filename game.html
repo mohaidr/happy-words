@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Game 🚗</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; }
+        
+        .score { font-size: 24px; margin-bottom: 15px; }
+        
+        #gameArea {
+            width: 300px;
+            height: 500px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #222;
+            border-radius: 10px;
+        }
+        
+        /* Road lines */
+        #gameArea::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                white 0px,
+                white 30px,
+                transparent 30px,
+                transparent 60px
+            );
+            animation: roadMove 0.5s linear infinite;
+        }
+        
+        @keyframes roadMove {
+            from { transform: translateY(0); }
+            to { transform: translateY(60px); }
+        }
+        
+        #car {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-20%) rotate(90deg);
+            font-size: 40px;
+            transition: left 0.1s, bottom 0.1s;
+        }
+        
+        .obstacle {
+            position: absolute;
+            font-size: 35px;
+            transform: translateX(-20%) rotate(90deg);
+        }
+        
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .controls-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .controls button {
+            width: 60px;
+            height: 50px;
+            font-size: 24px;
+            border: none;
+            border-radius: 10px;
+            background: #feca57;
+            cursor: pointer;
+        }
+        
+        .controls button:hover { background: #ff9f43; }
+        
+        #startBtn, #mainStartBtn {
+            margin-top: 15px;
+            padding: 15px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 25px;
+            background: #1dd1a1;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #startBtn:hover, #mainStartBtn:hover { 
+            background: #10ac84; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(29, 209, 161, 0.4);
+        }
+        
+        #mainStartBtn:disabled {
+            background: #b2bec3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        #gameOver h2 { color: #ff6b6b; margin-bottom: 10px; }
+        #gameOver p { margin: 10px 0; }
+        
+        .info { margin-top: 10px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <h1>🚗 Car Game 🏁</h1>
+    <div class="score">Score: <span id="score">0</span> | Speed: <span id="speedDisplay">1</span></div>
+    
+    <div id="gameArea">
+        <div id="car">🚗</div>
+        <div id="gameOver">
+            <h2>Game Over!</h2>
+            <p>Score: <span id="finalScore">0</span></p>
+            <p>Best: <span id="bestScore">0</span></p>
+            <button id="startBtn" onclick="startGame()">Play Again</button>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button onclick="moveUp()">⬆️</button>
+        <div class="controls-row">
+            <button onclick="moveLeft()">⬅️</button>
+            <button onclick="moveRight()">➡️</button>
+        </div>
+        <button onclick="moveDown()">⬇️</button>
+    </div>
+    
+    <p class="info">Use arrow keys or buttons to move</p>
+    <button id="mainStartBtn" onclick="startGame()">Start Game</button>
+
+    <script>
+        let carX = 150;
+        let carY = 20;
+        let score = 0;
+        let bestScore = 0;
+        let gameRunning = false;
+        let obstacles = [];
+        let gameLoop;
+        let speed = 2;
+        
+        const car = document.getElementById('car');
+        const gameArea = document.getElementById('gameArea');
+        const scoreEl = document.getElementById('score');
+        const gameOverEl = document.getElementById('gameOver');
+        const finalScoreEl = document.getElementById('finalScore');
+        const bestScoreEl = document.getElementById('bestScore');
+        const speedDisplay = document.getElementById('speedDisplay');
+        
+        function moveLeft() {
+            if (!gameRunning) return;
+            carX = Math.max(30, carX - 40);
+            car.style.left = carX + 'px';
+            car.style.transform = 'translateX(-20%) rotate(90deg)';
+        }
+        
+        function moveRight() {
+            if (!gameRunning) return;
+            carX = Math.min(270, carX + 40);
+            car.style.left = carX + 'px';
+            car.style.transform = 'translateX(-20%) rotate(90deg)';
+        }
+        
+        function moveUp() {
+            if (!gameRunning) return;
+            carY = Math.min(400, carY + 40);
+            car.style.bottom = carY + 'px';
+        }
+        
+        function moveDown() {
+            if (!gameRunning) return;
+            carY = Math.max(20, carY - 40);
+            car.style.bottom = carY + 'px';
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') moveLeft();
+            if (e.key === 'ArrowRight') moveRight();
+            if (e.key === 'ArrowUp') { e.preventDefault(); moveUp(); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); moveDown(); }
+        });
+        
+        function createObstacle() {
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.textContent = ['🌲', '🪨', '🚕', '🚌', '🛻'][Math.floor(Math.random() * 5)];
+            obstacle.style.left = (Math.random() * 240 + 20) + 'px';
+            obstacle.style.top = '-50px';
+            gameArea.appendChild(obstacle);
+            obstacles.push({ el: obstacle, y: -50 });
+        }
+        
+        function update() {
+            if (!gameRunning) return;
+            
+            score++;
+            scoreEl.textContent = score;
+            
+            // Increase speed every 200 points
+            speed = 2 + Math.floor(score / 200);
+            speedDisplay.textContent = speed - 1;
+            
+            // Move obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].y += speed;
+                obstacles[i].el.style.top = obstacles[i].y + 'px';
+                
+                // Check collision using bounding boxes
+                const carRect = car.getBoundingClientRect();
+                const obsRect = obstacles[i].el.getBoundingClientRect();
+                
+                // Shrink hitboxes for fairer collision (more forgiving)
+                const padding = 12;
+                if (
+                    carRect.left + padding < obsRect.right - padding &&
+                    carRect.right - padding > obsRect.left + padding &&
+                    carRect.top + padding < obsRect.bottom - padding &&
+                    carRect.bottom - padding > obsRect.top + padding
+                ) {
+                    endGame();
+                    return;
+                }
+                
+                // Remove off-screen
+                if (obstacles[i].y > 520) {
+                    obstacles[i].el.remove();
+                    obstacles.splice(i, 1);
+                }
+            }
+            
+            // Spawn new obstacles (more frequent as speed increases)
+            if (Math.random() < 0.01 + (speed * 0.005)) createObstacle();
+        }
+        
+        function startGame() {
+            // Reset
+            obstacles.forEach(o => o.el.remove());
+            obstacles = [];
+            score = 0;
+            speed = 2;
+            carX = 150;
+            carY = 20;
+            car.style.left = '50%';
+            car.style.bottom = '20px';
+            car.style.transform = 'translateX(-20%) rotate(90deg)';
+            scoreEl.textContent = '0';
+            gameOverEl.style.display = 'none';
+            gameRunning = true;
+            
+            // Hide start button while playing
+            const mainStartBtn = document.getElementById('mainStartBtn');
+            if (mainStartBtn) {
+                mainStartBtn.textContent = '🎮 Playing...';
+                mainStartBtn.disabled = true;
+                mainStartBtn.style.opacity = '0.6';
+            }
+            
+            gameLoop = setInterval(update, 30);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            
+            if (score > bestScore) bestScore = score;
+            
+            finalScoreEl.textContent = score;
+            bestScoreEl.textContent = bestScore;
+            gameOverEl.style.display = 'block';
+            
+            // Re-enable start button
+            const mainStartBtn = document.getElementById('mainStartBtn');
+            if (mainStartBtn) {
+                mainStartBtn.textContent = 'Start Game';
+                mainStartBtn.disabled = false;
+                mainStartBtn.style.opacity = '1';
+            }
+        }
+    </script>
+</body>
+</html>

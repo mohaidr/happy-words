@@ -64,7 +64,49 @@
             <button class="back-button hidden" id="backButton" onclick="goBack()">
                 ← Change Name
             </button>
+
+            <!-- Game Button -->
+            <button class="game-button hidden" id="gameButton" onclick="window.location.href='game.html'">
+                🚗 Play Car Game! 🏁
+            </button>
         </main>
+
+        <!-- Car Game Container -->
+        <div class="game-container hidden" id="gameContainer">
+            <div class="game-header">
+                <div class="game-score">Score: <span id="gameScore">0</span></div>
+                <div class="game-speed">Speed: <span id="gameSpeed">1</span>x</div>
+                <button class="game-close-btn" onclick="exitCarGame()">✕</button>
+            </div>
+            <div class="game-road" id="gameRoad">
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="car" id="playerCar">🚗</div>
+            </div>
+            <div class="game-controls">
+                <button class="game-control-btn" ontouchstart="moveCarLeft()" onmousedown="moveCarLeft()">⬅️</button>
+                <button class="game-control-btn" ontouchstart="moveCarRight()" onmousedown="moveCarRight()">➡️</button>
+            </div>
+            <div class="game-instructions">Use ← → arrow keys or buttons to move!</div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="game-over-modal hidden" id="gameOverModal">
+            <div class="game-over-content">
+                <h2>🏁 Game Over! 🏁</h2>
+                <div class="final-score">
+                    <span class="score-emoji">⭐</span>
+                    <span id="finalScore">0</span>
+                    <span class="score-emoji">⭐</span>
+                </div>
+                <p class="high-score">🏆 Best: <span id="highScore">0</span></p>
+                <div class="game-over-buttons">
+                    <button class="play-again-btn" onclick="restartCarGame()">🔄 Play Again!</button>
+                    <button class="exit-game-btn" onclick="exitCarGame()">👋 Exit</button>
+                </div>
+            </div>
+        </div>
 
         <div class="decorations">
             <span class="star star1">⭐</span>
