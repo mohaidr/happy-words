@@ -30,6 +30,7 @@
             overflow: hidden;
             border: 4px solid #222;
             border-radius: 10px;
+            touch-action: none;
         }
         
         /* Road lines */
@@ -61,7 +62,7 @@
             left: 50%;
             transform: translateX(-20%) rotate(90deg);
             font-size: 40px;
-            transition: left 0.1s, bottom 0.1s;
+            transition: left 0.08s ease-out, bottom 0.08s ease-out;
         }
         
         .obstacle {
@@ -91,9 +92,12 @@
             border-radius: 10px;
             background: #feca57;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
         }
         
-        .controls button:hover { background: #ff9f43; }
+        .controls button:hover, .controls button:active { background: #ff9f43; }
         
         #startBtn, #mainStartBtn {
             margin-top: 15px;
@@ -153,15 +157,15 @@
     </div>
     
     <div class="controls">
-        <button onclick="moveUp()">⬆️</button>
+        <button data-action="moveUp" onclick="moveUp()">⬆️</button>
         <div class="controls-row">
-            <button onclick="moveLeft()">⬅️</button>
-            <button onclick="moveRight()">➡️</button>
+            <button data-action="moveLeft" onclick="moveLeft()">⬅️</button>
+            <button data-action="moveRight" onclick="moveRight()">➡️</button>
         </div>
-        <button onclick="moveDown()">⬇️</button>
+        <button data-action="moveDown" onclick="moveDown()">⬇️</button>
     </div>
     
-    <p class="info">Use arrow keys or buttons to move</p>
+    <p class="info">Use arrow keys, buttons, or swipe to move</p>
     <button id="mainStartBtn" onclick="startGame()">Start Game</button>
 
     <script>
@@ -182,29 +186,31 @@
         const bestScoreEl = document.getElementById('bestScore');
         const speedDisplay = document.getElementById('speedDisplay');
         
+        const moveStep = 25; // Smaller steps = smoother movement
+        
         function moveLeft() {
             if (!gameRunning) return;
-            carX = Math.max(30, carX - 40);
+            carX = Math.max(30, carX - moveStep);
             car.style.left = carX + 'px';
             car.style.transform = 'translateX(-20%) rotate(90deg)';
         }
         
         function moveRight() {
             if (!gameRunning) return;
-            carX = Math.min(270, carX + 40);
+            carX = Math.min(270, carX + moveStep);
             car.style.left = carX + 'px';
             car.style.transform = 'translateX(-20%) rotate(90deg)';
         }
         
         function moveUp() {
             if (!gameRunning) return;
-            carY = Math.min(400, carY + 40);
+            carY = Math.min(400, carY + moveStep);
             car.style.bottom = carY + 'px';
         }
         
         function moveDown() {
             if (!gameRunning) return;
-            carY = Math.max(20, carY - 40);
+            carY = Math.max(20, carY - moveStep);
             car.style.bottom = carY + 'px';
         }
         
@@ -213,6 +219,74 @@
             if (e.key === 'ArrowRight') moveRight();
             if (e.key === 'ArrowUp') { e.preventDefault(); moveUp(); }
             if (e.key === 'ArrowDown') { e.preventDefault(); moveDown(); }
+        });
+        
+        // Smooth touch controls
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let lastMoveX = 0;
+        let lastMoveY = 0;
+        
+        gameArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            lastMoveX = touchStartX;
+            lastMoveY = touchStartY;
+        }, { passive: true });
+        
+        // Continuous movement while dragging
+        gameArea.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!gameRunning) return;
+            
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            
+            const diffX = touchX - lastMoveX;
+            const diffY = touchY - lastMoveY;
+            
+            const threshold = 15; // Pixels to trigger movement (responsive)
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) moveRight();
+                else moveLeft();
+                lastMoveX = touchX;
+            }
+            
+            if (Math.abs(diffY) > threshold) {
+                if (diffY > 0) moveDown();
+                else moveUp();
+                lastMoveY = touchY;
+            }
+        }, { passive: false });
+        
+        // Touch-hold support for D-pad buttons
+        let holdInterval = null;
+        
+        function startHold(action) {
+            action(); // Immediate first action
+            holdInterval = setInterval(action, 80); // Fast repeat while holding
+        }
+        
+        function stopHold() {
+            if (holdInterval) {
+                clearInterval(holdInterval);
+                holdInterval = null;
+            }
+        }
+        
+        // Apply touch-hold to all control buttons
+        document.querySelectorAll('.controls button').forEach(btn => {
+            const action = btn.getAttribute('data-action');
+            
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const actionFn = window[action];
+                if (actionFn) startHold(actionFn);
+            });
+            
+            btn.addEventListener('touchend', stopHold);
+            btn.addEventListener('touchcancel', stopHold);
         });
         
         function createObstacle() {
