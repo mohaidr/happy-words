@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Spotter 🔷</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .target-area {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .target-label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .target-shape {
+            font-size: 50px;
+        }
+        
+        .target-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .game-area {
+            width: 340px;
+            height: 340px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            position: relative;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            font-size: 45px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .shape:hover {
+            transform: scale(1.2);
+        }
+        
+        .shape.correct {
+            animation: pop 0.5s ease forwards;
+        }
+        
+        .shape.wrong {
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .progress-bar {
+            width: 340px;
+            height: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .found-display {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .message {
+            font-size: 22px;
+            margin-bottom: 15px;
+            min-height: 30px;
+            text-align: center;
+        }
+        
+        button.btn {
+            background: linear-gradient(145deg, #fdcb6e, #f39c12);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(253,203,110,0.4);
+        }
+        
+        button.btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(253,203,110,0.6);
+        }
+        
+        .high-score {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,215,0,0.3);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        #gameOver p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        
+        .new-high {
+            color: #ffd700;
+            font-weight: bold;
+            animation: glow 1s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>🔷 Shape Spotter</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Round: <span id="round">1</span>/5</div>
+        <div>⏱️ <span id="time">30</span>s</div>
+    </div>
+    
+    <div class="target-area">
+        <div class="target-label">Find all the:</div>
+        <div class="target-shape" id="targetShape">⭐</div>
+        <div class="target-name" id="targetName">Stars</div>
+    </div>
+    
+    <div class="game-area" id="gameArea"></div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <div class="found-display">Found: <span id="found">0</span>/<span id="total">5</span></div>
+    
+    <div class="message" id="message"></div>
+    
+    <button class="btn" id="startBtn">Start Game</button>
+    
+    <div class="high-score" id="highScoreDisplay">Best: -- points</div>
+    
+    <div id="gameOver">
+        <h2>🔷 Great Spotting!</h2>
+        <p>Score: <span id="finalScore">0</span></p>
+        <p>Shapes Found: <span id="totalFound">0</span></p>
+        <p id="highScoreMsg"></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+        const shapes = [
+            { emoji: '⭐', name: 'Stars' },
+            { emoji: '❤️', name: 'Hearts' },
+            { emoji: '🔵', name: 'Circles' },
+            { emoji: '🟢', name: 'Green Circles' },
+            { emoji: '🔴', name: 'Red Circles' },
+            { emoji: '🟡', name: 'Yellow Circles' },
+            { emoji: '🔷', name: 'Diamonds' },
+            { emoji: '🔶', name: 'Orange Diamonds' },
+            { emoji: '🟥', name: 'Red Squares' },
+            { emoji: '🟦', name: 'Blue Squares' },
+            { emoji: '🟩', name: 'Green Squares' },
+            { emoji: '🔺', name: 'Triangles' },
+        ];
+        
+        let score = 0;
+        let round = 0;
+        let totalRounds = 5;
+        let targetShape = null;
+        let targetCount = 0;
+        let foundCount = 0;
+        let totalShapesFound = 0;
+        let timeLeft = 30;
+        let timerLoop = null;
+        let gameRunning = false;
+        
+        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // High score system
+        const GAME_KEY = 'shapeSpotter';
+        
+        function loadHighScore() {
+            const saved = localStorage.getItem(GAME_KEY + '_highScore');
+            if (saved) {
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
+            }
+        }
+        
+        function saveHighScore(score) {
+            const current = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+            if (score > current) {
+                localStorage.setItem(GAME_KEY + '_highScore', score);
+                return true;
+            }
+            return false;
+        }
+        
+        function getShapesForGrade() {
+            if (gradeLevel === 'kg') {
+                return shapes.slice(0, 6); // Basic shapes
+            }
+            return shapes;
+        }
+        
+        function loadRound() {
+            round++;
+            document.getElementById('round').textContent = round;
+            
+            const availableShapes = getShapesForGrade();
+            
+            // Pick target shape
+            targetShape = availableShapes[Math.floor(Math.random() * availableShapes.length)];
+            document.getElementById('targetShape').textContent = targetShape.emoji;
+            document.getElementById('targetName').textContent = targetShape.name;
+            
+            // Determine counts based on grade
+            targetCount = gradeLevel === 'kg' ? 3 : (gradeLevel === 'g1-3' ? 4 : 5);
+            const distractorCount = gradeLevel === 'kg' ? 5 : (gradeLevel === 'g1-3' ? 8 : 12);
+            
+            foundCount = 0;
+            document.getElementById('found').textContent = '0';
+            document.getElementById('total').textContent = targetCount;
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Clear game area
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = '';
+            
+            // Generate positions (avoid overlap)
+            const positions = [];
+            const shapeSize = 50;
+            const padding = 10;
+            const maxX = 340 - shapeSize - padding;
+            const maxY = 340 - shapeSize - padding;
+            
+            function getRandomPosition() {
+                let attempts = 0;
+                while (attempts < 50) {
+                    const x = Math.random() * maxX + padding;
+                    const y = Math.random() * maxY + padding;
+                    
+                    // Check for overlap
+                    let overlap = false;
+                    for (const pos of positions) {
+                        const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+                        if (dist < shapeSize) {
+                            overlap = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!overlap) {
+                        positions.push({ x, y });
+                        return { x, y };
+                    }
+                    attempts++;
+                }
+                // Fallback
+                const x = Math.random() * maxX + padding;
+                const y = Math.random() * maxY + padding;
+                positions.push({ x, y });
+                return { x, y };
+            }
+            
+            // Add target shapes
+            for (let i = 0; i < targetCount; i++) {
+                const pos = getRandomPosition();
+                createShape(targetShape.emoji, pos.x, pos.y, true);
+            }
+            
+            // Add distractor shapes
+            const distractors = availableShapes.filter(s => s.emoji !== targetShape.emoji);
+            for (let i = 0; i < distractorCount; i++) {
+                const pos = getRandomPosition();
+                const distractor = distractors[Math.floor(Math.random() * distractors.length)];
+                createShape(distractor.emoji, pos.x, pos.y, false);
+            }
+            
+            // Start/reset timer
+            timeLeft = gradeLevel === 'kg' ? 40 : 30;
+            document.getElementById('time').textContent = timeLeft;
+            
+            document.getElementById('message').textContent = '';
+        }
+        
+        function createShape(emoji, x, y, isTarget) {
+            const shape = document.createElement('div');
+            shape.className = 'shape';
+            shape.textContent = emoji;
+            shape.style.left = x + 'px';
+            shape.style.top = y + 'px';
+            shape.dataset.isTarget = isTarget;
+            
+            shape.onclick = () => handleTap(shape, isTarget);
+            shape.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleTap(shape, isTarget);
+            });
+            
+            document.getElementById('gameArea').appendChild(shape);
+        }
+        
+        function handleTap(shape, isTarget) {
+            if (!gameRunning || shape.classList.contains('correct') || shape.classList.contains('wrong')) return;
+            
+            if (isTarget) {
+                // Correct!
+                shape.classList.add('correct');
+                foundCount++;
+                totalShapesFound++;
+                document.getElementById('found').textContent = foundCount;
+                document.getElementById('progressFill').style.width = (foundCount / targetCount * 100) + '%';
+                
+                score += 10 + Math.floor(timeLeft / 2); // Time bonus
+                document.getElementById('score').textContent = score;
+                
+                // Check if all found
+                if (foundCount >= targetCount) {
+                    document.getElementById('message').textContent = '✨ All found! +20 bonus!';
+                    score += 20;
+                    document.getElementById('score').textContent = score;
+                    
+                    setTimeout(() => {
+                        if (round < totalRounds) {
+                            loadRound();
+                        } else {
+                            endGame();
+                        }
+                    }, 1000);
+                }
+            } else {
+                // Wrong
+                shape.classList.add('wrong');
+                score = Math.max(0, score - 5);
+                document.getElementById('score').textContent = score;
+                document.getElementById('message').textContent = '❌ Not that one!';
+                
+                setTimeout(() => {
+                    shape.classList.remove('wrong');
+                    document.getElementById('message').textContent = '';
+                }, 500);
+            }
+        }
+        
+        function startTimer() {
+            timerLoop = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    // Time up for this round
+                    if (round < totalRounds) {
+                        document.getElementById('message').textContent = '⏰ Time up!';
+                        setTimeout(() => loadRound(), 1000);
+                    } else {
+                        endGame();
+                    }
+                }
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerLoop) {
+                clearInterval(timerLoop);
+                timerLoop = null;
+            }
+        }
+        
+        function startGame() {
+            score = 0;
+            round = 0;
+            totalShapesFound = 0;
+            gameRunning = true;
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'none';
+            
+            loadRound();
+            startTimer();
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            stopTimer();
+            
+            const isNewHigh = saveHighScore(score);
+            loadHighScore();
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('totalFound').textContent = totalShapesFound;
+            
+            const highMsg = document.getElementById('highScoreMsg');
+            if (isNewHigh) {
+                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+            } else {
+                highMsg.textContent = 'Great spotting, ' + playerName + '!';
+            }
+            
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('startBtn').style.display = 'block';
+        }
+        
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        
+        // Initialize
+        loadHighScore();
+    </script>
+</body>
+</html>

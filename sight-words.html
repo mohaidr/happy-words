@@ -282,6 +282,20 @@
         const GAME_KEY = 'sightWords';
         let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
         let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        let gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Grade-filtered sight words
+        function getSightWords() {
+            if (gradeLevel === 'kg') {
+                // KG: Only the most basic pre-primer words
+                return sightWords.slice(0, 20);
+            } else if (gradeLevel === 'g1-3') {
+                // Grade 1-3: Pre-primer through primer
+                return sightWords.slice(0, 44);
+            }
+            // Grade 3-6: All words
+            return sightWords;
+        }
         
         const gameArea = document.getElementById('gameArea');
         const targetWordEl = document.getElementById('targetWord');
@@ -295,7 +309,8 @@
         
         function getDistractors(target, count) {
             const distractors = [];
-            const available = sightWords.filter(w => w !== target);
+            const words = getSightWords();
+            const available = words.filter(w => w !== target);
             
             while (distractors.length < count) {
                 const word = available[Math.floor(Math.random() * available.length)];
@@ -311,7 +326,8 @@
             gameArea.innerHTML = '';
             
             // Pick target word
-            targetWord = sightWords[Math.floor(Math.random() * sightWords.length)];
+            const availableWords = getSightWords();
+            targetWord = availableWords[Math.floor(Math.random() * availableWords.length)];
             targetWordEl.textContent = targetWord.toUpperCase();
             
             // Determine count based on level
@@ -324,29 +340,29 @@
             totalEl.textContent = targetCount;
             
             // Create word cards
-            const words = [];
+            const wordCards = [];
             
             // Add target words
             for (let i = 0; i < targetCount; i++) {
-                words.push({ word: targetWord, isTarget: true });
+                wordCards.push({ word: targetWord, isTarget: true });
             }
             
             // Add distractors
             const distractors = getDistractors(targetWord, distractorCount);
             distractors.forEach(d => {
-                words.push({ word: d, isTarget: false });
+                wordCards.push({ word: d, isTarget: false });
             });
             
             // Shuffle
-            words.sort(() => Math.random() - 0.5);
+            wordCards.sort(() => Math.random() - 0.5);
             
             // Position cards in a grid-like pattern to avoid overlaps
             const cols = 3;
-            const rows = Math.ceil(words.length / cols);
+            const rows = Math.ceil(wordCards.length / cols);
             const cellWidth = 110;
             const cellHeight = 80;
             
-            words.forEach((item, index) => {
+            wordCards.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = `word-card ${item.isTarget ? 'target' : 'distractor'}`;
                 card.textContent = item.word.toUpperCase();

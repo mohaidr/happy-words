@@ -330,6 +330,27 @@
         let draggedItem = null;
         
         const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Get categories based on grade level
+        function getCategories() {
+            if (gradeLevel === 'kg') {
+                // KG: Only the simplest, most obvious categories
+                return categories.slice(0, 2); // Animals vs Food, Land vs Water
+            } else if (gradeLevel === 'g1-3') {
+                // Grade 1-3: More categories
+                return categories.slice(0, 4);
+            }
+            // Grade 3-6: All categories
+            return categories;
+        }
+        
+        // Get number of items per bin based on grade
+        function getItemsPerBin() {
+            if (gradeLevel === 'kg') return 2;
+            if (gradeLevel === 'g1-3') return 3;
+            return 3;
+        }
         
         function loadHighScore() {
             const saved = localStorage.getItem('sortingFun_highScore');
@@ -367,8 +388,9 @@
         }
         
         function setupRound() {
-            // Pick random category
-            const availableCategories = categories.filter(c => c !== currentCategory);
+            // Pick random category based on grade
+            const gradeCategories = getCategories();
+            const availableCategories = gradeCategories.filter(c => c !== currentCategory);
             currentCategory = availableCategories[Math.floor(Math.random() * availableCategories.length)];
             
             document.getElementById('categoryName').textContent = currentCategory.name;
@@ -413,8 +435,9 @@
             
             // Setup items
             itemsToSort = [];
+            const itemsPerBin = getItemsPerBin();
             currentCategory.bins.forEach((binData, binIndex) => {
-                const selectedItems = shuffle(binData.items).slice(0, 3);
+                const selectedItems = shuffle(binData.items).slice(0, itemsPerBin);
                 selectedItems.forEach(item => {
                     itemsToSort.push({ emoji: item, correctBin: binIndex });
                 });

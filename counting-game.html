@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counting Game 🔢</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .question {
+            font-size: 22px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .objects-container {
+            width: 320px;
+            height: 200px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .object {
+            font-size: 40px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        .object:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .answers {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .answer-btn {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, #48dbfb, #0abde3);
+            border: none;
+            border-radius: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(72,219,251,0.4);
+        }
+        
+        .answer-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .answer-btn.correct {
+            background: linear-gradient(145deg, #00d084, #00a65a);
+            animation: correctPulse 0.5s ease;
+        }
+        
+        .answer-btn.wrong {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .message {
+            font-size: 24px;
+            margin-bottom: 15px;
+            min-height: 35px;
+            text-align: center;
+        }
+        
+        button.btn {
+            background: linear-gradient(145deg, #f093fb, #f5576c);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(240,147,251,0.4);
+        }
+        
+        button.btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(240,147,251,0.6);
+        }
+        
+        .high-score {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,215,0,0.3);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        #gameOver p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        
+        .new-high {
+            color: #ffd700;
+            font-weight: bold;
+            animation: glow 1s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700; }
+        }
+        
+        .streak {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>🔢 Counting Game</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Round: <span id="round">1</span>/10</div>
+        <div class="streak">🔥 <span id="streak">0</span></div>
+    </div>
+    
+    <div class="question" id="question">How many do you see?</div>
+    
+    <div class="objects-container" id="objectsContainer"></div>
+    
+    <div class="answers" id="answers"></div>
+    
+    <div class="message" id="message"></div>
+    
+    <button class="btn" id="startBtn">Start Game</button>
+    
+    <div class="high-score" id="highScoreDisplay">Best: -- points</div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Counting!</h2>
+        <p>Score: <span id="finalScore">0</span></p>
+        <p>Best Streak: <span id="bestStreak">0</span> 🔥</p>
+        <p id="highScoreMsg"></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+        const emojis = ['🍎', '⭐', '🌸', '🐶', '🎈', '🦋', '🍕', '🚗', '🌈', '🎁', '🐱', '🍦', '🌻', '🐸', '⚽'];
+        
+        let score = 0;
+        let round = 0;
+        let streak = 0;
+        let bestStreak = 0;
+        let totalRounds = 10;
+        let currentCount = 0;
+        let gameRunning = false;
+        let canClick = true;
+        
+        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // High score system
+        const GAME_KEY = 'countingGame';
+        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+        
+        function loadHighScore() {
+            const saved = localStorage.getItem(GAME_KEY + '_highScore');
+            if (saved) {
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
+            }
+        }
+        
+        function saveHighScore(score) {
+            const current = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+            if (score > current) {
+                localStorage.setItem(GAME_KEY + '_highScore', score);
+                return true;
+            }
+            return false;
+        }
+        
+        function getMaxCount() {
+            if (gradeLevel === 'kg') return 5;
+            if (gradeLevel === 'g1-3') return 10;
+            return 15;
+        }
+        
+        function loadRound() {
+            round++;
+            document.getElementById('round').textContent = round;
+            canClick = true;
+            
+            // Pick random emoji and count
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const maxCount = getMaxCount();
+            const minCount = gradeLevel === 'kg' ? 1 : 2;
+            currentCount = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+            
+            // Display objects
+            const container = document.getElementById('objectsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < currentCount; i++) {
+                const obj = document.createElement('span');
+                obj.className = 'object';
+                obj.textContent = emoji;
+                obj.style.animationDelay = (i * 0.1) + 's';
+                container.appendChild(obj);
+            }
+            
+            // Update question
+            document.getElementById('question').textContent = `How many ${emoji} do you see?`;
+            
+            // Generate answer options
+            const answers = [currentCount];
+            const numOptions = gradeLevel === 'kg' ? 3 : 4;
+            
+            while (answers.length < numOptions) {
+                let wrong = currentCount + Math.floor(Math.random() * 5) - 2;
+                if (wrong < 1) wrong = currentCount + Math.floor(Math.random() * 3) + 1;
+                if (wrong !== currentCount && !answers.includes(wrong) && wrong > 0) {
+                    answers.push(wrong);
+                }
+            }
+            
+            // Shuffle answers
+            answers.sort(() => Math.random() - 0.5);
+            
+            // Create answer buttons
+            const answersEl = document.getElementById('answers');
+            answersEl.innerHTML = '';
+            answersEl.style.gridTemplateColumns = `repeat(${numOptions}, 1fr)`;
+            
+            answers.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = num;
+                btn.onclick = () => checkAnswer(num, btn);
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    checkAnswer(num, btn);
+                });
+                answersEl.appendChild(btn);
+            });
+            
+            document.getElementById('message').textContent = '';
+        }
+        
+        function checkAnswer(num, btn) {
+            if (!gameRunning || !canClick) return;
+            canClick = false;
+            
+            if (num === currentCount) {
+                // Correct!
+                streak++;
+                if (streak > bestStreak) bestStreak = streak;
+                document.getElementById('streak').textContent = streak;
+                
+                const bonus = streak > 2 ? streak * 5 : 0;
+                score += 10 + bonus;
+                document.getElementById('score').textContent = score;
+                document.getElementById('message').textContent = streak > 2 ? `✨ Correct! +${bonus} streak bonus!` : '✨ Correct!';
+                btn.classList.add('correct');
+                
+                setTimeout(() => {
+                    btn.classList.remove('correct');
+                    if (round < totalRounds) {
+                        loadRound();
+                    } else {
+                        endGame();
+                    }
+                }, 800);
+            } else {
+                // Wrong
+                streak = 0;
+                document.getElementById('streak').textContent = '0';
+                document.getElementById('message').textContent = `❌ It was ${currentCount}!`;
+                btn.classList.add('wrong');
+                
+                // Show correct answer
+                document.querySelectorAll('.answer-btn').forEach(b => {
+                    if (parseInt(b.textContent) === currentCount) {
+                        b.classList.add('correct');
+                    }
+                });
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.answer-btn').forEach(b => {
+                        b.classList.remove('wrong', 'correct');
+                    });
+                    if (round < totalRounds) {
+                        loadRound();
+                    } else {
+                        endGame();
+                    }
+                }, 1200);
+            }
+        }
+        
+        function startGame() {
+            score = 0;
+            round = 0;
+            streak = 0;
+            bestStreak = 0;
+            gameRunning = true;
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('streak').textContent = '0';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'none';
+            
+            loadRound();
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            
+            const isNewHigh = saveHighScore(score);
+            loadHighScore();
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('bestStreak').textContent = bestStreak;
+            
+            const highMsg = document.getElementById('highScoreMsg');
+            if (isNewHigh) {
+                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+            } else {
+                highMsg.textContent = 'Great counting, ' + playerName + '!';
+            }
+            
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('startBtn').style.display = 'block';
+        }
+        
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        
+        // Initialize
+        loadHighScore();
+    </script>
+</body>
+</html>

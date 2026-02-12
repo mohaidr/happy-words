@@ -244,17 +244,55 @@
         const GAME_KEY = 'numberMuncher';
         let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
         let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        let gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
         
-        const rules = [
+        // Grade-specific rules
+        const rulesKG = [
+            { name: "numbers less than 5", check: n => n < 5 },
+            { name: "numbers greater than 5", check: n => n > 5 },
+            { name: "the number 1", check: n => n === 1 },
+            { name: "the number 5", check: n => n === 5 },
+        ];
+        
+        const rulesG13 = [
             { name: "even numbers", check: n => n % 2 === 0 },
             { name: "odd numbers", check: n => n % 2 !== 0 },
-            { name: "multiples of 3", check: n => n % 3 === 0 },
             { name: "multiples of 5", check: n => n % 5 === 0 },
             { name: "numbers less than 10", check: n => n < 10 },
             { name: "numbers greater than 15", check: n => n > 15 },
-            { name: "multiples of 4", check: n => n % 4 === 0 },
             { name: "numbers between 10-20", check: n => n >= 10 && n <= 20 },
         ];
+        
+        const rulesG36 = [
+            { name: "even numbers", check: n => n % 2 === 0 },
+            { name: "odd numbers", check: n => n % 2 !== 0 },
+            { name: "multiples of 3", check: n => n % 3 === 0 },
+            { name: "multiples of 4", check: n => n % 4 === 0 },
+            { name: "multiples of 6", check: n => n % 6 === 0 },
+            { name: "multiples of 7", check: n => n % 7 === 0 },
+            { name: "prime numbers", check: n => isPrime(n) },
+            { name: "square numbers", check: n => Math.sqrt(n) % 1 === 0 },
+        ];
+        
+        function isPrime(n) {
+            if (n < 2) return false;
+            for (let i = 2; i <= Math.sqrt(n); i++) {
+                if (n % i === 0) return false;
+            }
+            return true;
+        }
+        
+        function getRules() {
+            if (gradeLevel === 'kg') return rulesKG;
+            if (gradeLevel === 'g1-3') return rulesG13;
+            return rulesG36;
+        }
+        
+        function getNumberRange() {
+            if (gradeLevel === 'kg') return 10;
+            if (gradeLevel === 'g1-3') return 30;
+            return 50;
+        }
         
         const gameArea = document.getElementById('gameArea');
         const muncher = document.getElementById('muncher');
@@ -272,6 +310,7 @@
             // Generate 20 numbers for 4x5 grid
             const numbers = [];
             let correctNumbers = 0;
+            const maxNum = getNumberRange();
             
             // Ensure at least 5 correct answers
             while (numbers.length < 20) {
@@ -279,11 +318,11 @@
                 if (correctNumbers < 5 && numbers.length < 15) {
                     // Force some correct answers
                     do {
-                        num = Math.floor(Math.random() * 30) + 1;
+                        num = Math.floor(Math.random() * maxNum) + 1;
                     } while (!currentRule.check(num) || numbers.includes(num));
                     correctNumbers++;
                 } else {
-                    num = Math.floor(Math.random() * 30) + 1;
+                    num = Math.floor(Math.random() * maxNum) + 1;
                     if (!numbers.includes(num)) {
                         if (currentRule.check(num)) correctNumbers++;
                     } else {
@@ -355,6 +394,7 @@
             
             // New rule every 2 levels
             if (level % 2 === 1) {
+                const rules = getRules();
                 currentRule = rules[Math.floor(Math.random() * rules.length)];
                 ruleText.textContent = currentRule.name;
             }
@@ -382,6 +422,7 @@
             startBtn.style.display = 'none';
             
             // Pick random rule
+            const rules = getRules();
             currentRule = rules[Math.floor(Math.random() * rules.length)];
             ruleText.textContent = currentRule.name;
             

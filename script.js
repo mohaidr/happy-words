@@ -169,6 +169,7 @@ const categoryLabels = {
 // Track app state
 let lastIndex = -1;
 let studentName = "Friend";
+let currentGrade = "kg";
 let currentCategory = "praise";
 let favorites = [];
 let streak = 0;
@@ -340,6 +341,13 @@ function updateStreakDisplay() {
     }
 }
 
+function selectGrade(grade) {
+    currentGrade = grade;
+    document.querySelectorAll('.grade-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.grade === grade);
+    });
+}
+
 function startApp() {
     const nameInput = document.getElementById('studentName');
     const nameContainer = document.getElementById('nameContainer');
@@ -353,6 +361,7 @@ function startApp() {
     
     // Save player name for games to use
     localStorage.setItem('happyWordsPlayerName', studentName);
+    localStorage.setItem('happyWordsGradeLevel', currentGrade);
 
     // Hide name input, show the main app
     nameContainer.classList.add('hidden');
@@ -798,6 +807,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load voices for speech synthesis
     if ('speechSynthesis' in window) {
         speechSynthesis.getVoices();
+    }
+    
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => {
+                console.log('Service Worker registered:', registration.scope);
+            })
+            .catch(error => {
+                console.log('Service Worker registration failed:', error);
+            });
     }
 });
 

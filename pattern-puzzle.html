@@ -276,6 +276,17 @@
         let isShowingPattern = false;
         
         const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Get flash duration based on grade (slower for younger kids)
+        function getFlashDuration() {
+            if (gradeLevel === 'kg') {
+                return Math.max(400, 700 - level * 15);
+            } else if (gradeLevel === 'g1-3') {
+                return Math.max(300, 500 - level * 20);
+            }
+            return Math.max(200, 400 - level * 25);
+        }
         
         function loadHighScore() {
             const saved = localStorage.getItem('patternPuzzle_highScore');
@@ -357,7 +368,7 @@
             await new Promise(r => setTimeout(r, 500));
             
             for (const color of pattern) {
-                await flashButton(color, Math.max(300, 500 - level * 20));
+                await flashButton(color, getFlashDuration());
             }
             
             isShowingPattern = false;

@@ -289,6 +289,14 @@
         const GAME_KEY = 'carGame';
         let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
         let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Adjust initial speed and obstacle frequency based on grade
+        function getInitialSpeed() {
+            if (gradeLevel === 'kg') return 1.5;
+            if (gradeLevel === 'g1-3') return 2;
+            return 2.5;
+        }
         
         const car = document.getElementById('car');
         const gameArea = document.getElementById('gameArea');
@@ -469,7 +477,7 @@
             obstacles.forEach(o => o.el.remove());
             obstacles = [];
             score = 0;
-            speed = 2;
+            speed = getInitialSpeed();
             carX = 150;
             carY = 20;
             car.style.left = '50%';

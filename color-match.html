@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Match 🎨</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .color-word {
+            font-size: 48px;
+            font-weight: bold;
+            padding: 20px 40px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .instruction {
+            font-size: 18px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .colors-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 350px;
+            margin-bottom: 20px;
+        }
+        
+        .color-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            border: 4px solid rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.1);
+            border-color: white;
+        }
+        
+        .color-btn.correct {
+            animation: correctPulse 0.5s ease;
+            border-color: #00ff00;
+            box-shadow: 0 0 20px #00ff00;
+        }
+        
+        .color-btn.wrong {
+            animation: shake 0.5s ease;
+            border-color: #ff0000;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .message {
+            font-size: 24px;
+            margin-bottom: 15px;
+            min-height: 35px;
+            text-align: center;
+        }
+        
+        .streak-display {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        button.btn {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+        
+        button.btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.6);
+        }
+        
+        .high-score {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,215,0,0.3);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        #gameOver p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        
+        .new-high {
+            color: #ffd700;
+            font-weight: bold;
+            animation: glow 1s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700; }
+        }
+        
+        .lives {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>🎨 Color Match</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Round: <span id="round">1</span>/10</div>
+        <div class="lives">❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="color-word" id="colorWord">RED</div>
+    
+    <div class="instruction">Tap the color that matches the word!</div>
+    
+    <div class="colors-grid" id="colorsGrid"></div>
+    
+    <div class="message" id="message"></div>
+    
+    <button class="btn" id="startBtn">Start Game</button>
+    
+    <div class="high-score" id="highScoreDisplay">Best: -- points</div>
+    
+    <div id="gameOver">
+        <h2>🎨 Game Over!</h2>
+        <p>Score: <span id="finalScore">0</span></p>
+        <p id="highScoreMsg"></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+        const colors = [
+            { name: 'Red', hex: '#ff4444' },
+            { name: 'Blue', hex: '#4444ff' },
+            { name: 'Green', hex: '#44aa44' },
+            { name: 'Yellow', hex: '#ffdd00' },
+            { name: 'Orange', hex: '#ff8800' },
+            { name: 'Purple', hex: '#aa44aa' },
+            { name: 'Pink', hex: '#ff69b4' },
+            { name: 'Brown', hex: '#8b4513' },
+            { name: 'Black', hex: '#222222' },
+        ];
+        
+        let score = 0;
+        let round = 0;
+        let lives = 3;
+        let totalRounds = 10;
+        let currentColor = null;
+        let gameRunning = false;
+        let canClick = true;
+        
+        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // High score system
+        const GAME_KEY = 'colorMatch';
+        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+        
+        function loadHighScore() {
+            const saved = localStorage.getItem(GAME_KEY + '_highScore');
+            if (saved) {
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
+            }
+        }
+        
+        function saveHighScore(score) {
+            const current = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+            if (score > current) {
+                localStorage.setItem(GAME_KEY + '_highScore', score);
+                return true;
+            }
+            return false;
+        }
+        
+        function getColorsForGrade() {
+            if (gradeLevel === 'kg') {
+                return colors.slice(0, 6); // Basic colors only
+            }
+            return colors; // All colors
+        }
+        
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+        
+        function loadRound() {
+            round++;
+            document.getElementById('round').textContent = round;
+            canClick = true;
+            
+            const availableColors = getColorsForGrade();
+            
+            // Pick target color
+            currentColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+            
+            // Display the word (sometimes in a trick color for harder grades)
+            const wordEl = document.getElementById('colorWord');
+            wordEl.textContent = currentColor.name.toUpperCase();
+            
+            // For harder grades, sometimes show the word in a different color (Stroop effect)
+            if (gradeLevel === 'g3-6' && Math.random() < 0.4) {
+                const trickColors = availableColors.filter(c => c.name !== currentColor.name);
+                const trickColor = trickColors[Math.floor(Math.random() * trickColors.length)];
+                wordEl.style.color = trickColor.hex;
+            } else {
+                wordEl.style.color = 'white';
+            }
+            
+            // Create color buttons
+            const grid = document.getElementById('colorsGrid');
+            grid.innerHTML = '';
+            
+            // Select colors to show (always include correct answer)
+            let displayColors = [currentColor];
+            const others = shuffle(availableColors.filter(c => c.name !== currentColor.name));
+            
+            const numButtons = gradeLevel === 'kg' ? 4 : 6;
+            displayColors = displayColors.concat(others.slice(0, numButtons - 1));
+            displayColors = shuffle(displayColors);
+            
+            displayColors.forEach(color => {
+                const btn = document.createElement('div');
+                btn.className = 'color-btn';
+                btn.style.backgroundColor = color.hex;
+                btn.onclick = () => checkAnswer(color, btn);
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    checkAnswer(color, btn);
+                });
+                grid.appendChild(btn);
+            });
+            
+            document.getElementById('message').textContent = '';
+        }
+        
+        function checkAnswer(color, btn) {
+            if (!gameRunning || !canClick) return;
+            canClick = false;
+            
+            if (color.name === currentColor.name) {
+                // Correct!
+                score += 10;
+                document.getElementById('score').textContent = score;
+                document.getElementById('message').textContent = '✨ Correct!';
+                btn.classList.add('correct');
+                
+                setTimeout(() => {
+                    btn.classList.remove('correct');
+                    if (round < totalRounds) {
+                        loadRound();
+                    } else {
+                        endGame();
+                    }
+                }, 600);
+            } else {
+                // Wrong
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                document.getElementById('message').textContent = '❌ Try again!';
+                btn.classList.add('wrong');
+                
+                setTimeout(() => {
+                    btn.classList.remove('wrong');
+                    if (lives <= 0) {
+                        endGame();
+                    } else {
+                        canClick = true;
+                    }
+                }, 600);
+            }
+        }
+        
+        function startGame() {
+            score = 0;
+            round = 0;
+            lives = 3;
+            gameRunning = true;
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('lives').textContent = '3';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'none';
+            
+            loadRound();
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            
+            const isNewHigh = saveHighScore(score);
+            loadHighScore();
+            
+            document.getElementById('finalScore').textContent = score;
+            
+            const highMsg = document.getElementById('highScoreMsg');
+            if (isNewHigh) {
+                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+            } else {
+                highMsg.textContent = 'Great job, ' + playerName + '!';
+            }
+            
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('startBtn').style.display = 'block';
+        }
+        
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        
+        // Initialize
+        loadHighScore();
+    </script>
+</body>
+</html>

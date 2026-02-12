@@ -348,6 +348,42 @@ footer {
     box-shadow: 0 12px 30px rgba(72, 219, 251, 0.5);
 }
 
+.grade-label {
+    font-size: 1.3rem !important;
+    margin-top: 10px;
+}
+
+.grade-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.grade-btn {
+    background: rgba(118, 75, 162, 0.1);
+    border: 2px solid #764ba2;
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 500;
+    color: #764ba2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.grade-btn:hover {
+    background: rgba(118, 75, 162, 0.2);
+}
+
+.grade-btn.active {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+}
+
 .hidden {
     display: none !important;
 }
@@ -877,6 +913,23 @@ footer {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.category-title {
+    color: #fff;
+    font-size: 1.3rem;
+    margin: 25px 0 15px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.category-title:first-of-type {
+    margin-top: 10px;
+}
+
 .games-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -966,6 +1019,18 @@ footer {
 
 .game-card-emerald {
     background: linear-gradient(145deg, #11998e, #38ef7d);
+}
+
+.game-card-coral {
+    background: linear-gradient(145deg, #ff9a9e, #fecfef);
+}
+
+.game-card-lavender {
+    background: linear-gradient(145deg, #667eea, #764ba2);
+}
+
+.game-card-mint {
+    background: linear-gradient(145deg, #00b894, #00cec9);
 }
 
 /* Responsive games grid */

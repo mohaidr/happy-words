@@ -250,6 +250,23 @@
         let pairsNeeded = 8;
         
         const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Adjust available levels based on grade
+        function initGradeLevels() {
+            const levelBtns = document.querySelectorAll('.level-btn');
+            if (gradeLevel === 'kg') {
+                // KG: Only easy (6 pairs)
+                pairsNeeded = 6;
+                levelBtns.forEach(btn => {
+                    if (btn.dataset.level !== 'easy') btn.style.display = 'none';
+                });
+            } else if (gradeLevel === 'g1-3') {
+                // Grade 1-3: Easy (8) and Medium (12)
+                pairsNeeded = 8;
+            }
+            // Grade 3-6: All levels available (default)
+        }
         
         function getHighScoreKey() {
             return `memoryMatch_${currentLevel}_highScore`;
@@ -428,6 +445,7 @@
         document.getElementById('startBtn').addEventListener('click', startGame);
         
         // Initialize
+        initGradeLevels();
         loadHighScore();
     </script>
 </body>

@@ -286,6 +286,31 @@
         const GAME_KEY = 'rhymeTime';
         let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
         let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        let gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Grade-filtered rhyme groups
+        function getRhymeGroups() {
+            if (gradeLevel === 'kg') {
+                // KG: Simple short words only
+                return [
+                    ['cat', 'hat', 'bat', 'mat', 'rat'],
+                    ['dog', 'log', 'fog', 'hog'],
+                    ['sun', 'fun', 'run', 'bun'],
+                    ['bed', 'red', 'fed'],
+                    ['cup', 'up', 'pup'],
+                    ['ball', 'call', 'fall', 'tall'],
+                    ['car', 'star', 'far', 'jar'],
+                    ['hop', 'top', 'pop'],
+                    ['bug', 'hug', 'mug', 'rug'],
+                    ['fish', 'dish', 'wish'],
+                ];
+            } else if (gradeLevel === 'g1-3') {
+                // Grade 1-3: Medium difficulty
+                return rhymeGroups.slice(0, 14);
+            }
+            // Grade 3-6: All groups
+            return rhymeGroups;
+        }
         
         const mainWordEl = document.getElementById('mainWord');
         const choicesEl = document.getElementById('choices');
@@ -305,13 +330,15 @@
             roundEl.textContent = round;
             progressFill.style.width = (round / totalRounds * 100) + '%';
             
+            const groups = getRhymeGroups();
+            
             // Pick a random rhyme group
             let groupIndex, mainWord, rhymeWord;
             let attempts = 0;
             
             do {
-                groupIndex = Math.floor(Math.random() * rhymeGroups.length);
-                const group = rhymeGroups[groupIndex];
+                groupIndex = Math.floor(Math.random() * groups.length);
+                const group = groups[groupIndex];
                 const shuffled = [...group].sort(() => Math.random() - 0.5);
                 mainWord = shuffled[0];
                 rhymeWord = shuffled[1];
@@ -329,11 +356,11 @@
             while (wrongAnswers.length < 3) {
                 let wrongGroupIndex;
                 do {
-                    wrongGroupIndex = Math.floor(Math.random() * rhymeGroups.length);
+                    wrongGroupIndex = Math.floor(Math.random() * groups.length);
                 } while (usedGroups.includes(wrongGroupIndex));
                 
                 usedGroups.push(wrongGroupIndex);
-                const wrongWord = getRandomFromArray(rhymeGroups[wrongGroupIndex]);
+                const wrongWord = getRandomFromArray(groups[wrongGroupIndex]);
                 wrongAnswers.push(wrongWord);
             }
             
