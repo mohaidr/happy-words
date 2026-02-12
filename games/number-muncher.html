@@ -237,33 +237,52 @@
             // Clear existing cells (except muncher and game over)
             document.querySelectorAll('.number-cell').forEach(cell => cell.remove());
             
-            // Generate 20 numbers for 4x5 grid
-            const numbers = [];
-            let correctNumbers = 0;
             const maxNum = getNumberRange();
+            const gridSize = Math.min(20, maxNum); // Don't exceed available numbers
             
-            // Ensure at least 5 correct answers
-            while (numbers.length < 20) {
-                let num;
-                if (correctNumbers < 5 && numbers.length < 15) {
-                    // Force some correct answers
-                    do {
-                        num = Math.floor(Math.random() * maxNum) + 1;
-                    } while (!currentRule.check(num) || numbers.includes(num));
-                    correctNumbers++;
+            // Build pool of all numbers
+            const allNumbers = [];
+            const correctPool = [];
+            const wrongPool = [];
+            
+            for (let i = 1; i <= maxNum; i++) {
+                allNumbers.push(i);
+                if (currentRule.check(i)) {
+                    correctPool.push(i);
                 } else {
-                    num = Math.floor(Math.random() * maxNum) + 1;
-                    if (!numbers.includes(num)) {
-                        if (currentRule.check(num)) correctNumbers++;
-                    } else {
-                        continue;
-                    }
+                    wrongPool.push(i);
                 }
-                if (!numbers.includes(num)) numbers.push(num);
             }
             
-            // Shuffle
+            // Shuffle pools
+            correctPool.sort(() => Math.random() - 0.5);
+            wrongPool.sort(() => Math.random() - 0.5);
+            
+            // Pick numbers: ensure at least some correct answers
+            const numbers = [];
+            const minCorrect = Math.min(5, correctPool.length);
+            
+            // Add correct answers first
+            for (let i = 0; i < minCorrect && i < correctPool.length; i++) {
+                numbers.push(correctPool[i]);
+            }
+            
+            // Fill remaining with mix of correct and wrong
+            const remaining = [...correctPool.slice(minCorrect), ...wrongPool];
+            remaining.sort(() => Math.random() - 0.5);
+            
+            for (let i = 0; numbers.length < gridSize && i < remaining.length; i++) {
+                numbers.push(remaining[i]);
+            }
+            
+            // Shuffle final array
             numbers.sort(() => Math.random() - 0.5);
+            
+            // Update grid styling based on size
+            const cols = numbers.length <= 12 ? 3 : 4;
+            const rows = Math.ceil(numbers.length / cols);
+            gameArea.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            gameArea.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
             
             // Create cells
             numbers.forEach((num, index) => {
@@ -339,6 +358,17 @@
             }
             
             generateNumbers();
+            updateTargetCorrect();
+        }
+        
+        function updateTargetCorrect() {
+            // Count actual correct numbers in the grid
+            const cells = document.querySelectorAll('.number-cell');
+            let total = 0;
+            cells.forEach(cell => {
+                if (currentRule.check(parseInt(cell.dataset.number))) total++;
+            });
+            targetCorrect = Math.max(3, total); // At least 3, or all correct numbers
         }
         
         function startGame() {
@@ -368,6 +398,7 @@
             muncher.style.top = '170px';
             
             generateNumbers();
+            updateTargetCorrect();
         }
         
         function endGame() {
