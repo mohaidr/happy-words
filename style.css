@@ -7,9 +7,9 @@
 body {
     font-family: 'Fredoka', Arial, sans-serif;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 25%, #00d2ff 50%, #f093fb 75%, #ffecd2 100%);
     background-size: 400% 400%;
-    animation: gradientShift 10s ease infinite;
+    animation: gradientShift 15s ease infinite;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -260,19 +260,21 @@ header h1 {
     height: 100%;
     pointer-events: none;
     z-index: -1;
+    overflow: hidden;
 }
 
 .star {
     position: absolute;
-    font-size: 2rem;
+    font-size: 2.5rem;
     animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
 }
 
-.star1 { top: 10%; left: 10%; animation-delay: 0s; }
-.star2 { top: 20%; right: 15%; animation-delay: 0.5s; }
-.star3 { bottom: 30%; left: 5%; animation-delay: 1s; }
-.star4 { bottom: 15%; right: 10%; animation-delay: 1.5s; }
-.star5 { top: 50%; left: 3%; animation-delay: 2s; }
+.star1 { top: 8%; left: 8%; animation-delay: 0s; font-size: 3rem; }
+.star2 { top: 15%; right: 12%; animation-delay: 0.5s; font-size: 2.5rem; }
+.star3 { bottom: 25%; left: 5%; animation-delay: 1s; font-size: 2rem; }
+.star4 { bottom: 12%; right: 8%; animation-delay: 1.5s; font-size: 2.8rem; }
+.star5 { top: 45%; left: 3%; animation-delay: 2s; font-size: 2.2rem; }
 
 @keyframes float {
     0%, 100% { 
@@ -904,22 +906,27 @@ footer {
 
 .games-section {
     margin-top: 25px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
 }
 
 .games-title {
     color: #fff;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    animation: bounce 2s ease-in-out infinite;
 }
 
 .category-title {
     color: #fff;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     margin: 25px 0 15px 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     padding-bottom: 8px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.5);
     text-align: left;
     max-width: 500px;
     margin-left: auto;
@@ -944,45 +951,77 @@ footer {
     align-items: center;
     justify-content: center;
     padding: 20px 15px;
-    border-radius: 20px;
+    border-radius: 25px;
     text-decoration: none;
     color: #fff;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    min-height: 130px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    min-height: 140px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.game-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+}
+
+.game-card:hover::before {
+    animation: shine 0.5s ease;
+}
+
+@keyframes shine {
+    0% { left: -50%; }
+    100% { left: 150%; }
 }
 
 .game-card:hover {
-    transform: translateY(-5px) scale(1.03);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px) scale(1.05) rotate(-2deg);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.6);
 }
 
 .game-card:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
 }
 
 .game-icon {
-    font-size: 2.8rem;
-    margin-bottom: 8px;
-    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.2));
+    font-size: 3.2rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+.game-card:hover .game-icon {
+    animation: bounce 0.5s ease;
 }
 
 .game-name {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
 
 .game-desc {
-    font-size: 0.75rem;
-    opacity: 0.9;
+    font-size: 0.8rem;
+    opacity: 0.95;
     text-align: center;
+    font-weight: 500;
 }
 
-/* Game card colors */
+/* Game card colors - Brighter for kids */
 .game-card-red {
-    background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+    background: linear-gradient(145deg, #ff6b6b, #ff4757);
 }
 
 .game-card-purple {
@@ -990,7 +1029,7 @@ footer {
 }
 
 .game-card-green {
-    background: linear-gradient(145deg, #00b894, #00a186);
+    background: linear-gradient(145deg, #55efc4, #00b894);
 }
 
 .game-card-blue {
@@ -998,39 +1037,40 @@ footer {
 }
 
 .game-card-pink {
-    background: linear-gradient(145deg, #fd79a8, #e84393);
+    background: linear-gradient(145deg, #ff9ff3, #f368e0);
 }
 
 .game-card-indigo {
-    background: linear-gradient(145deg, #667eea, #5a67d8);
+    background: linear-gradient(145deg, #667eea, #5f27cd);
 }
 
 .game-card-teal {
-    background: linear-gradient(145deg, #00cec9, #00b5ad);
+    background: linear-gradient(145deg, #81ecec, #00cec9);
 }
 
 .game-card-violet {
-    background: linear-gradient(145deg, #667eea, #764ba2);
+    background: linear-gradient(145deg, #a29bfe, #6c5ce7);
 }
 
 .game-card-orange {
-    background: linear-gradient(145deg, #ffa502, #ff7f50);
+    background: linear-gradient(145deg, #ffeaa7, #fdcb6e);
+    color: #2d3436;
 }
 
 .game-card-emerald {
-    background: linear-gradient(145deg, #11998e, #38ef7d);
+    background: linear-gradient(145deg, #55efc4, #00b894);
 }
 
 .game-card-coral {
-    background: linear-gradient(145deg, #ff9a9e, #fecfef);
+    background: linear-gradient(145deg, #fab1a0, #e17055);
 }
 
 .game-card-lavender {
-    background: linear-gradient(145deg, #667eea, #764ba2);
+    background: linear-gradient(145deg, #dfe6e9, #a29bfe);
 }
 
 .game-card-mint {
-    background: linear-gradient(145deg, #00b894, #00cec9);
+    background: linear-gradient(145deg, #81ecec, #00cec9);
 }
 
 /* Responsive games grid */
