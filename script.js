@@ -809,6 +809,26 @@ document.addEventListener('DOMContentLoaded', () => {
         speechSynthesis.getVoices();
     }
     
+    // Check if user already has a name saved - auto-login
+    const savedName = localStorage.getItem('happyWordsPlayerName');
+    const savedGrade = localStorage.getItem('happyWordsGradeLevel');
+    
+    if (savedName) {
+        // Pre-fill the name input
+        document.getElementById('studentName').value = savedName;
+        
+        // Set the grade level
+        if (savedGrade) {
+            currentGrade = savedGrade;
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.grade === savedGrade);
+            });
+        }
+        
+        // Auto-start the app (skip name entry)
+        startApp();
+    }
+    
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
