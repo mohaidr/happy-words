@@ -4,58 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shape Spotter 🔷</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            color: white;
         }
         
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 20px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
+        h1 { white-space: nowrap; }
         
         .target-area {
             background: rgba(255,255,255,0.2);
@@ -85,10 +41,7 @@
             width: 340px;
             height: 340px;
             background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            position: relative;
             margin-bottom: 15px;
-            overflow: hidden;
         }
         
         .shape {
@@ -104,20 +57,20 @@
         }
         
         .shape.correct {
-            animation: pop 0.5s ease forwards;
+            animation: shapePop 0.5s ease forwards;
         }
         
         .shape.wrong {
-            animation: shake 0.5s ease;
+            animation: shapeShake 0.5s ease;
         }
         
-        @keyframes pop {
+        @keyframes shapePop {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); }
             100% { transform: scale(0); opacity: 0; }
         }
         
-        @keyframes shake {
+        @keyframes shapeShake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
             75% { transform: translateX(10px); }
@@ -151,21 +104,15 @@
             text-align: center;
         }
         
-        button.btn {
+        .btn {
             background: linear-gradient(145deg, #fdcb6e, #f39c12);
-            border: none;
             padding: 15px 40px;
             font-size: 18px;
             font-weight: bold;
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(253,203,110,0.4);
         }
         
-        button.btn:hover {
-            transform: scale(1.05);
+        .btn:hover {
             box-shadow: 0 6px 20px rgba(253,203,110,0.6);
         }
         
@@ -214,7 +161,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🔷 Shape Spotter</h1>
     </div>
     
@@ -252,6 +199,7 @@
         <button class="btn" onclick="startGame()">Play Again</button>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
         const shapes = [
             { emoji: '⭐', name: 'Stars' },
@@ -279,26 +227,18 @@
         let timerLoop = null;
         let gameRunning = false;
         
-        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        // Use GameUtils for player data
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
         
-        // High score system
+        // High score system using GameUtils
         const GAME_KEY = 'shapeSpotter';
         
         function loadHighScore() {
-            const saved = localStorage.getItem(GAME_KEY + '_highScore');
-            if (saved) {
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
+            const highScore = GameUtils.getHighScore(GAME_KEY);
+            if (highScore > 0) {
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${highScore} points`;
             }
-        }
-        
-        function saveHighScore(score) {
-            const current = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
-            if (score > current) {
-                localStorage.setItem(GAME_KEY + '_highScore', score);
-                return true;
-            }
-            return false;
         }
         
         function getShapesForGrade() {
@@ -420,11 +360,15 @@
                 score += 10 + Math.floor(timeLeft / 2); // Time bonus
                 document.getElementById('score').textContent = score;
                 
+                // Play correct sound
+                GameUtils.playSound('correct');
+                
                 // Check if all found
                 if (foundCount >= targetCount) {
                     document.getElementById('message').textContent = '✨ All found! +20 bonus!';
                     score += 20;
                     document.getElementById('score').textContent = score;
+                    GameUtils.playSound('levelUp');
                     
                     setTimeout(() => {
                         if (round < totalRounds) {
@@ -440,6 +384,9 @@
                 score = Math.max(0, score - 5);
                 document.getElementById('score').textContent = score;
                 document.getElementById('message').textContent = '❌ Not that one!';
+                
+                // Play wrong sound
+                GameUtils.playSound('wrong');
                 
                 setTimeout(() => {
                     shape.classList.remove('wrong');
@@ -490,7 +437,8 @@
             gameRunning = false;
             stopTimer();
             
-            const isNewHigh = saveHighScore(score);
+            // Use GameUtils for high score
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             loadHighScore();
             
             document.getElementById('finalScore').textContent = score;
@@ -499,6 +447,7 @@
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
                 highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                GameUtils.playSound('levelUp');
             } else {
                 highMsg.textContent = 'Great spotting, ' + playerName + '!';
             }

@@ -4,18 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Game 🚗</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
         }
         
         h1 { margin-bottom: 10px; font-size: 1.8rem; white-space: nowrap; }
@@ -28,23 +21,6 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
         }
         
         .score { font-size: 24px; margin-bottom: 15px; }
@@ -246,7 +222,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🚗 Car Game 🏁</h1>
     </div>
     <div class="score">Score: <span id="score">0</span> | Speed: <span id="speedDisplay">1</span></div>
@@ -259,7 +235,7 @@
             <p>Score: <span id="finalScore">0</span></p>
             <p>🏆 High Score: <span id="highScore">0</span></p>
             <button id="startBtn" onclick="startGame()">Play Again</button>
-            <a href="index.html" class="home-link">← Back to Home</a>
+            <a href="../index.html" class="home-link">← Back to Home</a>
         </div>
     </div>
     
@@ -275,7 +251,17 @@
     <p class="info">Use arrow keys, buttons, or swipe to move</p>
     <button id="mainStartBtn" onclick="startGame()">Start Game</button>
 
+    <script src="../js/game-utils.js"></script>
     <script>
+        // Game constants
+        const GAME_KEY = 'carGame';
+        
+        // Get player data using GameUtils
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        
+        // Game state
         let carX = 150;
         let carY = 20;
         let score = 0;
@@ -285,19 +271,14 @@
         let gameLoop;
         let speed = 2;
         
-        // High score system
-        const GAME_KEY = 'carGame';
-        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
-        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
-        
-        // Adjust initial speed and obstacle frequency based on grade
+        // Adjust initial speed based on grade
         function getInitialSpeed() {
             if (gradeLevel === 'kg') return 1.5;
             if (gradeLevel === 'g1-3') return 2;
             return 2.5;
         }
         
+        // DOM elements
         const car = document.getElementById('car');
         const gameArea = document.getElementById('gameArea');
         const scoreEl = document.getElementById('score');
@@ -306,7 +287,7 @@
         const bestScoreEl = document.getElementById('bestScore');
         const speedDisplay = document.getElementById('speedDisplay');
         
-        const moveStep = 25; // Smaller steps = smoother movement
+        const moveStep = 25;
         
         function moveLeft() {
             if (!gameRunning) return;
@@ -365,7 +346,7 @@
             const diffX = touchX - lastMoveX;
             const diffY = touchY - lastMoveY;
             
-            const threshold = 15; // Pixels to trigger movement (responsive)
+            const threshold = 15;
             
             if (Math.abs(diffX) > threshold) {
                 if (diffX > 0) moveRight();
@@ -384,8 +365,8 @@
         let holdInterval = null;
         
         function startHold(action) {
-            action(); // Immediate first action
-            holdInterval = setInterval(action, 80); // Fast repeat while holding
+            action();
+            holdInterval = setInterval(action, 80);
         }
         
         function stopHold() {
@@ -410,13 +391,12 @@
         });
         
         function createObstacle() {
-            // Check if any obstacle is still near spawn area
             const newX = Math.random() * 220 + 40;
             
             // Don't spawn if another car is nearby at the top
             for (let obs of obstacles) {
                 if (obs.y < 60 && Math.abs(obs.x - newX) < 50) {
-                    return; // Skip spawning this time
+                    return;
                 }
             }
             
@@ -449,7 +429,6 @@
                 const carRect = car.getBoundingClientRect();
                 const obsRect = obstacles[i].el.getBoundingClientRect();
                 
-                // Smaller padding for tighter collision with 3D cars (they're 30x50px)
                 const padding = 4;
                 if (
                     carRect.left + padding < obsRect.right - padding &&
@@ -502,12 +481,12 @@
             gameRunning = false;
             clearInterval(gameLoop);
             
-            // Save high score
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem(GAME_KEY + '_highScore', highScore);
-                localStorage.setItem(GAME_KEY + '_playerName', playerName);
-            }
+            // Play crash sound
+            GameUtils.playSound('wrong');
+            
+            // Save high score using GameUtils
+            const isNewHighScore = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            highScore = GameUtils.getHighScore(GAME_KEY);
             
             finalScoreEl.textContent = score;
             document.getElementById('highScore').textContent = highScore;

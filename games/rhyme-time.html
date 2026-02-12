@@ -4,58 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rhyme Time 🎵</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             padding: 15px;
-            color: white;
         }
         
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 25px;
-            font-size: 20px;
-            margin-bottom: 15px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 25px;
-            border-radius: 20px;
-        }
+        h1 { white-space: nowrap; }
         
         .instruction {
             font-size: 18px;
@@ -124,26 +81,11 @@
             50% { transform: scale(1.15); }
         }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        
         .btn {
             padding: 15px 35px;
             font-size: 18px;
-            border: none;
             border-radius: 25px;
             background: linear-gradient(145deg, #1dd1a1, #10ac84);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
         
         #gameOver {
@@ -163,18 +105,6 @@
         
         #gameOver h2 { color: #6c5ce7; margin-bottom: 15px; }
         #gameOver p { margin: 8px 0; font-size: 18px; }
-        
-        .home-link {
-            display: block;
-            margin-top: 15px;
-            color: #999;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .home-link:hover {
-            color: #6c5ce7;
-        }
         
         .progress {
             width: 300px;
@@ -206,7 +136,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🎵 Rhyme Time</h1>
     </div>
     
@@ -243,9 +173,10 @@
         <p>🏆 High Score: <span id="highScore">0</span></p>
         <p>Accuracy: <span id="accuracy">0</span>%</p>
         <button class="btn" style="margin-top: 15px;" onclick="startGame()">Play Again</button>
-        <a href="index.html" class="home-link">← Back to Home</a>
+        <a href="../index.html" class="home-link">← Back to Home</a>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
         // Rhyme groups - words in the same array rhyme with each other
         const rhymeGroups = [
@@ -282,11 +213,13 @@
         let correctAnswerIndex = -1;
         let usedPairs = [];
         
-        // High score system
+        // Game key for high scores
         const GAME_KEY = 'rhymeTime';
-        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
-        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        let gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Use GameUtils for player data and high scores
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
         
         // Grade-filtered rhyme groups
         function getRhymeGroups() {
@@ -402,12 +335,18 @@
                 
                 scoreEl.textContent = score;
                 streakEl.textContent = streak;
+                
+                // Play correct sound
+                GameUtils.playSound('correct');
             } else {
                 // Wrong!
                 buttons[index].classList.add('wrong');
                 buttons[correctAnswerIndex].classList.add('correct');
                 streak = 0;
                 streakEl.textContent = streak;
+                
+                // Play wrong sound
+                GameUtils.playSound('wrong');
             }
             
             setTimeout(() => {
@@ -420,6 +359,11 @@
         }
         
         function startGame() {
+            // Refresh player data in case it changed
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
             score = 0;
             round = 0;
             streak = 0;
@@ -440,21 +384,23 @@
         function endGame() {
             gameRunning = false;
             
-            // Save high score
-            if (score > highScore) {
+            // Save high score using GameUtils
+            const isNewHighScore = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHighScore) {
                 highScore = score;
-                localStorage.setItem(GAME_KEY + '_highScore', highScore);
-                localStorage.setItem(GAME_KEY + '_playerName', playerName);
             }
             
             const accuracy = Math.round((correctAnswers / totalRounds) * 100);
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('accuracy').textContent = accuracy;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
             startBtn.style.display = 'block';
+            
+            // Play level up sound for completing the game
+            GameUtils.playSound('levelUp');
         }
         
         // Keyboard support (1-4 keys)

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Pop Math 🎈</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        /* Game-specific styles */
+        body {
+            background: linear-gradient(180deg, #74b9ff 0%, #a29bfe 50%, #fd79a8 100%);
+            overflow: hidden;
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 450px;
+        }
+        
+        .floating {
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        .balloon.wrong-pop {
+            animation: wrongPop 0.4s ease forwards;
+        }
+        
+        @keyframes wrongPop {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            50% { transform: scale(0.9) rotate(5deg); }
+            75% { transform: scale(1.05) rotate(-3deg); }
+            100% { transform: scale(1); }
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.98);
+            color: #2d3436;
+            padding: 30px 40px;
+            border-radius: 25px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        #gameOver h2 { color: #6c5ce7; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+        
+        .streak {
+            position: fixed;
+            top: 20%;
+            font-size: 48px;
+            font-weight: bold;
+            color: #fdcb6e;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: streakPop 0.5s ease forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes streakPop {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg) translateY(-20px); opacity: 0; }
+        }
+        
+        .timer-bar {
+            width: 350px;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #fdcb6e, #ff6b6b);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        
+        .btn-purple {
+            background: linear-gradient(145deg, #6c5ce7, #a29bfe);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <h1>🎈 Balloon Pop Math</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>🔥 <span id="streak">0</span></div>
+    </div>
+    
+    <div class="question-box">
+        <div id="question">5 + 3 = ?</div>
+        <div class="hint">Pop the correct answer!</div>
+    </div>
+    
+    <div id="gameArea" class="game-area">
+        <div id="gameOver">
+            <h2>🎉 Time's Up!</h2>
+            <p id="playerDisplay"></p>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <p>🏆 High Score: <span id="highScore">0</span></p>
+            <p>Questions Correct: <span id="correctCount">0</span></p>
+            <button class="btn btn-purple" onclick="startGame()">Play Again</button>
+            <a href="../index.html" class="home-link">← Back to Home</a>
+        </div>
+    </div>
+    
+    <div class="timer-bar">
+        <div class="timer-fill" id="timerFill"></div>
+    </div>
+    
+    <button class="btn btn-purple" id="startBtn" onclick="startGame()">Start Game</button>
+    <p class="info">Pop balloons with the correct answer before time runs out!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        // Game state
+        let score = 0;
+        let level = 1;
+        let streak = 0;
+        let bestStreak = 0;
+        let correctCount = 0;
+        let gameRunning = false;
+        let timeLeft = 60;
+        let maxTime = 60;
+        let balloons = [];
+        let currentAnswer = 0;
+        let timerLoop;
+        
+        // Game configuration
+        const GAME_KEY = 'balloonMath';
+        
+        // Get player data from shared utilities
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        document.getElementById('highScore').textContent = highScore;
+        
+        // DOM elements
+        const gameArea = document.getElementById('gameArea');
+        const questionEl = document.getElementById('question');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const streakEl = document.getElementById('streak');
+        const timerFill = document.getElementById('timerFill');
+        const gameOverEl = document.getElementById('gameOver');
+        const startBtn = document.getElementById('startBtn');
+        
+        const balloonColors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink'];
+        
+        function generateQuestion() {
+            // Use shared utility for math question generation
+            const question = GameUtils.generateMathQuestion(gradeLevel, level);
+            currentAnswer = question.answer;
+            questionEl.textContent = `${question.question} = ?`;
+            
+            // Clear old balloons
+            balloons.forEach(b => b.el.remove());
+            balloons = [];
+            
+            // Generate answer options using shared utility
+            const answers = GameUtils.generateWrongAnswers(currentAnswer, 4);
+            
+            // Create balloons with answers
+            answers.forEach((ans, i) => {
+                createBalloon(ans, i, answers.length);
+            });
+        }
+        
+        function createBalloon(value, index, total) {
+            const balloon = document.createElement('div');
+            const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+            balloon.className = `balloon ${color} floating`;
+            
+            const body = document.createElement('div');
+            body.className = 'balloon-body';
+            body.textContent = value;
+            balloon.appendChild(body);
+            
+            // Grid-based positioning to prevent overlap
+            const cols = 3;
+            const rows = 2;
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            
+            const cellWidth = 280 / cols;
+            const cellHeight = 350 / rows;
+            
+            // Position in grid cell with small random offset
+            const x = col * cellWidth + 20 + (Math.random() * 30);
+            const y = row * cellHeight + 40 + (Math.random() * 40);
+            
+            balloon.style.left = x + 'px';
+            balloon.style.top = y + 'px';
+            balloon.style.animationDelay = (Math.random() * 2) + 's';
+            
+            balloon.onclick = () => popBalloon(balloon, value);
+            
+            gameArea.appendChild(balloon);
+            balloons.push({ el: balloon, value: value });
+        }
+        
+        function popBalloon(balloon, value) {
+            if (!gameRunning || balloon.classList.contains('popping')) return;
+            
+            if (value === currentAnswer) {
+                // Correct!
+                balloon.classList.add('popping');
+                GameUtils.playSound('pop');
+                
+                score += 10 + (streak * 2);
+                streak++;
+                correctCount++;
+                
+                if (streak > bestStreak) bestStreak = streak;
+                
+                scoreEl.textContent = score;
+                streakEl.textContent = streak;
+                
+                // Show streak message
+                if (streak >= 3 && streak % 3 === 0) {
+                    showStreak(streak);
+                }
+                
+                // Level up every 5 correct
+                if (correctCount % 5 === 0) {
+                    level++;
+                    levelEl.textContent = level;
+                    GameUtils.playSound('levelUp');
+                    // Bonus time
+                    timeLeft = Math.min(maxTime, timeLeft + 5);
+                }
+                
+                setTimeout(() => {
+                    generateQuestion();
+                }, 300);
+            } else {
+                // Wrong!
+                balloon.classList.add('wrong-pop');
+                GameUtils.playSound('wrong');
+                
+                streak = 0;
+                streakEl.textContent = streak;
+                timeLeft = Math.max(0, timeLeft - 3);
+                
+                setTimeout(() => {
+                    balloon.classList.remove('wrong-pop');
+                }, 400);
+            }
+        }
+        
+        function showStreak(count) {
+            const streakPopEl = document.createElement('div');
+            streakPopEl.className = 'streak';
+            streakPopEl.textContent = `🔥 ${count} Streak!`;
+            streakPopEl.style.left = '50%';
+            streakPopEl.style.transform = 'translateX(-50%)';
+            document.body.appendChild(streakPopEl);
+            
+            setTimeout(() => streakPopEl.remove(), 600);
+        }
+        
+        function updateTimer() {
+            timeLeft -= 0.1;
+            const percent = (timeLeft / maxTime) * 100;
+            timerFill.style.width = percent + '%';
+            
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            streak = 0;
+            bestStreak = 0;
+            correctCount = 0;
+            timeLeft = maxTime;
+            gameRunning = true;
+            
+            // Refresh player data in case it changed
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            scoreEl.textContent = '0';
+            levelEl.textContent = '1';
+            streakEl.textContent = '0';
+            timerFill.style.width = '100%';
+            gameOverEl.style.display = 'none';
+            startBtn.style.display = 'none';
+            
+            generateQuestion();
+            timerLoop = setInterval(updateTimer, 100);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            clearInterval(timerLoop);
+            
+            // Save high score using shared utility
+            const isNewHighScore = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHighScore) {
+                highScore = score;
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = Math.max(score, highScore);
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            gameOverEl.style.display = 'block';
+            startBtn.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -4,57 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sight Word Speed 👀</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific background */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #00b894, #00cec9);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            color: white;
-        }
-        
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 20px;
-            font-size: 18px;
-            margin-bottom: 10px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 20px;
-            border-radius: 20px;
         }
         
         .instruction {
@@ -76,10 +30,6 @@
         .game-area {
             width: 350px;
             height: 420px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
             margin-bottom: 15px;
         }
         
@@ -125,17 +75,6 @@
             100% { transform: scale(0); opacity: 0; }
         }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        
         .timer-bar {
             width: 350px;
             height: 12px;
@@ -155,17 +94,7 @@
         .btn {
             padding: 15px 35px;
             font-size: 18px;
-            border: none;
-            border-radius: 25px;
             background: linear-gradient(145deg, #6c5ce7, #a29bfe);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
         
         #gameOver {
@@ -186,18 +115,6 @@
         #gameOver h2 { color: #00b894; margin-bottom: 15px; }
         #gameOver p { margin: 8px 0; font-size: 18px; }
         
-        .home-link {
-            display: block;
-            margin-top: 15px;
-            color: #999;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .home-link:hover {
-            color: #00b894;
-        }
-        
         .level-badge {
             display: inline-block;
             padding: 5px 15px;
@@ -216,7 +133,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>👀 Sight Word Speed</h1>
     </div>
     
@@ -248,9 +165,10 @@
         <p>Words Found: <span id="wordsFound">0</span></p>
         <p>Level Reached: <span id="finalLevel">1</span></p>
         <button class="btn" style="margin-top: 15px;" onclick="startGame()">Play Again</button>
-        <a href="index.html" class="home-link">← Back to Home</a>
+        <a href="../index.html" class="home-link">← Back to Home</a>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
         // Common sight words for 2nd graders (Dolch + Fry words)
         const sightWords = [
@@ -278,11 +196,13 @@
         let gameRunning = false;
         let timerLoop;
         
-        // High score system
+        // Game key for high scores
         const GAME_KEY = 'sightWords';
-        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
-        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        let gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        
+        // Get player data using GameUtils
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
         
         // Grade-filtered sight words
         function getSightWords() {
@@ -397,6 +317,8 @@
                 foundEl.textContent = foundCount;
                 scoreEl.textContent = score;
                 
+                GameUtils.playSound('correct');
+                
                 // Check if all found
                 if (foundCount >= targetCount) {
                     // Bonus for completing round
@@ -407,6 +329,8 @@
                     level++;
                     levelEl.textContent = level;
                     
+                    GameUtils.playSound('levelUp');
+                    
                     // Bonus time
                     timeLeft = Math.min(maxTime, timeLeft + 5);
                     
@@ -416,6 +340,8 @@
                 // Wrong!
                 card.classList.add('wrong');
                 timeLeft = Math.max(0, timeLeft - 2);
+                
+                GameUtils.playSound('wrong');
                 
                 setTimeout(() => {
                     card.classList.remove('wrong');
@@ -440,6 +366,11 @@
             timeLeft = maxTime;
             gameRunning = true;
             
+            // Refresh player data in case it changed
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
             scoreEl.textContent = '0';
             levelEl.textContent = '1';
             timerFill.style.width = '100%';
@@ -454,15 +385,14 @@
             gameRunning = false;
             clearInterval(timerLoop);
             
-            // Save high score
-            if (score > highScore) {
+            // Save high score using GameUtils
+            const isNewHighScore = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHighScore) {
                 highScore = score;
-                localStorage.setItem(GAME_KEY + '_highScore', highScore);
-                localStorage.setItem(GAME_KEY + '_playerName', playerName);
             }
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('wordsFound').textContent = totalWordsFound;
             document.getElementById('finalLevel').textContent = level;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";

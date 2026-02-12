@@ -4,57 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Match 🧠</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific background */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            color: white;
-        }
-        
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 20px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            font-size: 16px;
         }
         
         .game-board {
@@ -106,7 +60,7 @@
         
         .card.matched {
             background: linear-gradient(145deg, #48bb78, #38a169);
-            animation: pulse 0.5s ease;
+            animation: matchPulse 0.5s ease;
             pointer-events: none;
         }
         
@@ -115,7 +69,7 @@
             transform: rotateY(180deg);
         }
         
-        @keyframes pulse {
+        @keyframes matchPulse {
             0%, 100% { transform: rotateY(180deg) scale(1); }
             50% { transform: rotateY(180deg) scale(1.1); }
         }
@@ -127,7 +81,7 @@
             text-align: center;
         }
         
-        button {
+        .start-btn {
             background: linear-gradient(145deg, #f093fb, #f5576c);
             border: none;
             padding: 15px 40px;
@@ -140,7 +94,7 @@
             box-shadow: 0 4px 15px rgba(240,147,251,0.4);
         }
         
-        button:hover {
+        .start-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(240,147,251,0.6);
         }
@@ -197,6 +151,11 @@
             padding: 10px 20px;
             font-size: 14px;
             background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .level-btn.active {
@@ -206,7 +165,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🧠 Memory Match</h1>
     </div>
     
@@ -225,7 +184,7 @@
     
     <div class="message" id="message">Find all matching pairs!</div>
     
-    <button id="startBtn">Start Game</button>
+    <button id="startBtn" class="start-btn">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best: -- moves</div>
     
@@ -234,9 +193,10 @@
         <p>Moves: <span id="finalMoves">0</span></p>
         <p>Time: <span id="finalTime">0</span> seconds</p>
         <p id="highScoreMsg"></p>
-        <button onclick="startGame()">Play Again</button>
+        <button class="start-btn" onclick="startGame()">Play Again</button>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
         const emojis = ['🐶', '🐱', '🐼', '🦊', '🐸', '🦋', '🌸', '⭐', '🍎', '🎈', '🌈', '🍕'];
         let cards = [];
@@ -249,8 +209,8 @@
         let currentLevel = 'easy';
         let pairsNeeded = 8;
         
-        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
         
         // Adjust available levels based on grade
         function initGradeLevels() {
@@ -269,31 +229,28 @@
         }
         
         function getHighScoreKey() {
-            return `memoryMatch_${currentLevel}_highScore`;
+            return `memoryMatch_${currentLevel}`;
         }
         
         function loadHighScore() {
-            const saved = localStorage.getItem(getHighScoreKey());
-            if (saved) {
-                const data = JSON.parse(saved);
+            const highScore = GameUtils.getHighScore(getHighScoreKey());
+            if (highScore > 0) {
                 document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: ${data.moves} moves by ${data.name}`;
+                    `🏆 Best: ${highScore} moves`;
             } else {
                 document.getElementById('highScoreDisplay').innerHTML = 'Best: -- moves';
             }
         }
         
-        function saveHighScore(moves) {
+        function saveHighScore(movesCount) {
+            // For memory match, lower moves is better, so we invert the logic
+            // We'll store 1000 - moves as "score" so higher is better for GameUtils
             const key = getHighScoreKey();
-            const saved = localStorage.getItem(key);
-            const current = saved ? JSON.parse(saved) : null;
+            const currentHigh = GameUtils.getHighScore(key);
+            const scoreValue = 1000 - movesCount; // Convert to "higher is better"
             
-            if (!current || moves < current.moves) {
-                localStorage.setItem(key, JSON.stringify({
-                    moves: moves,
-                    name: playerName,
-                    time: timeElapsed
-                }));
+            if (currentHigh === 0 || scoreValue > currentHigh) {
+                GameUtils.saveHighScore(key, scoreValue, playerName);
                 return true;
             }
             return false;
@@ -340,6 +297,7 @@
                 return;
             }
             
+            GameUtils.playSound('click');
             card.classList.add('flipped');
             flippedCards.push(card);
             
@@ -358,6 +316,7 @@
                         matchedPairs++;
                         document.getElementById('pairs').textContent = matchedPairs;
                         document.getElementById('message').textContent = '✨ Match found!';
+                        GameUtils.playSound('correct');
                         
                         if (matchedPairs === pairsNeeded) {
                             endGame();
@@ -368,6 +327,7 @@
                     }, 300);
                 } else {
                     // No match
+                    GameUtils.playSound('wrong');
                     setTimeout(() => {
                         card1.classList.remove('flipped');
                         card2.classList.remove('flipped');
@@ -414,6 +374,7 @@
         
         function endGame() {
             stopTimer();
+            GameUtils.playSound('levelUp');
             
             const isNewHigh = saveHighScore(moves);
             loadHighScore();

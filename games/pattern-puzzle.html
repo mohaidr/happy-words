@@ -4,64 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pattern Puzzle 🔮</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            color: white;
         }
         
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 20px;
-            background: rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
+        h1 { white-space: nowrap; }
         
         .game-area {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 25px;
+            background: transparent;
         }
         
         .color-btn {
@@ -112,7 +69,7 @@
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
         
-        button {
+        .start-btn {
             background: linear-gradient(145deg, #e94560, #c73e54);
             border: none;
             padding: 15px 40px;
@@ -125,12 +82,12 @@
             box-shadow: 0 4px 15px rgba(233,69,96,0.4);
         }
         
-        button:hover {
+        .start-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(233,69,96,0.6);
         }
         
-        button:disabled {
+        .start-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
@@ -165,6 +122,24 @@
         #gameOver p {
             margin: 10px 0;
             font-size: 18px;
+        }
+        
+        #gameOver button {
+            background: linear-gradient(145deg, #e94560, #c73e54);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(233,69,96,0.4);
+        }
+        
+        #gameOver button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(233,69,96,0.6);
         }
         
         .new-high {
@@ -229,7 +204,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🔮 Pattern Puzzle</h1>
     </div>
     
@@ -254,7 +229,7 @@
     
     <div class="message" id="message">Watch the pattern!</div>
     
-    <button id="startBtn">Start Game</button>
+    <button class="start-btn" id="startBtn">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best Level: --</div>
     
@@ -266,6 +241,7 @@
         <button onclick="startGame()">Try Again</button>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
         const colors = ['red', 'blue', 'yellow', 'green'];
         let pattern = [];
@@ -275,8 +251,8 @@
         let isPlaying = false;
         let isShowingPattern = false;
         
-        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
         
         // Get flash duration based on grade (slower for younger kids)
         function getFlashDuration() {
@@ -289,9 +265,9 @@
         }
         
         function loadHighScore() {
-            const saved = localStorage.getItem('patternPuzzle_highScore');
-            if (saved) {
-                const data = JSON.parse(saved);
+            const highScoreData = localStorage.getItem('patternPuzzle_highScore');
+            if (highScoreData) {
+                const data = JSON.parse(highScoreData);
                 document.getElementById('highScoreDisplay').innerHTML = 
                     `🏆 Best: Level ${data.level} by ${data.name}`;
             } else {
@@ -299,14 +275,14 @@
             }
         }
         
-        function saveHighScore(level, score) {
+        function saveHighScore(levelReached, scoreValue) {
             const saved = localStorage.getItem('patternPuzzle_highScore');
             const current = saved ? JSON.parse(saved) : null;
             
-            if (!current || level > current.level) {
+            if (!current || levelReached > current.level) {
                 localStorage.setItem('patternPuzzle_highScore', JSON.stringify({
-                    level: level,
-                    score: score,
+                    level: levelReached,
+                    score: scoreValue,
                     name: playerName
                 }));
                 return true;
@@ -318,6 +294,7 @@
             return new Promise(resolve => {
                 const btn = document.querySelector(`.color-btn.${color}`);
                 btn.classList.add('active');
+                GameUtils.playSound('click');
                 setTimeout(() => {
                     btn.classList.remove('active');
                     setTimeout(resolve, 100);
@@ -394,18 +371,24 @@
             
             if (playerPattern[currentIndex] !== pattern[currentIndex]) {
                 // Wrong!
+                GameUtils.playSound('wrong');
                 gameOver();
                 return;
             }
             
             // Check if pattern complete
             if (playerPattern.length === pattern.length) {
+                GameUtils.playSound('correct');
                 score += level * 10;
                 document.getElementById('score').textContent = score;
                 
                 level++;
                 document.getElementById('level').textContent = level;
                 document.getElementById('message').textContent = '✨ Perfect! Next level...';
+                
+                if (level % 3 === 0) {
+                    GameUtils.playSound('levelUp');
+                }
                 
                 addToPattern();
                 

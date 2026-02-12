@@ -4,59 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorting Fun 📦</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            color: white;
             user-select: none;
         }
         
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 20px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
+        h1 { white-space: nowrap; }
         
         .category-name {
             font-size: 20px;
@@ -154,10 +110,10 @@
             height: 40px;
             font-size: 22px;
             cursor: default;
-            animation: pop 0.3s ease;
+            animation: popIn 0.3s ease;
         }
         
-        @keyframes pop {
+        @keyframes popIn {
             0% { transform: scale(0); }
             70% { transform: scale(1.2); }
             100% { transform: scale(1); }
@@ -166,12 +122,6 @@
         .item.wrong {
             animation: shake 0.5s ease;
             background: #ffcccc;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
         }
         
         .message {
@@ -244,7 +194,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>📦 Sorting Fun</h1>
     </div>
     
@@ -274,7 +224,10 @@
         <button onclick="startGame()">Play Again</button>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
+        const GAME_KEY = 'sortingFun';
+        
         const categories = [
             {
                 name: 'Animals vs Food',
@@ -329,8 +282,8 @@
         let timeElapsed = 0;
         let draggedItem = null;
         
-        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
         
         // Get categories based on grade level
         function getCategories() {
@@ -353,29 +306,13 @@
         }
         
         function loadHighScore() {
-            const saved = localStorage.getItem('sortingFun_highScore');
-            if (saved) {
-                const data = JSON.parse(saved);
+            const highScore = GameUtils.getHighScore(GAME_KEY);
+            if (highScore > 0) {
                 document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: ${data.score} points by ${data.name}`;
+                    `🏆 Best: ${highScore} points`;
             } else {
                 document.getElementById('highScoreDisplay').innerHTML = 'Best: -- points';
             }
-        }
-        
-        function saveHighScore(score) {
-            const saved = localStorage.getItem('sortingFun_highScore');
-            const current = saved ? JSON.parse(saved) : null;
-            
-            if (!current || score > current.score) {
-                localStorage.setItem('sortingFun_highScore', JSON.stringify({
-                    score: score,
-                    name: playerName,
-                    time: timeElapsed
-                }));
-                return true;
-            }
-            return false;
         }
         
         function shuffle(array) {
@@ -514,6 +451,7 @@
                 score += 10;
                 document.getElementById('score').textContent = score;
                 document.getElementById('message').textContent = '✨ Correct!';
+                GameUtils.playSound('correct');
                 
                 // Move to bin
                 const binItems = document.getElementById(`binItems${binIndex}`);
@@ -534,6 +472,7 @@
                     } else {
                         document.getElementById('round').textContent = round;
                         document.getElementById('message').textContent = '🎉 Round complete!';
+                        GameUtils.playSound('levelUp');
                         setTimeout(setupRound, 1000);
                     }
                 }
@@ -542,6 +481,7 @@
                 score = Math.max(0, score - 5);
                 document.getElementById('score').textContent = score;
                 document.getElementById('message').textContent = '❌ Try again!';
+                GameUtils.playSound('wrong');
                 
                 if (itemElement) {
                     itemElement.classList.add('wrong');
@@ -586,7 +526,7 @@
         function endGame() {
             stopTimer();
             
-            const isNewHigh = saveHighScore(score);
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             loadHighScore();
             
             document.getElementById('finalScore').textContent = score;
@@ -595,6 +535,7 @@
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
                 highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                GameUtils.playSound('levelUp');
             } else {
                 highMsg.textContent = 'Great sorting, ' + playerName + '!';
             }

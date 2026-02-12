@@ -4,58 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Counting Game 🔢</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            color: white;
         }
         
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
-        
-        .stats {
-            display: flex;
-            gap: 20px;
-            background: rgba(0,0,0,0.2);
-            padding: 10px 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
+        h1 { white-space: nowrap; }
         
         .question {
             font-size: 22px;
@@ -132,12 +88,6 @@
             50% { transform: scale(1.2); }
         }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        
         .message {
             font-size: 24px;
             margin-bottom: 15px;
@@ -212,7 +162,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🔢 Counting Game</h1>
     </div>
     
@@ -242,6 +192,7 @@
         <button class="btn" onclick="startGame()">Play Again</button>
     </div>
 
+    <script src="../js/game-utils.js"></script>
     <script>
         const emojis = ['🍎', '⭐', '🌸', '🐶', '🎈', '🦋', '🍕', '🚗', '🌈', '🎁', '🐱', '🍦', '🌻', '🐸', '⚽'];
         
@@ -254,27 +205,17 @@
         let gameRunning = false;
         let canClick = true;
         
-        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        const gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
         
         // High score system
         const GAME_KEY = 'countingGame';
-        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
         
         function loadHighScore() {
-            const saved = localStorage.getItem(GAME_KEY + '_highScore');
-            if (saved) {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
                 document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
             }
-        }
-        
-        function saveHighScore(score) {
-            const current = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
-            if (score > current) {
-                localStorage.setItem(GAME_KEY + '_highScore', score);
-                return true;
-            }
-            return false;
         }
         
         function getMaxCount() {
@@ -359,6 +300,7 @@
                 document.getElementById('score').textContent = score;
                 document.getElementById('message').textContent = streak > 2 ? `✨ Correct! +${bonus} streak bonus!` : '✨ Correct!';
                 btn.classList.add('correct');
+                GameUtils.playSound('correct');
                 
                 setTimeout(() => {
                     btn.classList.remove('correct');
@@ -374,6 +316,7 @@
                 document.getElementById('streak').textContent = '0';
                 document.getElementById('message').textContent = `❌ It was ${currentCount}!`;
                 btn.classList.add('wrong');
+                GameUtils.playSound('wrong');
                 
                 // Show correct answer
                 document.querySelectorAll('.answer-btn').forEach(b => {
@@ -413,7 +356,7 @@
         function endGame() {
             gameRunning = false;
             
-            const isNewHigh = saveHighScore(score);
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             loadHighScore();
             
             document.getElementById('finalScore').textContent = score;

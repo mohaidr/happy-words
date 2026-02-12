@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Racing 🏎️</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        #gameArea {
+            width: 180px;
+            height: 320px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #222;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        @media (min-width: 500px) {
+            #gameArea { width: 250px; height: 400px; }
+        }
+        
+        #gameArea::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, white 0px, white 30px, transparent 30px, transparent 60px);
+            animation: roadMove 0.5s linear infinite;
+        }
+        
+        @keyframes roadMove {
+            from { transform: translateY(0); }
+            to { transform: translateY(60px); }
+        }
+        
+        #car {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+            border-radius: 8px 8px 5px 5px;
+            background: linear-gradient(180deg, #ff6b6b 0%, #ee5a5a 20%, #cc4444 50%, #ee5a5a 80%, #ff6b6b 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: left 0.15s ease;
+        }
+        
+        #car::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 4px;
+            right: 4px;
+            height: 14px;
+            background: linear-gradient(180deg, #333 0%, #222 100%);
+            border-radius: 3px;
+        }
+        
+        .math-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 160px;
+            max-width: 200px;
+            flex: 1;
+        }
+        
+        .question {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #fdcb6e;
+        }
+        
+        @media (min-width: 500px) {
+            .math-panel { padding: 20px; min-width: 180px; max-width: none; }
+            .question { font-size: 32px; margin-bottom: 15px; }
+        }
+        
+        .instruction {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #ff6b6b; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <h1>🏎️ Math Racing</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Speed: <span id="speed">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="game-container">
+        <div id="gameArea">
+            <div id="car"></div>
+            <div id="gameOver">
+                <h2>Game Over!</h2>
+                <p id="playerDisplay"></p>
+                <p>Score: <span id="finalScore">0</span></p>
+                <p>🏆 High Score: <span id="highScore">0</span></p>
+                <button class="btn" onclick="startGame()">Play Again</button>
+                <a href="../index.html" class="home-link">← Back to Home</a>
+            </div>
+        </div>
+        
+        <div class="math-panel">
+            <div class="question" id="question">5 + 3 = ?</div>
+            <div class="instruction">Pick the answer to clear obstacles!</div>
+            <div class="answer-buttons" id="answers">
+                <button class="answer-btn">8</button>
+                <button class="answer-btn">6</button>
+                <button class="answer-btn">9</button>
+                <button class="answer-btn">7</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="leftBtn">⬅️</button>
+        <button id="rightBtn">➡️</button>
+    </div>
+    
+    <p class="info">Arrow keys to move • Answer math to clear obstacles!</p>
+    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        // Game state
+        let carX = 125;
+        let score = 0;
+        let lives = 3;
+        let speed = 2;
+        let gameRunning = false;
+        let obstacles = [];
+        let gameLoop;
+        let currentAnswer = 0;
+        let gameWidth = 250;
+        let gameHeight = 400;
+        
+        // Use shared utilities
+        const GAME_KEY = 'mathRacing';
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        const playerName = GameUtils.getPlayerName();
+        const gradeLevel = GameUtils.getGradeLevel();
+        
+        // DOM elements
+        const car = document.getElementById('car');
+        const gameArea = document.getElementById('gameArea');
+        const scoreEl = document.getElementById('score');
+        const speedEl = document.getElementById('speed');
+        const livesEl = document.getElementById('lives');
+        const questionEl = document.getElementById('question');
+        const answersEl = document.getElementById('answers');
+        const gameOverEl = document.getElementById('gameOver');
+        const startBtn = document.getElementById('startBtn');
+        
+        function moveLeft() {
+            if (!gameRunning) return;
+            carX = Math.max(25, carX - 25);
+            car.style.left = carX + 'px';
+            car.style.transform = 'translateX(-50%)';
+        }
+        
+        function moveRight() {
+            if (!gameRunning) return;
+            carX = Math.min(gameWidth - 25, carX + 25);
+            car.style.left = carX + 'px';
+            car.style.transform = 'translateX(-50%)';
+        }
+        
+        // Touch-hold support
+        let holdInterval = null;
+        
+        function startHold(direction, e) {
+            if (e) e.preventDefault();
+            const action = direction === 'left' ? moveLeft : moveRight;
+            action();
+            holdInterval = setInterval(action, 100);
+        }
+        
+        function stopHold(e) {
+            if (e) e.preventDefault();
+            if (holdInterval) {
+                clearInterval(holdInterval);
+                holdInterval = null;
+            }
+        }
+        
+        // Setup controls
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        
+        leftBtn.addEventListener('touchstart', (e) => startHold('left', e), { passive: false });
+        leftBtn.addEventListener('touchend', stopHold, { passive: false });
+        leftBtn.addEventListener('mousedown', (e) => startHold('left', e));
+        leftBtn.addEventListener('mouseup', stopHold);
+        leftBtn.addEventListener('mouseleave', stopHold);
+        
+        rightBtn.addEventListener('touchstart', (e) => startHold('right', e), { passive: false });
+        rightBtn.addEventListener('touchend', stopHold, { passive: false });
+        rightBtn.addEventListener('mousedown', (e) => startHold('right', e));
+        rightBtn.addEventListener('mouseup', stopHold);
+        rightBtn.addEventListener('mouseleave', stopHold);
+        
+        // Answer button touch support
+        document.querySelectorAll('.answer-btn').forEach((btn, index) => {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                checkAnswer(index);
+            }, { passive: false });
+            btn.addEventListener('click', () => checkAnswer(index));
+        });
+        
+        // Swipe controls on game area
+        let touchStartX = 0;
+        gameArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        gameArea.addEventListener('touchmove', (e) => {
+            if (!gameRunning) return;
+            const touchX = e.touches[0].clientX;
+            const diff = touchX - touchStartX;
+            if (Math.abs(diff) > 20) {
+                if (diff > 0) moveRight();
+                else moveLeft();
+                touchStartX = touchX;
+            }
+        }, { passive: true });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') moveLeft();
+            if (e.key === 'ArrowRight') moveRight();
+            if (e.key >= '1' && e.key <= '4') checkAnswer(parseInt(e.key) - 1);
+        });
+        
+        function generateQuestion() {
+            const level = Math.floor(score / 100) + 1;
+            const q = GameUtils.generateMathQuestion(gradeLevel, level);
+            currentAnswer = q.answer;
+            questionEl.textContent = `${q.question} = ?`;
+            
+            const answers = GameUtils.generateWrongAnswers(q.answer, 3);
+            const buttons = answersEl.querySelectorAll('.answer-btn');
+            buttons.forEach((btn, i) => {
+                btn.textContent = answers[i];
+                btn.dataset.value = answers[i];
+                btn.className = 'answer-btn';
+            });
+        }
+        
+        function checkAnswer(index) {
+            if (!gameRunning) return;
+            
+            const buttons = answersEl.querySelectorAll('.answer-btn');
+            const selectedValue = parseInt(buttons[index].dataset.value);
+            
+            if (selectedValue === currentAnswer) {
+                buttons[index].classList.add('correct-flash');
+                score += 20;
+                scoreEl.textContent = score;
+                GameUtils.playSound('correct');
+                
+                obstacles.forEach(obs => {
+                    obs.el.classList.add('correct');
+                    setTimeout(() => obs.el.remove(), 200);
+                });
+                obstacles = [];
+                
+                setTimeout(() => {
+                    buttons[index].classList.remove('correct-flash');
+                    generateQuestion();
+                }, 300);
+            } else {
+                buttons[index].classList.add('wrong-flash');
+                GameUtils.playSound('wrong');
+                setTimeout(() => buttons[index].classList.remove('wrong-flash'), 300);
+            }
+        }
+        
+        function createObstacle() {
+            if (obstacles.length >= 3) return;
+            
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.textContent = '🚧';
+            
+            const laneCount = gameWidth >= 200 ? 3 : 2;
+            const laneSpacing = gameWidth / (laneCount + 1);
+            const lanes = [];
+            for (let i = 1; i <= laneCount; i++) lanes.push(Math.floor(laneSpacing * i));
+            const lane = lanes[Math.floor(Math.random() * lanes.length)];
+            
+            for (let obs of obstacles) {
+                if (obs.y < 60 && Math.abs(obs.x - lane) < 40) return;
+            }
+            
+            obstacle.style.left = (lane - 20) + 'px';
+            obstacle.style.top = '-35px';
+            gameArea.appendChild(obstacle);
+            obstacles.push({ el: obstacle, x: lane, y: -35 });
+        }
+        
+        function update() {
+            if (!gameRunning) return;
+            
+            score++;
+            scoreEl.textContent = score;
+            speed = 2 + Math.floor(score / 150);
+            speedEl.textContent = speed - 1;
+            
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].y += speed;
+                obstacles[i].el.style.top = obstacles[i].y + 'px';
+                
+                const carRect = car.getBoundingClientRect();
+                const obsRect = obstacles[i].el.getBoundingClientRect();
+                const padding = 15;
+                
+                if (
+                    carRect.left + 5 < obsRect.right - padding &&
+                    carRect.right - 5 > obsRect.left + padding &&
+                    carRect.top + 5 < obsRect.bottom - padding &&
+                    carRect.bottom - 5 > obsRect.top + padding
+                ) {
+                    lives--;
+                    livesEl.textContent = lives;
+                    obstacles[i].el.remove();
+                    obstacles.splice(i, 1);
+                    GameUtils.playSound('wrong');
+                    
+                    if (lives <= 0) {
+                        endGame();
+                        return;
+                    }
+                    continue;
+                }
+                
+                if (obstacles[i].y > gameHeight + 20) {
+                    obstacles[i].el.remove();
+                    obstacles.splice(i, 1);
+                }
+            }
+            
+            if (Math.random() < 0.02) createObstacle();
+        }
+        
+        function startGame() {
+            obstacles.forEach(o => o.el.remove());
+            obstacles = [];
+            score = 0;
+            lives = 3;
+            speed = 2;
+            
+            gameWidth = gameArea.offsetWidth;
+            gameHeight = gameArea.offsetHeight;
+            carX = gameWidth / 2;
+            
+            car.style.left = '50%';
+            car.style.transform = 'translateX(-50%)';
+            scoreEl.textContent = '0';
+            livesEl.textContent = '3';
+            gameOverEl.style.display = 'none';
+            startBtn.style.display = 'none';
+            gameRunning = true;
+            
+            generateQuestion();
+            gameLoop = setInterval(update, 30);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = Math.max(score, highScore);
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            gameOverEl.style.display = 'block';
+            startBtn.style.display = 'block';
+        }
+        
+        // Initialize
+        generateQuestion();
+    </script>
+</body>
+</html>

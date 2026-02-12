@@ -4,54 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Muncher 🐛</title>
+    <link rel="stylesheet" href="../css/games.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Game-specific styles */
         body {
-            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #11998e, #38ef7d);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             padding: 20px;
-            color: white;
         }
         
-        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
-        
-        .top-bar {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .home-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        
-        .home-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
+        h1 { white-space: nowrap; }
         
         .stats {
-            display: flex;
             gap: 30px;
             font-size: 20px;
-            margin-bottom: 15px;
         }
         
         .rule-display {
@@ -126,12 +91,6 @@
             100% { transform: scale(0); }
         }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        
         .muncher {
             position: absolute;
             font-size: 40px;
@@ -157,33 +116,8 @@
         #gameOver h2 { color: #00b894; margin-bottom: 15px; }
         #gameOver p { margin: 8px 0; font-size: 18px; }
         
-        .home-link {
-            display: block;
-            margin-top: 15px;
-            color: #999;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .home-link:hover {
-            color: #00b894;
-        }
-        
         .btn {
-            margin-top: 15px;
-            padding: 15px 35px;
-            font-size: 18px;
-            border: none;
-            border-radius: 25px;
             background: linear-gradient(145deg, #fdcb6e, #e17055);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
         
         .lives {
@@ -191,16 +125,13 @@
         }
         
         .info {
-            margin-top: 15px;
-            opacity: 0.9;
-            text-align: center;
             max-width: 320px;
         }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <a href="index.html" class="home-btn">← Home</a>
+        <a href="../index.html" class="home-btn">← Home</a>
         <h1>🐛 Number Muncher</h1>
     </div>
     
@@ -223,7 +154,7 @@
             <p>🏆 High Score: <span id="highScore">0</span></p>
             <p>Level Reached: <span id="finalLevel">1</span></p>
             <button class="btn" onclick="startGame()">Play Again</button>
-            <a href="index.html" class="home-link">← Back to Home</a>
+            <a href="../index.html" class="home-link">← Back to Home</a>
         </div>
     </div>
     
@@ -231,7 +162,10 @@
     
     <p class="info">Click or tap on numbers that match the rule. Don't eat the wrong ones!</p>
 
+    <script src="../js/game-utils.js"></script>
     <script>
+        const GAME_KEY = 'numberMuncher';
+        
         let score = 0;
         let level = 1;
         let lives = 3;
@@ -240,11 +174,10 @@
         let correctCount = 0;
         let targetCorrect = 8;
         
-        // High score system
-        const GAME_KEY = 'numberMuncher';
-        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
-        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
-        let gradeLevel = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+        // Use GameUtils for player data and high score
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
         
         // Grade-specific rules
         const rulesKG = [
@@ -361,6 +294,7 @@
                 score += 10 * level;
                 correctCount++;
                 scoreEl.textContent = score;
+                GameUtils.playSound('correct');
                 
                 setTimeout(() => {
                     cell.classList.remove('correct');
@@ -376,6 +310,7 @@
                 cell.classList.add('wrong');
                 lives--;
                 livesEl.textContent = lives;
+                GameUtils.playSound('wrong');
                 
                 setTimeout(() => {
                     cell.classList.remove('wrong');
@@ -391,6 +326,7 @@
             level++;
             levelEl.textContent = level;
             correctCount = 0;
+            GameUtils.playSound('levelUp');
             
             // New rule every 2 levels
             if (level % 2 === 1) {
@@ -415,6 +351,11 @@
             correctCount = 0;
             gameRunning = true;
             
+            // Refresh player data
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
             scoreEl.textContent = score;
             levelEl.textContent = level;
             livesEl.textContent = lives;
@@ -436,16 +377,15 @@
         function endGame() {
             gameRunning = false;
             
-            // Save high score
-            if (score > highScore) {
+            // Save high score using GameUtils
+            const isNewHighScore = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHighScore) {
                 highScore = score;
-                localStorage.setItem(GAME_KEY + '_highScore', highScore);
-                localStorage.setItem(GAME_KEY + '_playerName', playerName);
             }
             
             document.getElementById('finalScore').textContent = score;
             document.getElementById('finalLevel').textContent = level;
-            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
             startBtn.style.display = 'block';

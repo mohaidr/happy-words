@@ -1,4 +1,4 @@
-const CACHE_NAME = 'happy-words-v3';
+const CACHE_NAME = 'happy-words-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,19 +7,21 @@ const urlsToCache = [
   '/favicon.svg',
   '/manifest.json',
   '/icons/icon-192.svg',
-  '/game.html',
-  '/balloon-math.html',
-  '/number-muncher.html',
-  '/math-racing.html',
-  '/word-builder.html',
-  '/rhyme-time.html',
-  '/sight-words.html',
-  '/memory-match.html',
-  '/pattern-puzzle.html',
-  '/sorting-fun.html',
-  '/color-match.html',
-  '/counting-game.html',
-  '/shape-spotter.html'
+  '/css/games.css',
+  '/js/game-utils.js',
+  '/games/game.html',
+  '/games/balloon-math.html',
+  '/games/number-muncher.html',
+  '/games/math-racing.html',
+  '/games/word-builder.html',
+  '/games/rhyme-time.html',
+  '/games/sight-words.html',
+  '/games/memory-match.html',
+  '/games/pattern-puzzle.html',
+  '/games/sorting-fun.html',
+  '/games/color-match.html',
+  '/games/counting-game.html',
+  '/games/shape-spotter.html'
 ];
 
 // Install event - cache files
