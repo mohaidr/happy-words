@@ -1,9 +1,12 @@
-const CACHE_NAME = 'happy-words-v1';
+const CACHE_NAME = 'happy-words-v2';
 const urlsToCache = [
   '/',
   '/index.html',
   '/style.css',
   '/script.js',
+  '/favicon.svg',
+  '/manifest.json',
+  '/icons/icon-192.svg',
   '/game.html',
   '/balloon-math.html',
   '/number-muncher.html',
@@ -53,6 +56,11 @@ self.addEventListener('activate', event => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
+  // Skip non-http(s) requests (like chrome-extension://)
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
