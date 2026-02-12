@@ -113,16 +113,27 @@
         .controls {
             display: flex;
             gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .controls .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            min-width: 100px;
         }
         
         .btn-clear {
             background: #636e72;
             color: white;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .btn-check {
             background: linear-gradient(145deg, #00b894, #00cec9);
             color: white;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .btn-start {
@@ -192,8 +203,8 @@
     <div class="letter-bank" id="letterBank"></div>
     
     <div class="controls">
-        <button class="btn btn-clear" onclick="clearWord()">Clear</button>
-        <button class="btn btn-check" onclick="checkWord()">Check ✓</button>
+        <button class="btn btn-clear" id="clearBtn">Clear</button>
+        <button class="btn btn-check" id="checkBtn">Check ✓</button>
     </div>
     
     <p class="hint-text">Tap letters to spell the word!</p>
@@ -502,6 +513,22 @@
                 }
             }
         });
+
+        // Button event listeners with touch support
+        const clearBtn = document.getElementById('clearBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        
+        clearBtn.addEventListener('click', clearWord);
+        clearBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            clearWord();
+        }, { passive: false });
+        
+        checkBtn.addEventListener('click', checkWord);
+        checkBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            checkWord();
+        }, { passive: false });
 
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
