@@ -14,11 +14,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
+            padding: 10px;
             color: white;
         }
         
-        h1 { margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        h1 { 
+            margin-bottom: 8px; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3); 
+            font-size: 22px;
+        }
+        
+        @media (min-width: 500px) {
+            body { padding: 15px; }
+            h1 { font-size: 28px; }
+        }
         
         .top-bar {
             width: 100%;
@@ -26,21 +35,27 @@
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
         }
         
         .home-btn {
             background: rgba(255,255,255,0.25);
             border: none;
             border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: 13px;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             white-space: nowrap;
+        }
+        
+        @media (min-width: 500px) {
+            .top-bar { gap: 15px; margin-bottom: 10px; }
+            .home-btn { padding: 8px 14px; font-size: 14px; }
         }
         
         .home-btn:hover {
@@ -49,25 +64,46 @@
         
         .stats {
             display: flex;
-            gap: 20px;
-            font-size: 18px;
+            gap: 12px;
+            font-size: 15px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        @media (min-width: 500px) {
+            .stats {
+                gap: 20px;
+                font-size: 18px;
+            }
         }
         
         .game-container {
             display: flex;
+            flex-wrap: wrap;
             gap: 15px;
             align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
         }
         
         #gameArea {
-            width: 250px;
-            height: 400px;
+            width: 180px;
+            height: 320px;
             background: #333;
             position: relative;
             overflow: hidden;
             border: 4px solid #222;
             border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        @media (min-width: 500px) {
+            #gameArea {
+                width: 250px;
+                height: 400px;
+            }
         }
         
         /* Road lines */
@@ -119,17 +155,26 @@
         
         .obstacle {
             position: absolute;
-            width: 70px;
-            height: 45px;
+            width: 40px;
+            height: 30px;
             background: linear-gradient(145deg, #fdcb6e, #e17055);
-            border-radius: 10px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #2d3436;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+        
+        @media (min-width: 500px) {
+            .obstacle {
+                width: 50px;
+                height: 35px;
+                border-radius: 8px;
+                font-size: 16px;
+            }
         }
         
         .obstacle.correct {
@@ -139,17 +184,31 @@
         
         .math-panel {
             background: rgba(0,0,0,0.3);
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
             text-align: center;
-            min-width: 180px;
+            min-width: 160px;
+            max-width: 200px;
+            flex: 1;
         }
         
         .question {
-            font-size: 32px;
+            font-size: 26px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #fdcb6e;
+        }
+        
+        @media (min-width: 500px) {
+            .math-panel {
+                padding: 20px;
+                min-width: 180px;
+                max-width: none;
+            }
+            .question {
+                font-size: 32px;
+                margin-bottom: 15px;
+            }
         }
         
         .instruction {
@@ -165,8 +224,8 @@
         }
         
         .answer-btn {
-            padding: 15px;
-            font-size: 24px;
+            padding: 12px;
+            font-size: 20px;
             font-weight: bold;
             border: none;
             border-radius: 10px;
@@ -174,6 +233,16 @@
             color: white;
             cursor: pointer;
             transition: all 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        @media (min-width: 500px) {
+            .answer-btn {
+                padding: 15px;
+                font-size: 24px;
+            }
         }
         
         .answer-btn:hover {
@@ -241,6 +310,8 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .btn:hover {
@@ -262,6 +333,9 @@
             border-radius: 10px;
             background: #fdcb6e;
             cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         
         .info { margin-top: 10px; opacity: 0.8; font-size: 14px; }
@@ -305,8 +379,8 @@
     </div>
     
     <div class="controls">
-        <button id="leftBtn" ontouchstart="startHold('left')" ontouchend="stopHold()" onmousedown="startHold('left')" onmouseup="stopHold()">⬅️</button>
-        <button id="rightBtn" ontouchstart="startHold('right')" ontouchend="stopHold()" onmousedown="startHold('right')" onmouseup="stopHold()">➡️</button>
+        <button id="leftBtn">⬅️</button>
+        <button id="rightBtn">➡️</button>
     </div>
     
     <p class="info">Arrow keys to move • Answer math to clear obstacles!</p>
@@ -322,6 +396,8 @@
         let obstacles = [];
         let gameLoop;
         let currentAnswer = 0;
+        let gameWidth = 250;
+        let gameHeight = 400;
         
         // High score system
         const GAME_KEY = 'mathRacing';
@@ -341,14 +417,14 @@
         
         function moveLeft() {
             if (!gameRunning) return;
-            carX = Math.max(25, carX - 30);
+            carX = Math.max(25, carX - 25);
             car.style.left = carX + 'px';
             car.style.transform = 'translateX(-50%)';
         }
         
         function moveRight() {
             if (!gameRunning) return;
-            carX = Math.min(225, carX + 30);
+            carX = Math.min(gameWidth - 25, carX + 25);
             car.style.left = carX + 'px';
             car.style.transform = 'translateX(-50%)';
         }
@@ -356,18 +432,61 @@
         // Touch-hold support for continuous movement
         let holdInterval = null;
         
-        function startHold(direction) {
+        function startHold(direction, e) {
+            if (e) e.preventDefault();
             const action = direction === 'left' ? moveLeft : moveRight;
             action();
             holdInterval = setInterval(action, 100);
         }
         
-        function stopHold() {
+        function stopHold(e) {
+            if (e) e.preventDefault();
             if (holdInterval) {
                 clearInterval(holdInterval);
                 holdInterval = null;
             }
         }
+        
+        // Setup touch controls for movement buttons
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        
+        leftBtn.addEventListener('touchstart', (e) => startHold('left', e), { passive: false });
+        leftBtn.addEventListener('touchend', stopHold, { passive: false });
+        leftBtn.addEventListener('mousedown', (e) => startHold('left', e));
+        leftBtn.addEventListener('mouseup', stopHold);
+        leftBtn.addEventListener('mouseleave', stopHold);
+        
+        rightBtn.addEventListener('touchstart', (e) => startHold('right', e), { passive: false });
+        rightBtn.addEventListener('touchend', stopHold, { passive: false });
+        rightBtn.addEventListener('mousedown', (e) => startHold('right', e));
+        rightBtn.addEventListener('mouseup', stopHold);
+        rightBtn.addEventListener('mouseleave', stopHold);
+        
+        // Setup touch for answer buttons
+        document.querySelectorAll('.answer-btn').forEach((btn, index) => {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                checkAnswer(index);
+            }, { passive: false });
+        });
+        
+        // Swipe controls on game area
+        let touchStartX = 0;
+        gameArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        gameArea.addEventListener('touchmove', (e) => {
+            if (!gameRunning) return;
+            const touchX = e.touches[0].clientX;
+            const diff = touchX - touchStartX;
+            if (Math.abs(diff) > 20) {
+                if (diff > 0) moveRight();
+                else moveLeft();
+                touchStartX = touchX;
+            }
+        }, { passive: true });
         
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') moveLeft();
@@ -546,18 +665,24 @@
             obstacle.className = 'obstacle';
             obstacle.textContent = '🚧';
             
-            const lanes = [50, 125, 200];
+            // Dynamic lanes based on game width
+            const laneCount = gameWidth >= 200 ? 3 : 2;
+            const laneSpacing = gameWidth / (laneCount + 1);
+            const lanes = [];
+            for (let i = 1; i <= laneCount; i++) {
+                lanes.push(Math.floor(laneSpacing * i));
+            }
             const lane = lanes[Math.floor(Math.random() * lanes.length)];
             
             // Check spawn collision
             for (let obs of obstacles) {
-                if (obs.y < 80 && Math.abs(obs.x - lane) < 60) return;
+                if (obs.y < 60 && Math.abs(obs.x - lane) < 40) return;
             }
             
-            obstacle.style.left = (lane - 35) + 'px';
-            obstacle.style.top = '-50px';
+            obstacle.style.left = (lane - 20) + 'px';
+            obstacle.style.top = '-35px';
             gameArea.appendChild(obstacle);
-            obstacles.push({ el: obstacle, x: lane, y: -50 });
+            obstacles.push({ el: obstacle, x: lane, y: -35 });
         }
         
         function update() {
@@ -574,15 +699,17 @@
                 obstacles[i].y += speed;
                 obstacles[i].el.style.top = obstacles[i].y + 'px';
                 
-                // Check collision
+                // Check collision with tighter bounds
                 const carRect = car.getBoundingClientRect();
                 const obsRect = obstacles[i].el.getBoundingClientRect();
                 
+                // Use smaller collision box (shrink by 15px on each side)
+                const collisionPadding = 15;
                 if (
-                    carRect.left < obsRect.right - 10 &&
-                    carRect.right > obsRect.left + 10 &&
-                    carRect.top < obsRect.bottom - 10 &&
-                    carRect.bottom > obsRect.top + 10
+                    carRect.left + 5 < obsRect.right - collisionPadding &&
+                    carRect.right - 5 > obsRect.left + collisionPadding &&
+                    carRect.top + 5 < obsRect.bottom - collisionPadding &&
+                    carRect.bottom - 5 > obsRect.top + collisionPadding
                 ) {
                     // Hit obstacle
                     lives--;
@@ -598,7 +725,7 @@
                 }
                 
                 // Remove off-screen
-                if (obstacles[i].y > 420) {
+                if (obstacles[i].y > gameHeight + 20) {
                     obstacles[i].el.remove();
                     obstacles.splice(i, 1);
                 }
@@ -614,7 +741,11 @@
             score = 0;
             lives = 3;
             speed = 2;
-            carX = 125;
+            
+            // Get actual game dimensions
+            gameWidth = gameArea.offsetWidth;
+            gameHeight = gameArea.offsetHeight;
+            carX = gameWidth / 2;
             
             car.style.left = '50%';
             car.style.transform = 'translateX(-50%)';
