@@ -8,7 +8,7 @@
     <style>
         /* Game-specific styles for Word Builder */
         body {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
+            background: linear-gradient(135deg, #11998e, #38ef7d);
         }
         
         .picture-box {
@@ -113,27 +113,34 @@
         .controls {
             display: flex;
             gap: 15px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
         
         .controls .btn {
-            padding: 12px 25px;
-            font-size: 16px;
-            min-width: 100px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 110px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         
         .btn-clear {
-            background: #636e72;
+            background: linear-gradient(145deg, #636e72, #4a5568);
             color: white;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .btn-check {
-            background: linear-gradient(145deg, #00b894, #00cec9);
+            background: linear-gradient(145deg, #f39c12, #e67e22);
             color: white;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .controls .btn:active {
+            transform: scale(0.95);
         }
         
         .btn-start {
@@ -518,14 +525,22 @@
         const clearBtn = document.getElementById('clearBtn');
         const checkBtn = document.getElementById('checkBtn');
         
-        clearBtn.addEventListener('click', clearWord);
-        clearBtn.addEventListener('touchstart', (e) => {
+        // Clear button
+        clearBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            clearWord();
+        });
+        clearBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             clearWord();
         }, { passive: false });
         
-        checkBtn.addEventListener('click', checkWord);
-        checkBtn.addEventListener('touchstart', (e) => {
+        // Check button
+        checkBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            checkWord();
+        });
+        checkBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             checkWord();
         }, { passive: false });
