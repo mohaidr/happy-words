@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Fun 📦</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+            user-select: none;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .category-name {
+            font-size: 20px;
+            margin-bottom: 10px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            padding: 8px 20px;
+            border-radius: 15px;
+        }
+        
+        .bins-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .bin {
+            width: 150px;
+            min-height: 120px;
+            background: rgba(255,255,255,0.15);
+            border: 3px dashed rgba(255,255,255,0.5);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .bin.drag-over {
+            background: rgba(255,255,255,0.3);
+            border-color: white;
+            transform: scale(1.05);
+        }
+        
+        .bin-label {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .bin-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+        
+        .bin-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+        }
+        
+        .items-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            max-width: 350px;
+            min-height: 80px;
+            background: rgba(0,0,0,0.15);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .item {
+            width: 55px;
+            height: 55px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .item:hover {
+            transform: scale(1.1);
+        }
+        
+        .item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        
+        .item.sorted {
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            cursor: default;
+            animation: pop 0.3s ease;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .item.wrong {
+            animation: shake 0.5s ease;
+            background: #ffcccc;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .message {
+            font-size: 18px;
+            margin-bottom: 15px;
+            min-height: 25px;
+            text-align: center;
+        }
+        
+        button {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,107,107,0.6);
+        }
+        
+        .high-score {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,215,0,0.3);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        #gameOver p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        
+        .new-high {
+            color: #ffd700;
+            font-weight: bold;
+            animation: glow 1s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>📦 Sorting Fun</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Round: <span id="round">1</span>/5</div>
+        <div>⏱️ <span id="time">0</span>s</div>
+    </div>
+    
+    <div class="category-name" id="categoryName">Sort the items!</div>
+    
+    <div class="bins-container" id="binsContainer"></div>
+    
+    <div class="items-container" id="itemsContainer"></div>
+    
+    <div class="message" id="message">Drag items to the correct bins!</div>
+    
+    <button id="startBtn">Start Game</button>
+    
+    <div class="high-score" id="highScoreDisplay">Best: -- points</div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Sorting!</h2>
+        <p>Score: <span id="finalScore">0</span></p>
+        <p>Time: <span id="finalTime">0</span> seconds</p>
+        <p id="highScoreMsg"></p>
+        <button onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+        const categories = [
+            {
+                name: 'Animals vs Food',
+                bins: [
+                    { label: 'Animals', icon: '🐾', items: ['🐶', '🐱', '🐰', '🐸', '🦋', '🐼'] },
+                    { label: 'Food', icon: '🍽️', items: ['🍎', '🍕', '🍔', '🍦', '🧁', '🍩'] }
+                ]
+            },
+            {
+                name: 'Land vs Water',
+                bins: [
+                    { label: 'Land', icon: '🌲', items: ['🐕', '🐈', '🦁', '🐘', '🐿️', '🦔'] },
+                    { label: 'Water', icon: '🌊', items: ['🐠', '🐙', '🦈', '🐳', '🦀', '🐬'] }
+                ]
+            },
+            {
+                name: 'Fruits vs Vegetables',
+                bins: [
+                    { label: 'Fruits', icon: '🍇', items: ['🍎', '🍌', '🍊', '🍓', '🍑', '🥝'] },
+                    { label: 'Vegetables', icon: '🥬', items: ['🥕', '🥦', '🌽', '🍆', '🥒', '🫑'] }
+                ]
+            },
+            {
+                name: 'Hot vs Cold',
+                bins: [
+                    { label: 'Hot', icon: '🔥', items: ['☀️', '🌶️', '🍵', '🔥', '🌋', '♨️'] },
+                    { label: 'Cold', icon: '❄️', items: ['❄️', '⛄', '🧊', '🍦', '🥶', '🌨️'] }
+                ]
+            },
+            {
+                name: 'Sky vs Ground',
+                bins: [
+                    { label: 'Sky', icon: '☁️', items: ['✈️', '🦅', '☁️', '⭐', '🌙', '🎈'] },
+                    { label: 'Ground', icon: '🌍', items: ['🚗', '🏠', '🌳', '🐜', '🪨', '🌸'] }
+                ]
+            },
+            {
+                name: 'Day vs Night',
+                bins: [
+                    { label: 'Day', icon: '☀️', items: ['☀️', '🌤️', '🌈', '🦋', '🐝', '🌻'] },
+                    { label: 'Night', icon: '🌙', items: ['🌙', '⭐', '🦉', '🦇', '🌃', '🔦'] }
+                ]
+            }
+        ];
+        
+        let currentCategory = null;
+        let score = 0;
+        let round = 1;
+        let totalRounds = 5;
+        let itemsToSort = [];
+        let gameTimer = null;
+        let timeElapsed = 0;
+        let draggedItem = null;
+        
+        const playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        
+        function loadHighScore() {
+            const saved = localStorage.getItem('sortingFun_highScore');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('highScoreDisplay').innerHTML = 
+                    `🏆 Best: ${data.score} points by ${data.name}`;
+            } else {
+                document.getElementById('highScoreDisplay').innerHTML = 'Best: -- points';
+            }
+        }
+        
+        function saveHighScore(score) {
+            const saved = localStorage.getItem('sortingFun_highScore');
+            const current = saved ? JSON.parse(saved) : null;
+            
+            if (!current || score > current.score) {
+                localStorage.setItem('sortingFun_highScore', JSON.stringify({
+                    score: score,
+                    name: playerName,
+                    time: timeElapsed
+                }));
+                return true;
+            }
+            return false;
+        }
+        
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        
+        function setupRound() {
+            // Pick random category
+            const availableCategories = categories.filter(c => c !== currentCategory);
+            currentCategory = availableCategories[Math.floor(Math.random() * availableCategories.length)];
+            
+            document.getElementById('categoryName').textContent = currentCategory.name;
+            
+            // Setup bins
+            const binsContainer = document.getElementById('binsContainer');
+            binsContainer.innerHTML = '';
+            
+            currentCategory.bins.forEach((binData, index) => {
+                const bin = document.createElement('div');
+                bin.className = 'bin';
+                bin.dataset.binIndex = index;
+                bin.innerHTML = `
+                    <div class="bin-icon">${binData.icon}</div>
+                    <div class="bin-label">${binData.label}</div>
+                    <div class="bin-items" id="binItems${index}"></div>
+                `;
+                
+                // Drag events
+                bin.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    bin.classList.add('drag-over');
+                });
+                
+                bin.addEventListener('dragleave', () => {
+                    bin.classList.remove('drag-over');
+                });
+                
+                bin.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    bin.classList.remove('drag-over');
+                    handleDrop(index);
+                });
+                
+                // Touch support
+                bin.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                });
+                
+                binsContainer.appendChild(bin);
+            });
+            
+            // Setup items
+            itemsToSort = [];
+            currentCategory.bins.forEach((binData, binIndex) => {
+                const selectedItems = shuffle(binData.items).slice(0, 3);
+                selectedItems.forEach(item => {
+                    itemsToSort.push({ emoji: item, correctBin: binIndex });
+                });
+            });
+            itemsToSort = shuffle(itemsToSort);
+            
+            renderItems();
+        }
+        
+        function renderItems() {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = '';
+            
+            itemsToSort.forEach((itemData, index) => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.textContent = itemData.emoji;
+                item.draggable = true;
+                item.dataset.index = index;
+                
+                // Drag events
+                item.addEventListener('dragstart', (e) => {
+                    draggedItem = index;
+                    item.classList.add('dragging');
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+                
+                // Touch support
+                let touchStartX, touchStartY;
+                
+                item.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    draggedItem = index;
+                    item.classList.add('dragging');
+                });
+                
+                item.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                });
+                
+                item.addEventListener('touchend', (e) => {
+                    item.classList.remove('dragging');
+                    
+                    const touch = e.changedTouches[0];
+                    const bins = document.querySelectorAll('.bin');
+                    
+                    bins.forEach((bin, binIndex) => {
+                        const rect = bin.getBoundingClientRect();
+                        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                            handleDrop(binIndex);
+                        }
+                    });
+                    
+                    draggedItem = null;
+                });
+                
+                container.appendChild(item);
+            });
+        }
+        
+        function handleDrop(binIndex) {
+            if (draggedItem === null) return;
+            
+            const itemData = itemsToSort[draggedItem];
+            const itemElement = document.querySelector(`.item[data-index="${draggedItem}"]`);
+            
+            if (itemData.correctBin === binIndex) {
+                // Correct!
+                score += 10;
+                document.getElementById('score').textContent = score;
+                document.getElementById('message').textContent = '✨ Correct!';
+                
+                // Move to bin
+                const binItems = document.getElementById(`binItems${binIndex}`);
+                const sortedItem = document.createElement('div');
+                sortedItem.className = 'item sorted';
+                sortedItem.textContent = itemData.emoji;
+                binItems.appendChild(sortedItem);
+                
+                // Remove from items
+                itemsToSort.splice(draggedItem, 1);
+                renderItems();
+                
+                // Check if round complete
+                if (itemsToSort.length === 0) {
+                    round++;
+                    if (round > totalRounds) {
+                        endGame();
+                    } else {
+                        document.getElementById('round').textContent = round;
+                        document.getElementById('message').textContent = '🎉 Round complete!';
+                        setTimeout(setupRound, 1000);
+                    }
+                }
+            } else {
+                // Wrong!
+                score = Math.max(0, score - 5);
+                document.getElementById('score').textContent = score;
+                document.getElementById('message').textContent = '❌ Try again!';
+                
+                if (itemElement) {
+                    itemElement.classList.add('wrong');
+                    setTimeout(() => itemElement.classList.remove('wrong'), 500);
+                }
+            }
+            
+            draggedItem = null;
+        }
+        
+        function startTimer() {
+            timeElapsed = 0;
+            document.getElementById('time').textContent = '0';
+            gameTimer = setInterval(() => {
+                timeElapsed++;
+                document.getElementById('time').textContent = timeElapsed;
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+        }
+        
+        function startGame() {
+            stopTimer();
+            score = 0;
+            round = 1;
+            currentCategory = null;
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('round').textContent = '1';
+            document.getElementById('message').textContent = 'Drag items to the correct bins!';
+            document.getElementById('gameOver').style.display = 'none';
+            
+            setupRound();
+            startTimer();
+        }
+        
+        function endGame() {
+            stopTimer();
+            
+            const isNewHigh = saveHighScore(score);
+            loadHighScore();
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalTime').textContent = timeElapsed;
+            
+            const highMsg = document.getElementById('highScoreMsg');
+            if (isNewHigh) {
+                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+            } else {
+                highMsg.textContent = 'Great sorting, ' + playerName + '!';
+            }
+            
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        
+        // Initialize
+        loadHighScore();
+    </script>
+</body>
+</html>

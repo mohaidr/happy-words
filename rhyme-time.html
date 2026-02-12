@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhyme Time 🎵</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 25px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 25px;
+            border-radius: 20px;
+        }
+        
+        .instruction {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .main-word {
+            background: linear-gradient(145deg, #fdcb6e, #f39c12);
+            color: #2d3436;
+            padding: 20px 50px;
+            border-radius: 20px;
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+        }
+        
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 350px;
+            margin-bottom: 20px;
+        }
+        
+        .choice {
+            padding: 20px 30px;
+            font-size: 28px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            text-transform: uppercase;
+        }
+        
+        .choice:nth-child(1) { background: linear-gradient(145deg, #74b9ff, #0984e3); color: white; }
+        .choice:nth-child(2) { background: linear-gradient(145deg, #00b894, #00cec9); color: white; }
+        .choice:nth-child(3) { background: linear-gradient(145deg, #fd79a8, #e84393); color: white; }
+        .choice:nth-child(4) { background: linear-gradient(145deg, #a29bfe, #6c5ce7); color: white; }
+        
+        .choice:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .choice:active {
+            transform: scale(0.98);
+        }
+        
+        .choice.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9) !important;
+            animation: correctPop 0.4s ease;
+        }
+        
+        .choice.wrong {
+            background: linear-gradient(145deg, #d63031, #e17055) !important;
+            animation: shake 0.4s ease;
+        }
+        
+        @keyframes correctPop {
+            50% { transform: scale(1.15); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        .btn {
+            padding: 15px 35px;
+            font-size: 18px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(145deg, #1dd1a1, #10ac84);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.98);
+            color: #2d3436;
+            padding: 30px 40px;
+            border-radius: 25px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        #gameOver h2 { color: #6c5ce7; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+        
+        .home-link {
+            display: block;
+            margin-top: 15px;
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .home-link:hover {
+            color: #6c5ce7;
+        }
+        
+        .progress {
+            width: 300px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fdcb6e, #00b894);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .streak-display {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .hint-text {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>🎵 Rhyme Time</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Round: <span id="round">1</span>/10</div>
+    </div>
+    
+    <div class="progress">
+        <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+    </div>
+    
+    <div class="streak-display">🔥 Streak: <span id="streak">0</span></div>
+    
+    <p class="instruction">Find the word that rhymes with:</p>
+    
+    <div class="main-word" id="mainWord">CAT</div>
+    
+    <div class="choices" id="choices">
+        <button class="choice" onclick="checkAnswer(0)">HAT</button>
+        <button class="choice" onclick="checkAnswer(1)">DOG</button>
+        <button class="choice" onclick="checkAnswer(2)">SUN</button>
+        <button class="choice" onclick="checkAnswer(3)">CUP</button>
+    </div>
+    
+    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
+    
+    <p class="hint-text">Words that rhyme sound alike at the end!</p>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <p>Accuracy: <span id="accuracy">0</span>%</p>
+        <button class="btn" style="margin-top: 15px;" onclick="startGame()">Play Again</button>
+        <a href="index.html" class="home-link">← Back to Home</a>
+    </div>
+
+    <script>
+        // Rhyme groups - words in the same array rhyme with each other
+        const rhymeGroups = [
+            ['cat', 'hat', 'bat', 'mat', 'rat', 'sat', 'flat'],
+            ['dog', 'log', 'fog', 'frog', 'hog', 'jog'],
+            ['sun', 'fun', 'run', 'bun', 'one', 'done'],
+            ['bed', 'red', 'fed', 'led', 'head', 'said'],
+            ['cup', 'up', 'pup'],
+            ['ball', 'call', 'fall', 'tall', 'wall', 'small'],
+            ['cake', 'make', 'lake', 'take', 'bake', 'snake'],
+            ['tree', 'bee', 'see', 'free', 'key', 'me'],
+            ['book', 'look', 'cook', 'hook', 'took'],
+            ['ring', 'sing', 'king', 'bring', 'thing', 'swing'],
+            ['night', 'light', 'right', 'bright', 'tight', 'fight'],
+            ['day', 'play', 'say', 'way', 'may', 'stay'],
+            ['car', 'star', 'far', 'jar'],
+            ['moon', 'soon', 'spoon', 'June', 'tune'],
+            ['boat', 'coat', 'goat', 'note', 'float'],
+            ['rain', 'train', 'brain', 'main', 'chain', 'plane'],
+            ['fish', 'dish', 'wish'],
+            ['hop', 'top', 'stop', 'pop', 'drop', 'shop'],
+            ['bear', 'hair', 'chair', 'fair', 'care', 'share'],
+            ['bug', 'hug', 'mug', 'rug', 'dug', 'tug'],
+        ];
+        
+        let score = 0;
+        let round = 0;
+        let streak = 0;
+        let bestStreak = 0;
+        let correctAnswers = 0;
+        let totalRounds = 10;
+        let gameRunning = false;
+        let currentMainWord = '';
+        let correctAnswerIndex = -1;
+        let usedPairs = [];
+        
+        // High score system
+        const GAME_KEY = 'rhymeTime';
+        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        
+        const mainWordEl = document.getElementById('mainWord');
+        const choicesEl = document.getElementById('choices');
+        const scoreEl = document.getElementById('score');
+        const roundEl = document.getElementById('round');
+        const streakEl = document.getElementById('streak');
+        const progressFill = document.getElementById('progressFill');
+        const startBtn = document.getElementById('startBtn');
+        const gameOverEl = document.getElementById('gameOver');
+        
+        function getRandomFromArray(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        function loadRound() {
+            round++;
+            roundEl.textContent = round;
+            progressFill.style.width = (round / totalRounds * 100) + '%';
+            
+            // Pick a random rhyme group
+            let groupIndex, mainWord, rhymeWord;
+            let attempts = 0;
+            
+            do {
+                groupIndex = Math.floor(Math.random() * rhymeGroups.length);
+                const group = rhymeGroups[groupIndex];
+                const shuffled = [...group].sort(() => Math.random() - 0.5);
+                mainWord = shuffled[0];
+                rhymeWord = shuffled[1];
+                attempts++;
+            } while (usedPairs.includes(mainWord + rhymeWord) && attempts < 50);
+            
+            usedPairs.push(mainWord + rhymeWord);
+            currentMainWord = mainWord;
+            mainWordEl.textContent = mainWord.toUpperCase();
+            
+            // Get 3 wrong answers from different rhyme groups
+            const wrongAnswers = [];
+            const usedGroups = [groupIndex];
+            
+            while (wrongAnswers.length < 3) {
+                let wrongGroupIndex;
+                do {
+                    wrongGroupIndex = Math.floor(Math.random() * rhymeGroups.length);
+                } while (usedGroups.includes(wrongGroupIndex));
+                
+                usedGroups.push(wrongGroupIndex);
+                const wrongWord = getRandomFromArray(rhymeGroups[wrongGroupIndex]);
+                wrongAnswers.push(wrongWord);
+            }
+            
+            // Create answer options
+            const options = [rhymeWord, ...wrongAnswers];
+            correctAnswerIndex = 0;
+            
+            // Shuffle and track correct answer
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+                if (j === correctAnswerIndex) correctAnswerIndex = i;
+                else if (i === correctAnswerIndex) correctAnswerIndex = j;
+            }
+            
+            // Update buttons
+            const buttons = choicesEl.querySelectorAll('.choice');
+            buttons.forEach((btn, i) => {
+                btn.textContent = options[i].toUpperCase();
+                btn.className = 'choice';
+                btn.disabled = false;
+            });
+        }
+        
+        function checkAnswer(index) {
+            if (!gameRunning) return;
+            
+            const buttons = choicesEl.querySelectorAll('.choice');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (index === correctAnswerIndex) {
+                // Correct!
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                correctAnswers++;
+                
+                if (streak > bestStreak) bestStreak = streak;
+                
+                scoreEl.textContent = score;
+                streakEl.textContent = streak;
+            } else {
+                // Wrong!
+                buttons[index].classList.add('wrong');
+                buttons[correctAnswerIndex].classList.add('correct');
+                streak = 0;
+                streakEl.textContent = streak;
+            }
+            
+            setTimeout(() => {
+                if (round >= totalRounds) {
+                    endGame();
+                } else {
+                    loadRound();
+                }
+            }, 800);
+        }
+        
+        function startGame() {
+            score = 0;
+            round = 0;
+            streak = 0;
+            bestStreak = 0;
+            correctAnswers = 0;
+            usedPairs = [];
+            gameRunning = true;
+            
+            scoreEl.textContent = '0';
+            streakEl.textContent = '0';
+            progressFill.style.width = '0%';
+            gameOverEl.style.display = 'none';
+            startBtn.style.display = 'none';
+            
+            loadRound();
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            
+            // Save high score
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem(GAME_KEY + '_highScore', highScore);
+                localStorage.setItem(GAME_KEY + '_playerName', playerName);
+            }
+            
+            const accuracy = Math.round((correctAnswers / totalRounds) * 100);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('accuracy').textContent = accuracy;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            gameOverEl.style.display = 'block';
+            startBtn.style.display = 'block';
+        }
+        
+        // Keyboard support (1-4 keys)
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            if (e.key >= '1' && e.key <= '4') {
+                checkAnswer(parseInt(e.key) - 1);
+            }
+        });
+    </script>
+</body>
+</html>

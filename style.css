@@ -863,3 +863,132 @@ footer {
         font-size: 1rem;
     }
 }
+
+/* ==================== GAMES SECTION ==================== */
+
+.games-section {
+    margin-top: 25px;
+}
+
+.games-title {
+    color: #fff;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.game-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    min-height: 130px;
+}
+
+.game-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.game-card:active {
+    transform: scale(0.98);
+}
+
+.game-icon {
+    font-size: 2.8rem;
+    margin-bottom: 8px;
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.2));
+}
+
+.game-name {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.game-desc {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    text-align: center;
+}
+
+/* Game card colors */
+.game-card-red {
+    background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+}
+
+.game-card-purple {
+    background: linear-gradient(145deg, #a29bfe, #6c5ce7);
+}
+
+.game-card-green {
+    background: linear-gradient(145deg, #00b894, #00a186);
+}
+
+.game-card-blue {
+    background: linear-gradient(145deg, #74b9ff, #0984e3);
+}
+
+.game-card-pink {
+    background: linear-gradient(145deg, #fd79a8, #e84393);
+}
+
+.game-card-indigo {
+    background: linear-gradient(145deg, #667eea, #5a67d8);
+}
+
+.game-card-teal {
+    background: linear-gradient(145deg, #00cec9, #00b5ad);
+}
+
+.game-card-violet {
+    background: linear-gradient(145deg, #667eea, #764ba2);
+}
+
+.game-card-orange {
+    background: linear-gradient(145deg, #ffa502, #ff7f50);
+}
+
+.game-card-emerald {
+    background: linear-gradient(145deg, #11998e, #38ef7d);
+}
+
+/* Responsive games grid */
+@media (max-width: 400px) {
+    .games-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .game-card {
+        padding: 15px 10px;
+        min-height: 110px;
+    }
+    
+    .game-icon {
+        font-size: 2.2rem;
+    }
+    
+    .game-name {
+        font-size: 0.9rem;
+    }
+    
+    .games-title {
+        font-size: 1.5rem;
+    }
+}

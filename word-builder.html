@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Builder 🔤</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 25px;
+            font-size: 20px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 25px;
+            border-radius: 20px;
+        }
+        
+        .picture-box {
+            background: white;
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .word-slots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .slot {
+            width: 50px;
+            height: 60px;
+            background: rgba(255,255,255,0.3);
+            border: 3px dashed rgba(255,255,255,0.6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+        
+        .slot.filled {
+            background: rgba(255,255,255,0.9);
+            border: 3px solid #00b894;
+            color: #2d3436;
+        }
+        
+        .slot.correct {
+            background: #00b894;
+            border-color: #00b894;
+            color: white;
+            animation: correctPop 0.3s ease;
+        }
+        
+        .slot.wrong {
+            background: #d63031;
+            border-color: #d63031;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes correctPop {
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .letter-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            max-width: 350px;
+            margin-bottom: 15px;
+        }
+        
+        .letter {
+            width: 50px;
+            height: 55px;
+            background: linear-gradient(145deg, #fdcb6e, #f39c12);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+        }
+        
+        .letter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        
+        .letter:active {
+            transform: scale(0.95);
+        }
+        
+        .letter.used {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-clear {
+            background: #636e72;
+            color: white;
+        }
+        
+        .btn-check {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-start {
+            margin-top: 15px;
+            padding: 15px 35px;
+            font-size: 18px;
+            background: linear-gradient(145deg, #6c5ce7, #a29bfe);
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.98);
+            color: #2d3436;
+            padding: 30px 40px;
+            border-radius: 25px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        #gameOver h2 { color: #6c5ce7; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+        
+        .home-link {
+            display: block;
+            margin-top: 15px;
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .home-link:hover {
+            color: #6c5ce7;
+        }
+        
+        .hint-text {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .success-msg {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            animation: successPop 0.8s ease forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes successPop {
+            0% { opacity: 0; transform: translateX(-50%) scale(0); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>🔤 Word Builder</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>⭐ <span id="stars">0</span></div>
+    </div>
+    
+    <div class="picture-box" id="picture">🐱</div>
+    
+    <div class="word-slots" id="slots"></div>
+    
+    <div class="letter-bank" id="letterBank"></div>
+    
+    <div class="controls">
+        <button class="btn btn-clear" onclick="clearWord()">Clear</button>
+        <button class="btn btn-check" onclick="checkWord()">Check ✓</button>
+    </div>
+    
+    <button class="btn btn-start" id="startBtn" onclick="startGame()">Start Game</button>
+    
+    <p class="hint-text">Tap letters to spell the word!</p>
+    
+    <div id="gameOver">
+        <h2>🎉 Amazing!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <p>Words Spelled: <span id="wordsCount">0</span></p>
+        <p>Stars Earned: <span id="finalStars">0</span>⭐</p>
+        <button class="btn btn-start" onclick="startGame()">Play Again</button>
+        <a href="index.html" class="home-link">← Back to Home</a>
+    </div>
+
+    <script>
+        const words = [
+            // Level 1: 3-letter words
+            { word: 'cat', emoji: '🐱' },
+            { word: 'dog', emoji: '🐕' },
+            { word: 'sun', emoji: '☀️' },
+            { word: 'hat', emoji: '🎩' },
+            { word: 'cup', emoji: '🥤' },
+            { word: 'bed', emoji: '🛏️' },
+            { word: 'bus', emoji: '🚌' },
+            { word: 'car', emoji: '🚗' },
+            { word: 'egg', emoji: '🥚' },
+            { word: 'ant', emoji: '🐜' },
+            // Level 2: 4-letter words
+            { word: 'fish', emoji: '🐟' },
+            { word: 'bird', emoji: '🐦' },
+            { word: 'tree', emoji: '🌳' },
+            { word: 'cake', emoji: '🎂' },
+            { word: 'book', emoji: '📖' },
+            { word: 'star', emoji: '⭐' },
+            { word: 'moon', emoji: '🌙' },
+            { word: 'frog', emoji: '🐸' },
+            { word: 'duck', emoji: '🦆' },
+            { word: 'lion', emoji: '🦁' },
+            // Level 3: 5-letter words
+            { word: 'apple', emoji: '🍎' },
+            { word: 'house', emoji: '🏠' },
+            { word: 'train', emoji: '🚂' },
+            { word: 'horse', emoji: '🐴' },
+            { word: 'pizza', emoji: '🍕' },
+            { word: 'mouse', emoji: '🐭' },
+            { word: 'plant', emoji: '🌱' },
+            { word: 'beach', emoji: '🏖️' },
+            { word: 'robot', emoji: '🤖' },
+            { word: 'heart', emoji: '❤️' },
+        ];
+        
+        let score = 0;
+        let level = 1;
+        let stars = 0;
+        let wordsCompleted = 0;
+        let currentWord = null;
+        let currentGuess = [];
+        let gameRunning = false;
+        let usedWords = [];
+        
+        // High score system
+        const GAME_KEY = 'wordBuilder';
+        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        
+        const pictureEl = document.getElementById('picture');
+        const slotsEl = document.getElementById('slots');
+        const letterBankEl = document.getElementById('letterBank');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const starsEl = document.getElementById('stars');
+        const startBtn = document.getElementById('startBtn');
+        const gameOverEl = document.getElementById('gameOver');
+        
+        function getWordsByLevel(lvl) {
+            if (lvl <= 2) return words.filter(w => w.word.length === 3);
+            if (lvl <= 4) return words.filter(w => w.word.length === 4);
+            return words.filter(w => w.word.length === 5);
+        }
+        
+        function loadNewWord() {
+            const available = getWordsByLevel(level).filter(w => !usedWords.includes(w.word));
+            
+            if (available.length === 0) {
+                // Reset used words for this level
+                usedWords = usedWords.filter(w => !getWordsByLevel(level).map(x => x.word).includes(w));
+            }
+            
+            const pool = available.length > 0 ? available : getWordsByLevel(level);
+            currentWord = pool[Math.floor(Math.random() * pool.length)];
+            usedWords.push(currentWord.word);
+            currentGuess = [];
+            
+            // Show picture
+            pictureEl.textContent = currentWord.emoji;
+            
+            // Create slots
+            slotsEl.innerHTML = '';
+            for (let i = 0; i < currentWord.word.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.dataset.index = i;
+                slot.onclick = () => removeLetterAt(i);
+                slotsEl.appendChild(slot);
+            }
+            
+            // Create letter bank (word letters + extra random letters)
+            const letters = currentWord.word.split('');
+            const extraCount = Math.min(4, 8 - letters.length);
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            
+            for (let i = 0; i < extraCount; i++) {
+                let randomLetter;
+                do {
+                    randomLetter = alphabet[Math.floor(Math.random() * 26)];
+                } while (letters.filter(l => l === randomLetter).length >= 2);
+                letters.push(randomLetter);
+            }
+            
+            // Shuffle
+            letters.sort(() => Math.random() - 0.5);
+            
+            letterBankEl.innerHTML = '';
+            letters.forEach((letter, i) => {
+                const letterEl = document.createElement('div');
+                letterEl.className = 'letter';
+                letterEl.textContent = letter;
+                letterEl.dataset.index = i;
+                letterEl.onclick = () => addLetter(letter, i);
+                letterBankEl.appendChild(letterEl);
+            });
+        }
+        
+        function addLetter(letter, bankIndex) {
+            if (currentGuess.length >= currentWord.word.length) return;
+            
+            currentGuess.push({ letter, bankIndex });
+            updateSlots();
+            
+            // Mark letter as used
+            const letterEls = letterBankEl.querySelectorAll('.letter');
+            letterEls[bankIndex].classList.add('used');
+        }
+        
+        function removeLetterAt(slotIndex) {
+            if (slotIndex >= currentGuess.length) return;
+            
+            const removed = currentGuess.splice(slotIndex, 1)[0];
+            
+            // Unmark letter in bank
+            const letterEls = letterBankEl.querySelectorAll('.letter');
+            letterEls[removed.bankIndex].classList.remove('used');
+            
+            updateSlots();
+        }
+        
+        function updateSlots() {
+            const slots = slotsEl.querySelectorAll('.slot');
+            slots.forEach((slot, i) => {
+                if (i < currentGuess.length) {
+                    slot.textContent = currentGuess[i].letter;
+                    slot.classList.add('filled');
+                } else {
+                    slot.textContent = '';
+                    slot.classList.remove('filled');
+                }
+                slot.classList.remove('correct', 'wrong');
+            });
+        }
+        
+        function clearWord() {
+            currentGuess.forEach(g => {
+                const letterEls = letterBankEl.querySelectorAll('.letter');
+                letterEls[g.bankIndex].classList.remove('used');
+            });
+            currentGuess = [];
+            updateSlots();
+        }
+        
+        function checkWord() {
+            if (!gameRunning || currentGuess.length !== currentWord.word.length) return;
+            
+            const guess = currentGuess.map(g => g.letter).join('');
+            const slots = slotsEl.querySelectorAll('.slot');
+            
+            if (guess === currentWord.word) {
+                // Correct!
+                slots.forEach(slot => slot.classList.add('correct'));
+                score += currentWord.word.length * 10;
+                wordsCompleted++;
+                stars++;
+                
+                scoreEl.textContent = score;
+                starsEl.textContent = stars;
+                
+                showSuccess();
+                
+                // Level up every 3 words
+                if (wordsCompleted % 3 === 0 && level < 6) {
+                    level++;
+                    levelEl.textContent = level;
+                }
+                
+                setTimeout(() => {
+                    if (wordsCompleted >= 10) {
+                        endGame();
+                    } else {
+                        loadNewWord();
+                    }
+                }, 800);
+            } else {
+                // Wrong
+                slots.forEach(slot => slot.classList.add('wrong'));
+                setTimeout(() => {
+                    slots.forEach(slot => slot.classList.remove('wrong'));
+                }, 400);
+            }
+        }
+        
+        function showSuccess() {
+            const msg = document.createElement('div');
+            msg.className = 'success-msg';
+            msg.textContent = '⭐ Great! ⭐';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 800);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            stars = 0;
+            wordsCompleted = 0;
+            usedWords = [];
+            gameRunning = true;
+            
+            scoreEl.textContent = '0';
+            levelEl.textContent = '1';
+            starsEl.textContent = '0';
+            gameOverEl.style.display = 'none';
+            startBtn.style.display = 'none';
+            
+            loadNewWord();
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            
+            // Save high score
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem(GAME_KEY + '_highScore', highScore);
+                localStorage.setItem(GAME_KEY + '_playerName', playerName);
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('wordsCount').textContent = wordsCompleted;
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            gameOverEl.style.display = 'block';
+            startBtn.style.display = 'block';
+        }
+        
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            if (e.key === 'Backspace') {
+                if (currentGuess.length > 0) {
+                    removeLetterAt(currentGuess.length - 1);
+                }
+            } else if (e.key === 'Enter') {
+                checkWord();
+            } else if (e.key.length === 1 && e.key.match(/[a-z]/i)) {
+                // Find unused letter in bank
+                const letterEls = letterBankEl.querySelectorAll('.letter');
+                for (let i = 0; i < letterEls.length; i++) {
+                    if (!letterEls[i].classList.contains('used') && 
+                        letterEls[i].textContent.toLowerCase() === e.key.toLowerCase()) {
+                        addLetter(e.key.toLowerCase(), i);
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

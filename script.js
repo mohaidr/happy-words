@@ -350,6 +350,9 @@ function startApp() {
     studentName = nameInput.value.trim() || "Friend";
     // Capitalize first letter
     studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
+    
+    // Save player name for games to use
+    localStorage.setItem('happyWordsPlayerName', studentName);
 
     // Hide name input, show the main app
     nameContainer.classList.add('hidden');
@@ -359,6 +362,7 @@ function startApp() {
     document.getElementById('controlsContainer').classList.remove('hidden');
     document.getElementById('categoryFilter').classList.remove('hidden');
     document.getElementById('gameButton').classList.remove('hidden');
+    document.getElementById('gamesSection').classList.remove('hidden');
 
     playSound('magic');
     
@@ -550,6 +554,7 @@ function goBack() {
     const controlsContainer = document.getElementById('controlsContainer');
     const categoryFilter = document.getElementById('categoryFilter');
     const gameButton = document.getElementById('gameButton');
+    const gamesSection = document.getElementById('gamesSection');
 
     // Show name input, hide main app
     nameContainer.classList.remove('hidden');
@@ -559,6 +564,7 @@ function goBack() {
     if (controlsContainer) controlsContainer.classList.add('hidden');
     if (categoryFilter) categoryFilter.classList.add('hidden');
     if (gameButton) gameButton.classList.add('hidden');
+    if (gamesSection) gamesSection.classList.add('hidden');
 
     // Focus on the input
     document.getElementById('studentName').focus();

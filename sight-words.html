@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sight Word Speed 👀</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            color: white;
+        }
+        
+        h1 { margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+        
+        .instruction {
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+        }
+        
+        .instruction .target {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fdcb6e;
+            text-transform: uppercase;
+        }
+        
+        .game-area {
+            width: 350px;
+            height: 420px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .word-card {
+            position: absolute;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+        }
+        
+        .word-card:hover {
+            transform: scale(1.08);
+        }
+        
+        .word-card.target,
+        .word-card.distractor {
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            color: #2d3436;
+        }
+        
+        .word-card.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9) !important;
+            color: white !important;
+            animation: correctPop 0.3s ease forwards;
+        }
+        
+        .word-card.wrong {
+            background: linear-gradient(145deg, #d63031, #e17055) !important;
+            color: white !important;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes correctPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .timer-bar {
+            width: 350px;
+            height: 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #fdcb6e, #d63031);
+            border-radius: 6px;
+            transition: width 0.1s linear;
+        }
+        
+        .btn {
+            padding: 15px 35px;
+            font-size: 18px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(145deg, #6c5ce7, #a29bfe);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.98);
+            color: #2d3436;
+            padding: 30px 40px;
+            border-radius: 25px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        #gameOver h2 { color: #00b894; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+        
+        .home-link {
+            display: block;
+            margin-top: 15px;
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .home-link:hover {
+            color: #00b894;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #fdcb6e;
+            color: #2d3436;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .hint {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>👀 Sight Word Speed</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>🎯 <span id="found">0</span>/<span id="total">5</span></div>
+    </div>
+    
+    <div class="instruction">
+        Find all: <span class="target" id="targetWord">THE</span>
+    </div>
+    
+    <div class="timer-bar">
+        <div class="timer-fill" id="timerFill"></div>
+    </div>
+    
+    <div class="game-area" id="gameArea"></div>
+    
+    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
+    
+    <p class="hint">Tap all the words that match the target!</p>
+    
+    <div id="gameOver">
+        <h2>⏱️ Time's Up!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <p>Words Found: <span id="wordsFound">0</span></p>
+        <p>Level Reached: <span id="finalLevel">1</span></p>
+        <button class="btn" style="margin-top: 15px;" onclick="startGame()">Play Again</button>
+        <a href="index.html" class="home-link">← Back to Home</a>
+    </div>
+
+    <script>
+        // Common sight words for 2nd graders (Dolch + Fry words)
+        const sightWords = [
+            // Pre-primer & Primer
+            'the', 'and', 'a', 'to', 'is', 'you', 'it', 'in', 'was', 'he',
+            'she', 'for', 'on', 'are', 'as', 'with', 'his', 'they', 'at', 'be',
+            'this', 'from', 'I', 'have', 'or', 'by', 'one', 'had', 'not', 'but',
+            'what', 'all', 'were', 'when', 'we', 'there', 'can', 'an', 'your', 'which',
+            // 1st & 2nd grade
+            'said', 'each', 'she', 'do', 'how', 'their', 'if', 'will', 'up', 'other',
+            'about', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her', 'would',
+            'make', 'like', 'him', 'into', 'time', 'has', 'look', 'two', 'more', 'go',
+            'see', 'no', 'way', 'could', 'my', 'than', 'first', 'been', 'call', 'who',
+            'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may',
+        ];
+        
+        let score = 0;
+        let level = 1;
+        let targetWord = '';
+        let targetCount = 0;
+        let foundCount = 0;
+        let totalWordsFound = 0;
+        let timeLeft = 30;
+        let maxTime = 30;
+        let gameRunning = false;
+        let timerLoop;
+        
+        // High score system
+        const GAME_KEY = 'sightWords';
+        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        
+        const gameArea = document.getElementById('gameArea');
+        const targetWordEl = document.getElementById('targetWord');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const foundEl = document.getElementById('found');
+        const totalEl = document.getElementById('total');
+        const timerFill = document.getElementById('timerFill');
+        const startBtn = document.getElementById('startBtn');
+        const gameOverEl = document.getElementById('gameOver');
+        
+        function getDistractors(target, count) {
+            const distractors = [];
+            const available = sightWords.filter(w => w !== target);
+            
+            while (distractors.length < count) {
+                const word = available[Math.floor(Math.random() * available.length)];
+                if (!distractors.includes(word)) {
+                    distractors.push(word);
+                }
+            }
+            return distractors;
+        }
+        
+        function loadRound() {
+            // Clear game area
+            gameArea.innerHTML = '';
+            
+            // Pick target word
+            targetWord = sightWords[Math.floor(Math.random() * sightWords.length)];
+            targetWordEl.textContent = targetWord.toUpperCase();
+            
+            // Determine count based on level
+            targetCount = Math.min(3 + Math.floor(level / 2), 5);
+            const distractorCount = Math.min(4 + level, 10);
+            const maxWords = 15; // Limit total words to fit grid
+            
+            foundCount = 0;
+            foundEl.textContent = '0';
+            totalEl.textContent = targetCount;
+            
+            // Create word cards
+            const words = [];
+            
+            // Add target words
+            for (let i = 0; i < targetCount; i++) {
+                words.push({ word: targetWord, isTarget: true });
+            }
+            
+            // Add distractors
+            const distractors = getDistractors(targetWord, distractorCount);
+            distractors.forEach(d => {
+                words.push({ word: d, isTarget: false });
+            });
+            
+            // Shuffle
+            words.sort(() => Math.random() - 0.5);
+            
+            // Position cards in a grid-like pattern to avoid overlaps
+            const cols = 3;
+            const rows = Math.ceil(words.length / cols);
+            const cellWidth = 110;
+            const cellHeight = 80;
+            
+            words.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `word-card ${item.isTarget ? 'target' : 'distractor'}`;
+                card.textContent = item.word.toUpperCase();
+                
+                const col = index % cols;
+                const row = Math.floor(index / cols);
+                
+                const x = col * cellWidth + 15;
+                const y = row * cellHeight + 15;
+                
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+                card.style.animation = `float ${1.5 + Math.random()}s ease-in-out infinite`;
+                card.style.animationDelay = (Math.random() * 2) + 's';
+                
+                card.onclick = () => handleTap(card, item.isTarget);
+                
+                gameArea.appendChild(card);
+            });
+        }
+        
+        function handleTap(card, isTarget) {
+            if (!gameRunning || card.classList.contains('correct') || card.classList.contains('wrong')) return;
+            
+            if (isTarget) {
+                // Correct!
+                card.classList.add('correct');
+                foundCount++;
+                totalWordsFound++;
+                score += 10 * level;
+                
+                foundEl.textContent = foundCount;
+                scoreEl.textContent = score;
+                
+                // Check if all found
+                if (foundCount >= targetCount) {
+                    // Bonus for completing round
+                    score += 20 * level;
+                    scoreEl.textContent = score;
+                    
+                    // Level up
+                    level++;
+                    levelEl.textContent = level;
+                    
+                    // Bonus time
+                    timeLeft = Math.min(maxTime, timeLeft + 5);
+                    
+                    setTimeout(loadRound, 500);
+                }
+            } else {
+                // Wrong!
+                card.classList.add('wrong');
+                timeLeft = Math.max(0, timeLeft - 2);
+                
+                setTimeout(() => {
+                    card.classList.remove('wrong');
+                }, 400);
+            }
+        }
+        
+        function updateTimer() {
+            timeLeft -= 0.1;
+            const percent = (timeLeft / maxTime) * 100;
+            timerFill.style.width = percent + '%';
+            
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            totalWordsFound = 0;
+            timeLeft = maxTime;
+            gameRunning = true;
+            
+            scoreEl.textContent = '0';
+            levelEl.textContent = '1';
+            timerFill.style.width = '100%';
+            gameOverEl.style.display = 'none';
+            startBtn.style.display = 'none';
+            
+            loadRound();
+            timerLoop = setInterval(updateTimer, 100);
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            clearInterval(timerLoop);
+            
+            // Save high score
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem(GAME_KEY + '_highScore', highScore);
+                localStorage.setItem(GAME_KEY + '_playerName', playerName);
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('wordsFound').textContent = totalWordsFound;
+            document.getElementById('finalLevel').textContent = level;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            gameOverEl.style.display = 'block';
+            startBtn.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

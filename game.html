@@ -18,7 +18,34 @@
             color: white;
         }
         
-        h1 { margin-bottom: 10px; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; white-space: nowrap; }
+        
+        .top-bar {
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .home-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
         
         .score { font-size: 24px; margin-bottom: 15px; }
         
@@ -56,19 +83,82 @@
             to { transform: translateY(60px); }
         }
         
+        /* Top-down 3D car style */
+        .car-3d {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            border-radius: 8px 8px 5px 5px;
+            background: linear-gradient(180deg, #444 0%, #222 20%, #222 80%, #444 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+        
+        /* Front windshield */
+        .car-3d::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 4px;
+            right: 4px;
+            height: 14px;
+            background: linear-gradient(180deg, #87CEEB 0%, #5fa8d3 100%);
+            border-radius: 3px 3px 2px 2px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        /* Rear windshield */
+        .car-3d::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 4px;
+            right: 4px;
+            height: 10px;
+            background: linear-gradient(180deg, #5fa8d3 0%, #87CEEB 100%);
+            border-radius: 2px 2px 3px 3px;
+            box-shadow: inset 0 -1px 2px rgba(255,255,255,0.3);
+        }
+        
         #car {
             position: absolute;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-20%) rotate(90deg);
-            font-size: 40px;
+            transform: translateX(-50%);
             transition: left 0.08s ease-out, bottom 0.08s ease-out;
+            background: linear-gradient(180deg, #ff6b6b 0%, #ee5a5a 20%, #cc4444 50%, #ee5a5a 80%, #ff6b6b 100%);
+        }
+        
+        #car::before {
+            background: linear-gradient(180deg, #333 0%, #222 100%);
+        }
+        
+        #car::after {
+            background: linear-gradient(180deg, #222 0%, #333 100%);
         }
         
         .obstacle {
             position: absolute;
-            font-size: 35px;
-            transform: translateX(-20%) rotate(90deg);
+            transform: translateX(-50%);
+        }
+        
+        .obstacle.car-yellow {
+            background: linear-gradient(180deg, #feca57 0%, #f9a825 20%, #e09100 50%, #f9a825 80%, #feca57 100%);
+        }
+        
+        .obstacle.car-blue {
+            background: linear-gradient(180deg, #54a0ff 0%, #2e86de 20%, #1e6fba 50%, #2e86de 80%, #54a0ff 100%);
+        }
+        
+        .obstacle.car-green {
+            background: linear-gradient(180deg, #26de81 0%, #20bf6b 20%, #17a05a 50%, #20bf6b 80%, #26de81 100%);
+        }
+        
+        .obstacle.car-purple {
+            background: linear-gradient(180deg, #a55eea 0%, #8854d0 20%, #6c44a8 50%, #8854d0 80%, #a55eea 100%);
+        }
+        
+        .obstacle.car-white {
+            background: linear-gradient(180deg, #f5f5f5 0%, #ddd 20%, #bbb 50%, #ddd 80%, #f5f5f5 100%);
         }
         
         .controls {
@@ -139,20 +229,37 @@
         #gameOver h2 { color: #ff6b6b; margin-bottom: 10px; }
         #gameOver p { margin: 10px 0; }
         
+        .home-link {
+            display: block;
+            margin-top: 15px;
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .home-link:hover {
+            color: #fff;
+        }
+        
         .info { margin-top: 10px; opacity: 0.8; }
     </style>
 </head>
 <body>
-    <h1>🚗 Car Game 🏁</h1>
+    <div class="top-bar">
+        <a href="index.html" class="home-btn">← Home</a>
+        <h1>🚗 Car Game 🏁</h1>
+    </div>
     <div class="score">Score: <span id="score">0</span> | Speed: <span id="speedDisplay">1</span></div>
     
     <div id="gameArea">
-        <div id="car">🚗</div>
+        <div id="car" class="car-3d"></div>
         <div id="gameOver">
             <h2>Game Over!</h2>
+            <p id="playerDisplay"></p>
             <p>Score: <span id="finalScore">0</span></p>
-            <p>Best: <span id="bestScore">0</span></p>
+            <p>🏆 High Score: <span id="highScore">0</span></p>
             <button id="startBtn" onclick="startGame()">Play Again</button>
+            <a href="index.html" class="home-link">← Back to Home</a>
         </div>
     </div>
     
@@ -178,6 +285,11 @@
         let gameLoop;
         let speed = 2;
         
+        // High score system
+        const GAME_KEY = 'carGame';
+        let highScore = parseInt(localStorage.getItem(GAME_KEY + '_highScore')) || 0;
+        let playerName = localStorage.getItem('happyWordsPlayerName') || 'Player';
+        
         const car = document.getElementById('car');
         const gameArea = document.getElementById('gameArea');
         const scoreEl = document.getElementById('score');
@@ -192,14 +304,14 @@
             if (!gameRunning) return;
             carX = Math.max(30, carX - moveStep);
             car.style.left = carX + 'px';
-            car.style.transform = 'translateX(-20%) rotate(90deg)';
+            car.style.transform = 'translateX(-50%)';
         }
         
         function moveRight() {
             if (!gameRunning) return;
             carX = Math.min(270, carX + moveStep);
             car.style.left = carX + 'px';
-            car.style.transform = 'translateX(-20%) rotate(90deg)';
+            car.style.transform = 'translateX(-50%)';
         }
         
         function moveUp() {
@@ -290,13 +402,24 @@
         });
         
         function createObstacle() {
+            // Check if any obstacle is still near spawn area
+            const newX = Math.random() * 220 + 40;
+            
+            // Don't spawn if another car is nearby at the top
+            for (let obs of obstacles) {
+                if (obs.y < 60 && Math.abs(obs.x - newX) < 50) {
+                    return; // Skip spawning this time
+                }
+            }
+            
             const obstacle = document.createElement('div');
-            obstacle.className = 'obstacle';
-            obstacle.textContent = ['🌲', '🪨', '🚕', '🚌', '🛻'][Math.floor(Math.random() * 5)];
-            obstacle.style.left = (Math.random() * 240 + 20) + 'px';
-            obstacle.style.top = '-50px';
+            const carColors = ['car-yellow', 'car-blue', 'car-green', 'car-purple', 'car-white'];
+            const randomColor = carColors[Math.floor(Math.random() * carColors.length)];
+            obstacle.className = 'obstacle car-3d ' + randomColor;
+            obstacle.style.left = newX + 'px';
+            obstacle.style.top = '-60px';
             gameArea.appendChild(obstacle);
-            obstacles.push({ el: obstacle, y: -50 });
+            obstacles.push({ el: obstacle, x: newX, y: -60 });
         }
         
         function update() {
@@ -318,8 +441,8 @@
                 const carRect = car.getBoundingClientRect();
                 const obsRect = obstacles[i].el.getBoundingClientRect();
                 
-                // Shrink hitboxes for fairer collision (more forgiving)
-                const padding = 12;
+                // Smaller padding for tighter collision with 3D cars (they're 30x50px)
+                const padding = 4;
                 if (
                     carRect.left + padding < obsRect.right - padding &&
                     carRect.right - padding > obsRect.left + padding &&
@@ -351,7 +474,7 @@
             carY = 20;
             car.style.left = '50%';
             car.style.bottom = '20px';
-            car.style.transform = 'translateX(-20%) rotate(90deg)';
+            car.style.transform = 'translateX(-50%)';
             scoreEl.textContent = '0';
             gameOverEl.style.display = 'none';
             gameRunning = true;
@@ -371,10 +494,16 @@
             gameRunning = false;
             clearInterval(gameLoop);
             
-            if (score > bestScore) bestScore = score;
+            // Save high score
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem(GAME_KEY + '_highScore', highScore);
+                localStorage.setItem(GAME_KEY + '_playerName', playerName);
+            }
             
             finalScoreEl.textContent = score;
-            bestScoreEl.textContent = bestScore;
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
             
             // Re-enable start button
