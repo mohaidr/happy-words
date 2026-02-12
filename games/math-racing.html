@@ -160,7 +160,6 @@
     </div>
     
     <p class="info">Arrow keys to move • Answer math to clear obstacles!</p>
-    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
 
     <script src="../js/game-utils.js"></script>
     <script>
@@ -191,7 +190,6 @@
         const questionEl = document.getElementById('question');
         const answersEl = document.getElementById('answers');
         const gameOverEl = document.getElementById('gameOver');
-        const startBtn = document.getElementById('startBtn');
         
         function moveLeft() {
             if (!gameRunning) return;
@@ -401,7 +399,6 @@
             scoreEl.textContent = '0';
             livesEl.textContent = '3';
             gameOverEl.style.display = 'none';
-            startBtn.style.display = 'none';
             gameRunning = true;
             
             generateQuestion();
@@ -419,11 +416,10 @@
             document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            startBtn.style.display = 'block';
         }
         
-        // Initialize
-        generateQuestion();
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

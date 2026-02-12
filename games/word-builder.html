@@ -196,8 +196,6 @@
         <button class="btn btn-check" onclick="checkWord()">Check ✓</button>
     </div>
     
-    <button class="btn btn-start" id="startBtn" onclick="startGame()">Start Game</button>
-    
     <p class="hint-text">Tap letters to spell the word!</p>
     
     <div id="gameOver">
@@ -270,7 +268,6 @@
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
         const starsEl = document.getElementById('stars');
-        const startBtn = document.getElementById('startBtn');
         const gameOverEl = document.getElementById('gameOver');
         
         function getWordsByLevel(lvl) {
@@ -462,7 +459,6 @@
             levelEl.textContent = '1';
             starsEl.textContent = '0';
             gameOverEl.style.display = 'none';
-            startBtn.style.display = 'none';
             
             loadNewWord();
         }
@@ -482,7 +478,6 @@
             document.getElementById('finalStars').textContent = stars;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            startBtn.style.display = 'block';
         }
         
         // Keyboard support
@@ -507,6 +502,9 @@
                 }
             }
         });
+
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

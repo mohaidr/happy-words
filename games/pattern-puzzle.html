@@ -229,7 +229,7 @@
     
     <div class="message" id="message">Watch the pattern!</div>
     
-    <button class="start-btn" id="startBtn">Start Game</button>
+    <button class="start-btn" id="startBtn" style="display: none;">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best Level: --</div>
     
@@ -338,7 +338,6 @@
         async function showPattern() {
             isShowingPattern = true;
             document.getElementById('message').textContent = 'Watch carefully...';
-            document.getElementById('startBtn').disabled = true;
             
             updatePatternIndicator();
             
@@ -417,7 +416,6 @@
             }
             
             document.getElementById('gameOver').style.display = 'block';
-            document.getElementById('startBtn').disabled = false;
         }
         
         function startGame() {
@@ -445,12 +443,13 @@
             });
         });
         
-        document.getElementById('startBtn').addEventListener('click', startGame);
-        
         document.getElementById('hintsToggle').addEventListener('change', updatePatternIndicator);
         
         // Initialize
         loadHighScore();
+        
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

@@ -162,8 +162,6 @@
         <button class="choice" onclick="checkAnswer(3)">CUP</button>
     </div>
     
-    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
-    
     <p class="hint-text">Words that rhyme sound alike at the end!</p>
     
     <div id="gameOver">
@@ -251,7 +249,6 @@
         const roundEl = document.getElementById('round');
         const streakEl = document.getElementById('streak');
         const progressFill = document.getElementById('progressFill');
-        const startBtn = document.getElementById('startBtn');
         const gameOverEl = document.getElementById('gameOver');
         
         function getRandomFromArray(arr) {
@@ -376,7 +373,6 @@
             streakEl.textContent = '0';
             progressFill.style.width = '0%';
             gameOverEl.style.display = 'none';
-            startBtn.style.display = 'none';
             
             loadRound();
         }
@@ -397,7 +393,6 @@
             document.getElementById('accuracy').textContent = accuracy;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            startBtn.style.display = 'block';
             
             // Play level up sound for completing the game
             GameUtils.playSound('levelUp');
@@ -410,6 +405,9 @@
                 checkAnswer(parseInt(e.key) - 1);
             }
         });
+
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

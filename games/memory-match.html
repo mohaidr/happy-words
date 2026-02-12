@@ -184,7 +184,7 @@
     
     <div class="message" id="message">Find all matching pairs!</div>
     
-    <button id="startBtn" class="start-btn">Start Game</button>
+    <button id="startBtn" class="start-btn" style="display:none">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best: -- moves</div>
     
@@ -403,11 +403,12 @@
             });
         });
         
-        document.getElementById('startBtn').addEventListener('click', startGame);
-        
         // Initialize
         initGradeLevels();
         loadHighScore();
+
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

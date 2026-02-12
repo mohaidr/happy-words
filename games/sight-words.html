@@ -153,8 +153,6 @@
     
     <div class="game-area" id="gameArea"></div>
     
-    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
-    
     <p class="hint">Tap all the words that match the target!</p>
     
     <div id="gameOver">
@@ -224,7 +222,6 @@
         const foundEl = document.getElementById('found');
         const totalEl = document.getElementById('total');
         const timerFill = document.getElementById('timerFill');
-        const startBtn = document.getElementById('startBtn');
         const gameOverEl = document.getElementById('gameOver');
         
         function getDistractors(target, count) {
@@ -375,7 +372,6 @@
             levelEl.textContent = '1';
             timerFill.style.width = '100%';
             gameOverEl.style.display = 'none';
-            startBtn.style.display = 'none';
             
             loadRound();
             timerLoop = setInterval(updateTimer, 100);
@@ -397,8 +393,10 @@
             document.getElementById('finalLevel').textContent = level;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            startBtn.style.display = 'block';
         }
+
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

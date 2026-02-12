@@ -212,7 +212,7 @@
     
     <div class="message" id="message">Drag items to the correct bins!</div>
     
-    <button id="startBtn">Start Game</button>
+    <button id="startBtn" style="display: none;">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best: -- points</div>
     
@@ -543,10 +543,11 @@
             document.getElementById('gameOver').style.display = 'block';
         }
         
-        document.getElementById('startBtn').addEventListener('click', startGame);
-        
         // Initialize
         loadHighScore();
+        
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

@@ -122,7 +122,6 @@
         <div class="timer-fill" id="timerFill"></div>
     </div>
     
-    <button class="btn btn-purple" id="startBtn" onclick="startGame()">Start Game</button>
     <p class="info">Pop balloons with the correct answer before time runs out!</p>
 
     <script src="../js/game-utils.js"></script>
@@ -158,7 +157,6 @@
         const streakEl = document.getElementById('streak');
         const timerFill = document.getElementById('timerFill');
         const gameOverEl = document.getElementById('gameOver');
-        const startBtn = document.getElementById('startBtn');
         
         const balloonColors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink'];
         
@@ -303,7 +301,6 @@
             streakEl.textContent = '0';
             timerFill.style.width = '100%';
             gameOverEl.style.display = 'none';
-            startBtn.style.display = 'none';
             
             generateQuestion();
             timerLoop = setInterval(updateTimer, 100);
@@ -324,8 +321,10 @@
             document.getElementById('correctCount').textContent = correctCount;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            startBtn.style.display = 'block';
         }
+
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

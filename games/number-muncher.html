@@ -158,8 +158,6 @@
         </div>
     </div>
     
-    <button class="btn" id="startBtn" onclick="startGame()">Start Game</button>
-    
     <p class="info">Click or tap on numbers that match the rule. Don't eat the wrong ones!</p>
 
     <script src="../js/game-utils.js"></script>
@@ -234,7 +232,6 @@
         const livesEl = document.getElementById('lives');
         const ruleText = document.getElementById('ruleText');
         const gameOverEl = document.getElementById('gameOver');
-        const startBtn = document.getElementById('startBtn');
         
         function generateNumbers() {
             // Clear existing cells (except muncher and game over)
@@ -360,7 +357,6 @@
             levelEl.textContent = level;
             livesEl.textContent = lives;
             gameOverEl.style.display = 'none';
-            startBtn.style.display = 'none';
             
             // Pick random rule
             const rules = getRules();
@@ -388,8 +384,10 @@
             document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            startBtn.style.display = 'block';
         }
+
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>

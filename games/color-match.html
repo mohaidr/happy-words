@@ -168,8 +168,6 @@
     
     <div class="message" id="message"></div>
     
-    <button class="btn btn-game" id="startBtn">Start Game</button>
-    
     <div class="high-score" id="highScoreDisplay">Best: -- points</div>
     
     <div id="gameOver">
@@ -326,7 +324,6 @@
             document.getElementById('score').textContent = '0';
             document.getElementById('lives').textContent = '3';
             document.getElementById('gameOver').style.display = 'none';
-            document.getElementById('startBtn').style.display = 'none';
             
             loadRound();
         }
@@ -348,13 +345,13 @@
             }
             
             document.getElementById('gameOver').style.display = 'block';
-            document.getElementById('startBtn').style.display = 'block';
         }
-        
-        document.getElementById('startBtn').addEventListener('click', startGame);
         
         // Initialize
         loadHighScore();
+        
+        // Auto-start game on load
+        setTimeout(() => startGame(), 500);
     </script>
 </body>
 </html>
