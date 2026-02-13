@@ -370,7 +370,6 @@ function startApp() {
     document.getElementById('backButton').classList.remove('hidden');
     document.getElementById('controlsContainer').classList.remove('hidden');
     document.getElementById('categoryFilter').classList.remove('hidden');
-    document.getElementById('gameButton').classList.remove('hidden');
     document.getElementById('gamesSection').classList.remove('hidden');
 
     playSound('magic');
@@ -562,7 +561,6 @@ function goBack() {
     const backButton = document.getElementById('backButton');
     const controlsContainer = document.getElementById('controlsContainer');
     const categoryFilter = document.getElementById('categoryFilter');
-    const gameButton = document.getElementById('gameButton');
     const gamesSection = document.getElementById('gamesSection');
 
     // Show name input, hide main app
@@ -572,7 +570,6 @@ function goBack() {
     backButton.classList.add('hidden');
     if (controlsContainer) controlsContainer.classList.add('hidden');
     if (categoryFilter) categoryFilter.classList.add('hidden');
-    if (gameButton) gameButton.classList.add('hidden');
     if (gamesSection) gamesSection.classList.add('hidden');
 
     // Focus on the input
