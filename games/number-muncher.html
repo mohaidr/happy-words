@@ -181,8 +181,8 @@
         const rulesKG = [
             { name: "numbers less than 5", check: n => n < 5 },
             { name: "numbers greater than 5", check: n => n > 5 },
-            { name: "the number 1", check: n => n === 1 },
-            { name: "the number 5", check: n => n === 5 },
+            { name: "number 1", check: n => n === 1 },
+            { name: "number 5", check: n => n === 5 },
         ];
         
         const rulesG13 = [
@@ -368,7 +368,7 @@
             cells.forEach(cell => {
                 if (currentRule.check(parseInt(cell.dataset.number))) total++;
             });
-            targetCorrect = Math.max(3, total); // At least 3, or all correct numbers
+            targetCorrect = total; // Must eat all correct numbers to advance
         }
         
         function startGame() {
