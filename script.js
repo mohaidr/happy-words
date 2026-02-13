@@ -4,7 +4,7 @@ const happyMessages = [
     { emoji: "🌟", word: "{name}, you are a SUPERSTAR!", category: "praise" },
     { emoji: "🦋", word: "{name} is BEAUTIFUL inside and out!", category: "praise" },
     { emoji: "🚀", word: "{name} can do ANYTHING!", category: "praise" },
-    { emoji: "🌈", word: "{name} makes the world COLORFUL!", category: "praise" },
+    { emoji: "�", word: "{name} makes the world COLORFUL!", category: "praise" },
     { emoji: "💪", word: "{name} is SO STRONG!", category: "praise" },
     { emoji: "🎨", word: "{name} is SO CREATIVE!", category: "praise" },
     { emoji: "❤️", word: "{name} is LOVED!", category: "praise" },
@@ -151,7 +151,7 @@ const happyMessages = [
     { emoji: "💖", word: "{name} is thankful for LOVE!", category: "gratitude" },
     { emoji: "🎵", word: "{name} is grateful for MUSIC!", category: "gratitude" },
     { emoji: "📖", word: "{name} appreciates good BOOKS!", category: "gratitude" },
-    { emoji: "🌈", word: "{name} is thankful for BEAUTIFUL things!", category: "gratitude" },
+    { emoji: "�", word: "{name} is thankful for BEAUTIFUL things!", category: "gratitude" },
     { emoji: "😊", word: "{name} is grateful for HAPPINESS!", category: "gratitude" }
 ];
 
