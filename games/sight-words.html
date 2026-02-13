@@ -395,6 +395,9 @@
             gameOverEl.style.display = 'block';
         }
 
+        // Initialize sound toggle
+        GameUtils.initSoundToggle();
+        
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
     </script>

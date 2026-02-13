@@ -23,6 +23,7 @@
 <body>
     <div class="container">
         <header>
+            <button class="global-sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle Sound">🔊</button>
             <h1>✨ Happy Words! ✨</h1>
             <p class="subtitle">Click the button to see something wonderful!</p>
             <div class="streak-display">
@@ -67,7 +68,6 @@
 
             <!-- Controls Container -->
             <div class="controls-container hidden" id="controlsContainer">
-                <button class="control-btn" id="soundToggle" onclick="toggleSound()" title="Toggle Sound">🔊</button>
                 <button class="control-btn" onclick="showFavorites()" title="View Favorites">
                     💖 <span id="favoritesCount">0</span>
                 </button>

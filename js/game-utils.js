@@ -207,6 +207,31 @@ const GameUtils = {
         return `<a href="../index.html" class="home-btn">← Home</a>`;
     },
 
+    // Initialize sound toggle button in top-bar
+    initSoundToggle() {
+        const topBar = document.querySelector('.top-bar');
+        if (!topBar) return;
+        
+        const btn = document.createElement('button');
+        btn.className = 'sound-toggle';
+        btn.id = 'soundToggle';
+        btn.title = 'Toggle Sound';
+        btn.textContent = this.isSoundEnabled() ? '🔊' : '🔇';
+        
+        btn.addEventListener('click', () => {
+            const enabled = this.toggleSound();
+            btn.textContent = enabled ? '🔊' : '🔇';
+        });
+        
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            const enabled = this.toggleSound();
+            btn.textContent = enabled ? '🔊' : '🔇';
+        });
+        
+        topBar.appendChild(btn);
+    },
+
     // Create game over modal HTML
     createGameOverModal(gameKey, title = 'Game Over!') {
         return `
@@ -245,6 +270,18 @@ const GameUtils = {
 
     audioContext: null,
 
+    // Check if sound is enabled (global setting)
+    isSoundEnabled() {
+        return localStorage.getItem('happyWords_sound') !== 'false';
+    },
+
+    // Toggle sound globally
+    toggleSound() {
+        const current = this.isSoundEnabled();
+        localStorage.setItem('happyWords_sound', (!current).toString());
+        return !current;
+    },
+
     getAudioContext() {
         if (!this.audioContext) {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -253,6 +290,9 @@ const GameUtils = {
     },
 
     playSound(type) {
+        // Check global mute setting
+        if (!this.isSoundEnabled()) return;
+        
         try {
             const ctx = this.getAudioContext();
             const oscillator = ctx.createOscillator();
