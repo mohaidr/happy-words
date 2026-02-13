@@ -164,7 +164,7 @@
     <script src="../js/game-utils.js"></script>
     <script>
         // Game state
-        let carX = 125;
+        let carLane = 1; // 0=left, 1=center, 2=right
         let score = 0;
         let lives = 3;
         let speed = 2;
@@ -174,6 +174,7 @@
         let currentAnswer = 0;
         let gameWidth = 250;
         let gameHeight = 400;
+        let lanes = []; // Calculated lane positions
         
         // Use shared utilities
         const GAME_KEY = 'mathRacing';
@@ -191,18 +192,25 @@
         const answersEl = document.getElementById('answers');
         const gameOverEl = document.getElementById('gameOver');
         
+        function updateCarPosition() {
+            car.style.left = lanes[carLane] + 'px';
+            car.style.transform = 'translateX(-50%)';
+        }
+        
         function moveLeft() {
             if (!gameRunning) return;
-            carX = Math.max(25, carX - 25);
-            car.style.left = carX + 'px';
-            car.style.transform = 'translateX(-50%)';
+            if (carLane > 0) {
+                carLane--;
+                updateCarPosition();
+            }
         }
         
         function moveRight() {
             if (!gameRunning) return;
-            carX = Math.min(gameWidth - 25, carX + 25);
-            car.style.left = carX + 'px';
-            car.style.transform = 'translateX(-50%)';
+            if (carLane < lanes.length - 1) {
+                carLane++;
+                updateCarPosition();
+            }
         }
         
         // Touch-hold support
@@ -323,20 +331,17 @@
             obstacle.className = 'obstacle';
             obstacle.textContent = '🚧';
             
-            const laneCount = gameWidth >= 200 ? 3 : 2;
-            const laneSpacing = gameWidth / (laneCount + 1);
-            const lanes = [];
-            for (let i = 1; i <= laneCount; i++) lanes.push(Math.floor(laneSpacing * i));
-            const lane = lanes[Math.floor(Math.random() * lanes.length)];
+            const laneIndex = Math.floor(Math.random() * lanes.length);
+            const lane = lanes[laneIndex];
             
             for (let obs of obstacles) {
-                if (obs.y < 60 && Math.abs(obs.x - lane) < 40) return;
+                if (obs.y < 60 && obs.laneIndex === laneIndex) return;
             }
             
             obstacle.style.left = (lane - 20) + 'px';
             obstacle.style.top = '-35px';
             gameArea.appendChild(obstacle);
-            obstacles.push({ el: obstacle, x: lane, y: -35 });
+            obstacles.push({ el: obstacle, x: lane, y: -35, laneIndex: laneIndex });
         }
         
         function update() {
@@ -351,15 +356,16 @@
                 obstacles[i].y += speed;
                 obstacles[i].el.style.top = obstacles[i].y + 'px';
                 
-                const carRect = car.getBoundingClientRect();
-                const obsRect = obstacles[i].el.getBoundingClientRect();
-                const padding = 15;
+                // Lane-based collision: same lane + vertical overlap
+                const carBottom = gameHeight - 20;
+                const carTop = carBottom - 50;
+                const obsBottom = obstacles[i].y + 35;
+                const obsTop = obstacles[i].y;
                 
                 if (
-                    carRect.left + 5 < obsRect.right - padding &&
-                    carRect.right - 5 > obsRect.left + padding &&
-                    carRect.top + 5 < obsRect.bottom - padding &&
-                    carRect.bottom - 5 > obsRect.top + padding
+                    obstacles[i].laneIndex === carLane &&
+                    obsBottom > carTop + 10 &&
+                    obsTop < carBottom - 10
                 ) {
                     lives--;
                     livesEl.textContent = lives;
@@ -392,10 +398,17 @@
             
             gameWidth = gameArea.offsetWidth;
             gameHeight = gameArea.offsetHeight;
-            carX = gameWidth / 2;
             
-            car.style.left = '50%';
-            car.style.transform = 'translateX(-50%)';
+            // Calculate lane positions
+            const laneCount = gameWidth >= 200 ? 3 : 2;
+            const laneSpacing = gameWidth / (laneCount + 1);
+            lanes = [];
+            for (let i = 1; i <= laneCount; i++) lanes.push(Math.floor(laneSpacing * i));
+            
+            // Start car in center lane
+            carLane = Math.floor(lanes.length / 2);
+            updateCarPosition();
+            
             scoreEl.textContent = '0';
             livesEl.textContent = '3';
             gameOverEl.style.display = 'none';
