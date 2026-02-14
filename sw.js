@@ -1,4 +1,4 @@
-const CACHE_NAME = 'happy-words-v5';
+const CACHE_NAME = 'happy-words-v6';
 const urlsToCache = [
   '/',
   '/index.html',
