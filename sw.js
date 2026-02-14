@@ -1,4 +1,4 @@
-const CACHE_NAME = 'happy-words-v4';
+const CACHE_NAME = 'happy-words-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -10,18 +10,29 @@ const urlsToCache = [
   '/css/games.css',
   '/js/game-utils.js',
   '/games/game.html',
+  '/games/abc-order.html',
+  '/games/animal-sounds.html',
   '/games/balloon-math.html',
-  '/games/number-muncher.html',
-  '/games/math-racing.html',
-  '/games/word-builder.html',
-  '/games/rhyme-time.html',
-  '/games/sight-words.html',
-  '/games/memory-match.html',
-  '/games/pattern-puzzle.html',
-  '/games/sorting-fun.html',
+  '/games/category-fun.html',
+  '/games/category-logic.html',
+  '/games/category-math.html',
+  '/games/category-reading.html',
+  '/games/clock-time.html',
   '/games/color-match.html',
   '/games/counting-game.html',
-  '/games/shape-spotter.html'
+  '/games/emoji-feelings.html',
+  '/games/greater-less.html',
+  '/games/math-racing.html',
+  '/games/memory-match.html',
+  '/games/number-muncher.html',
+  '/games/odd-one-out.html',
+  '/games/opposite-match.html',
+  '/games/pattern-puzzle.html',
+  '/games/rhyme-time.html',
+  '/games/shape-spotter.html',
+  '/games/sight-words.html',
+  '/games/sorting-fun.html',
+  '/games/word-builder.html'
 ];
 
 // Install event - cache files
