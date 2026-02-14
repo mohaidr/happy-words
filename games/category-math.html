@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Games 🔢 - Happy Words</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease infinite;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .page-container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+        
+        .category-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .category-icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .category-title {
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .category-desc {
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            margin-top: 8px;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        
+        .game-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 22px 16px 18px;
+            text-decoration: none;
+            color: #2d3436;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        
+        .game-card:active {
+            transform: scale(0.97);
+            transition: all 0.1s ease;
+        }
+        
+        .game-card-icon {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 12px;
+            transition: transform 0.25s ease;
+        }
+        
+        .game-card:hover .game-card-icon {
+            transform: scale(1.15);
+        }
+        
+        .game-card-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d3436;
+            display: block;
+            margin-bottom: 6px;
+        }
+        
+        .game-card-desc {
+            font-size: 11px;
+            color: #636e72;
+            line-height: 1.4;
+            min-height: 30px;
+        }
+        
+        .game-card-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            color: #6b4f00;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(255,193,7,0.4);
+            display: none;
+            border: 2px solid #fff;
+        }
+        
+        .game-card-badge.has-score {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .play-btn {
+            margin-top: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            box-shadow: 0 3px 12px rgba(102,126,234,0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .game-card:hover .play-btn {
+            box-shadow: 0 5px 20px rgba(102,126,234,0.5);
+        }
+        
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 28px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+        
+        .back-home:hover {
+            background: rgba(255,255,255,0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="category-header">
+            <span class="category-icon">🔢</span>
+            <h1 class="category-title">Math Games</h1>
+            <p class="category-desc">Practice numbers, counting, and math skills!</p>
+        </div>
+        
+        <div class="games-grid">
+            <a href="counting-game.html" class="game-card" data-game="countingGame">
+                <span class="game-card-badge" id="badge-countingGame">⭐ 0</span>
+                <span class="game-card-icon">🔢</span>
+                <span class="game-card-name">Counting Game</span>
+                <span class="game-card-desc">Count objects and pick the right number</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="balloon-math.html" class="game-card" data-game="balloonMath">
+                <span class="game-card-badge" id="badge-balloonMath">⭐ 0</span>
+                <span class="game-card-icon">🎈</span>
+                <span class="game-card-name">Balloon Math</span>
+                <span class="game-card-desc">Pop balloons with the right answer</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="greater-less.html" class="game-card" data-game="greaterLess">
+                <span class="game-card-badge" id="badge-greaterLess">⭐ 0</span>
+                <span class="game-card-icon">🐊</span>
+                <span class="game-card-name">Greater or Less</span>
+                <span class="game-card-desc">Compare numbers with &gt;, &lt;, and =</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="clock-time.html" class="game-card" data-game="clockTime">
+                <span class="game-card-badge" id="badge-clockTime">⭐ 0</span>
+                <span class="game-card-icon">🕐</span>
+                <span class="game-card-name">Clock Time</span>
+                <span class="game-card-desc">Learn to read analog clocks</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="number-muncher.html" class="game-card" data-game="numberMuncher">
+                <span class="game-card-badge" id="badge-numberMuncher">⭐ 0</span>
+                <span class="game-card-icon">🐛</span>
+                <span class="game-card-name">Number Muncher</span>
+                <span class="game-card-desc">Munch numbers that match the rule</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="math-racing.html" class="game-card" data-game="mathRacing">
+                <span class="game-card-badge" id="badge-mathRacing">⭐ 0</span>
+                <span class="game-card-icon">🏎️</span>
+                <span class="game-card-name">Math Racing</span>
+                <span class="game-card-desc">Race and solve math problems</span>
+                <span class="play-btn">Play</span>
+            </a>
+        </div>
+        
+        <a href="../index.html" class="back-home">← Back to Home</a>
+    </div>
+    
+    <script>
+        // Load high scores
+        document.querySelectorAll('.game-card').forEach(card => {
+            const gameKey = card.dataset.game;
+            const score = localStorage.getItem(gameKey + '_highScore');
+            const badge = document.getElementById('badge-' + gameKey);
+            if (score && parseInt(score) > 0 && badge) {
+                badge.textContent = '⭐ ' + score;
+                badge.classList.add('has-score');
+            }
+        });
+    </script>
+</body>
+</html>

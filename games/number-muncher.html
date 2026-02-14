@@ -132,6 +132,7 @@
 <body>
     <div class="top-bar">
         <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-math.html" class="category-btn">🔢 Math</a>
         <h1>🐛 Number Muncher</h1>
     </div>
     
@@ -410,8 +411,11 @@
                 highScore = score;
             }
             
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalLevel').textContent = level;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
             document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';

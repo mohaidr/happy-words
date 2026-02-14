@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock Time 🕐</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .clock {
+            width: 200px;
+            height: 200px;
+            border: 8px solid #fff;
+            border-radius: 50%;
+            background: #fff;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .clock-center {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #333;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .clock-number {
+            position: absolute;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+        }
+        
+        .hour-hand {
+            position: absolute;
+            width: 6px;
+            height: 50px;
+            background: #333;
+            border-radius: 3px;
+            left: 50%;
+            bottom: 50%;
+            margin-left: -3px;
+            transform-origin: 50% 100%;
+            transform: rotate(0deg);
+            z-index: 5;
+        }
+        
+        .minute-hand {
+            position: absolute;
+            width: 4px;
+            height: 70px;
+            background: #e74c3c;
+            border-radius: 2px;
+            left: 50%;
+            bottom: 50%;
+            margin-left: -2px;
+            transform-origin: 50% 100%;
+            transform: rotate(0deg);
+            z-index: 6;
+        }
+        
+        .question-text {
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 10px 0;
+        }
+        
+        .time-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 300px;
+        }
+        
+        .time-btn {
+            padding: 15px 25px;
+            font-size: 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #fff, #e0e0e0);
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .time-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .time-btn.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            color: white;
+            animation: pulse 0.5s ease;
+        }
+        
+        .time-btn.wrong {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #667eea; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-math.html" class="category-btn">🔢 Math</a>
+        <h1>🕐 Clock Time</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="clock-container">
+        <div class="clock" id="clock">
+            <div class="clock-center"></div>
+            <div class="hour-hand" id="hourHand"></div>
+            <div class="minute-hand" id="minuteHand"></div>
+        </div>
+        
+        <p class="question-text">What time is it?</p>
+        
+        <div class="time-options" id="options"></div>
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+    
+    <p class="info">Read the clock and pick the right time!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'clockTime';
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let correctTime = '';
+        let questionsAnswered = 0;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        const clock = document.getElementById('clock');
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const optionsContainer = document.getElementById('options');
+        
+        // Add clock numbers
+        function initClock() {
+            const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            const radius = 75;
+            const center = 100; // half of 200px clock
+            
+            numbers.forEach((num, i) => {
+                const angle = (i * 30 - 90) * (Math.PI / 180);
+                const x = center + radius * Math.cos(angle) - 12;
+                const y = center + radius * Math.sin(angle) - 12;
+                
+                const numEl = document.createElement('div');
+                numEl.className = 'clock-number';
+                numEl.textContent = num;
+                numEl.style.left = x + 'px';
+                numEl.style.top = y + 'px';
+                clock.appendChild(numEl);
+            });
+        }
+        
+        function getTimeOptions() {
+            // Based on grade level, determine minute increments
+            if (gradeLevel === 'kg') {
+                return { minutes: [0], hourOnly: true }; // Only o'clock
+            } else if (gradeLevel === 'g1-3') {
+                return { minutes: [0, 30], hourOnly: false }; // O'clock and half past
+            } else {
+                return { minutes: [0, 15, 30, 45], hourOnly: false }; // Quarter hours
+            }
+        }
+        
+        function generateQuestion() {
+            const options = getTimeOptions();
+            const hour = Math.floor(Math.random() * 12) + 1;
+            const minute = options.minutes[Math.floor(Math.random() * options.minutes.length)];
+            
+            // Set clock hands with precise rotation
+            const hourAngle = (hour % 12) * 30 + minute * 0.5;
+            const minuteAngle = minute * 6;
+            
+            hourHand.style.transform = `rotate(${hourAngle}deg)`;
+            minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
+            
+            // Format correct time
+            correctTime = formatTime(hour, minute);
+            
+            // Generate wrong answers
+            const wrongTimes = [];
+            while (wrongTimes.length < 3) {
+                let wrongHour = Math.floor(Math.random() * 12) + 1;
+                let wrongMinute = options.minutes[Math.floor(Math.random() * options.minutes.length)];
+                let wrongTime = formatTime(wrongHour, wrongMinute);
+                
+                if (wrongTime !== correctTime && !wrongTimes.includes(wrongTime)) {
+                    wrongTimes.push(wrongTime);
+                }
+            }
+            
+            // Combine and shuffle
+            const allTimes = [correctTime, ...wrongTimes].sort(() => Math.random() - 0.5);
+            
+            // Create buttons
+            optionsContainer.innerHTML = '';
+            allTimes.forEach(time => {
+                const btn = document.createElement('button');
+                btn.className = 'time-btn';
+                btn.textContent = time;
+                btn.onclick = () => checkAnswer(btn, time);
+                optionsContainer.appendChild(btn);
+            });
+        }
+        
+        function formatTime(hour, minute) {
+            if (minute === 0) {
+                return `${hour}:00`;
+            } else if (minute === 30) {
+                return `${hour}:30`;
+            } else if (minute === 15) {
+                return `${hour}:15`;
+            } else if (minute === 45) {
+                return `${hour}:45`;
+            }
+            return `${hour}:${minute.toString().padStart(2, '0')}`;
+        }
+        
+        function checkAnswer(btn, time) {
+            const buttons = optionsContainer.querySelectorAll('.time-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (time === correctTime) {
+                btn.classList.add('correct');
+                score += 10 * level;
+                questionsAnswered++;
+                GameUtils.playSound('correct');
+                
+                // Level up every 5 questions
+                if (questionsAnswered % 5 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+            } else {
+                btn.classList.add('wrong');
+                // Show correct answer
+                buttons.forEach(b => {
+                    if (b.textContent === correctTime) b.classList.add('correct');
+                });
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1000);
+                    return;
+                }
+            }
+            
+            setTimeout(() => {
+                buttons.forEach(b => {
+                    b.classList.remove('correct', 'wrong');
+                    b.disabled = false;
+                });
+                generateQuestion();
+            }, 1000);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            questionsAnswered = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        initClock();
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>

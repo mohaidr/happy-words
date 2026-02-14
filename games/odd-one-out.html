@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odd One Out 🔍</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .instruction {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-size: 20px;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .item-card {
+            background: linear-gradient(145deg, #fff, #f5f5f5);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            min-height: 110px;
+            border: 3px solid transparent;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        
+        .item-card .emoji {
+            font-size: 48px;
+        }
+        
+        .item-card .label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .item-card.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            border-color: #00b894;
+            animation: pulse 0.5s ease;
+        }
+        
+        .item-card.correct .label {
+            color: white;
+        }
+        
+        .item-card.wrong {
+            background: linear-gradient(145deg, #d63031, #e74c3c);
+            border-color: #d63031;
+            animation: shake 0.3s ease;
+        }
+        
+        .item-card.wrong .label {
+            color: white;
+        }
+        
+        .item-card.highlight {
+            border-color: #fdcb6e;
+            background: linear-gradient(145deg, #ffeaa7, #fdcb6e);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .category-hint {
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            min-height: 40px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #fd79a8; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-logic.html" class="category-btn">🧠 Logic</a>
+        <h1>🔍 Odd One Out</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="game-area">
+        <div class="instruction">Which one doesn't belong?</div>
+        
+        <div class="items-grid" id="itemsGrid"></div>
+        
+        <div class="category-hint" id="categoryHint"></div>
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+    
+    <p class="info">Find the one that's different from the others!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'oddOneOut';
+        
+        // Categories with items
+        const categories = {
+            fruits: {
+                name: 'Fruits',
+                items: [
+                    { emoji: '🍎', label: 'Apple' },
+                    { emoji: '🍌', label: 'Banana' },
+                    { emoji: '🍇', label: 'Grapes' },
+                    { emoji: '🍊', label: 'Orange' },
+                    { emoji: '🍓', label: 'Strawberry' },
+                    { emoji: '🍑', label: 'Peach' },
+                ]
+            },
+            animals: {
+                name: 'Animals',
+                items: [
+                    { emoji: '🐶', label: 'Dog' },
+                    { emoji: '🐱', label: 'Cat' },
+                    { emoji: '🐰', label: 'Rabbit' },
+                    { emoji: '🐻', label: 'Bear' },
+                    { emoji: '🦁', label: 'Lion' },
+                    { emoji: '🐘', label: 'Elephant' },
+                ]
+            },
+            vehicles: {
+                name: 'Vehicles',
+                items: [
+                    { emoji: '🚗', label: 'Car' },
+                    { emoji: '🚌', label: 'Bus' },
+                    { emoji: '🚁', label: 'Helicopter' },
+                    { emoji: '🚂', label: 'Train' },
+                    { emoji: '🚲', label: 'Bike' },
+                    { emoji: '✈️', label: 'Plane' },
+                ]
+            },
+            food: {
+                name: 'Food',
+                items: [
+                    { emoji: '🍕', label: 'Pizza' },
+                    { emoji: '🍔', label: 'Burger' },
+                    { emoji: '🌭', label: 'Hot Dog' },
+                    { emoji: '🍟', label: 'Fries' },
+                    { emoji: '🌮', label: 'Taco' },
+                    { emoji: '🍩', label: 'Donut' },
+                ]
+            },
+            sports: {
+                name: 'Sports',
+                items: [
+                    { emoji: '⚽', label: 'Soccer' },
+                    { emoji: '🏀', label: 'Basketball' },
+                    { emoji: '🎾', label: 'Tennis' },
+                    { emoji: '⚾', label: 'Baseball' },
+                    { emoji: '🏈', label: 'Football' },
+                    { emoji: '🏐', label: 'Volleyball' },
+                ]
+            },
+            weather: {
+                name: 'Weather',
+                items: [
+                    { emoji: '☀️', label: 'Sunny' },
+                    { emoji: '🌧️', label: 'Rainy' },
+                    { emoji: '❄️', label: 'Snowy' },
+                    { emoji: '⛈️', label: 'Stormy' },
+                    { emoji: '🌤️', label: 'Cloudy' },
+                    { emoji: '🌪️', label: 'Windy' },
+                ]
+            },
+            colors: {
+                name: 'Colors',
+                items: [
+                    { emoji: '🔴', label: 'Red' },
+                    { emoji: '🔵', label: 'Blue' },
+                    { emoji: '🟢', label: 'Green' },
+                    { emoji: '🟡', label: 'Yellow' },
+                    { emoji: '🟣', label: 'Purple' },
+                    { emoji: '🟠', label: 'Orange' },
+                ]
+            },
+            clothes: {
+                name: 'Clothes',
+                items: [
+                    { emoji: '👕', label: 'Shirt' },
+                    { emoji: '👖', label: 'Pants' },
+                    { emoji: '👗', label: 'Dress' },
+                    { emoji: '🧥', label: 'Coat' },
+                    { emoji: '👟', label: 'Shoes' },
+                    { emoji: '🧢', label: 'Hat' },
+                ]
+            },
+            shapes: {
+                name: 'Shapes',
+                items: [
+                    { emoji: '⬛', label: 'Square' },
+                    { emoji: '⚫', label: 'Circle' },
+                    { emoji: '🔺', label: 'Triangle' },
+                    { emoji: '💠', label: 'Diamond' },
+                    { emoji: '⭐', label: 'Star' },
+                    { emoji: '❤️', label: 'Heart' },
+                ]
+            },
+            tools: {
+                name: 'Tools',
+                items: [
+                    { emoji: '🔨', label: 'Hammer' },
+                    { emoji: '🔧', label: 'Wrench' },
+                    { emoji: '🪛', label: 'Screwdriver' },
+                    { emoji: '✂️', label: 'Scissors' },
+                    { emoji: '📏', label: 'Ruler' },
+                    { emoji: '🔩', label: 'Bolt' },
+                ]
+            }
+        };
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let oddItem = null;
+        let mainCategory = '';
+        let questionsAnswered = 0;
+        let canAnswer = true;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        const itemsGrid = document.getElementById('itemsGrid');
+        const categoryHint = document.getElementById('categoryHint');
+        
+        function getItemCount() {
+            if (gradeLevel === 'kg') return 4;
+            if (gradeLevel === 'g1-3') return 4 + Math.floor(level / 3);
+            return 4 + Math.floor(level / 2);
+        }
+        
+        function generateQuestion() {
+            canAnswer = true;
+            categoryHint.textContent = '';
+            
+            const catKeys = Object.keys(categories);
+            const mainCatKey = catKeys[Math.floor(Math.random() * catKeys.length)];
+            let oddCatKey;
+            do {
+                oddCatKey = catKeys[Math.floor(Math.random() * catKeys.length)];
+            } while (oddCatKey === mainCatKey);
+            
+            mainCategory = categories[mainCatKey].name;
+            const mainItems = [...categories[mainCatKey].items];
+            const oddItems = [...categories[oddCatKey].items];
+            
+            // Shuffle and pick items
+            mainItems.sort(() => Math.random() - 0.5);
+            oddItems.sort(() => Math.random() - 0.5);
+            
+            const count = Math.min(getItemCount(), 6);
+            const selectedMain = mainItems.slice(0, count - 1);
+            oddItem = oddItems[0];
+            
+            // Combine and shuffle
+            const allItems = [...selectedMain, oddItem].sort(() => Math.random() - 0.5);
+            
+            // Create cards
+            itemsGrid.innerHTML = '';
+            allItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <span class="emoji">${item.emoji}</span>
+                    <span class="label">${item.label}</span>
+                `;
+                card.onclick = () => checkAnswer(card, item);
+                itemsGrid.appendChild(card);
+            });
+        }
+        
+        function checkAnswer(card, item) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            const cards = itemsGrid.querySelectorAll('.item-card');
+            cards.forEach(c => c.style.pointerEvents = 'none');
+            
+            if (item === oddItem) {
+                card.classList.add('correct');
+                categoryHint.textContent = `✅ Yes! ${item.label} is not a ${mainCategory.slice(0, -1)}!`;
+                score += 10 * level;
+                questionsAnswered++;
+                GameUtils.playSound('correct');
+                
+                if (questionsAnswered % 5 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+            } else {
+                card.classList.add('wrong');
+                // Show correct answer
+                cards.forEach(c => {
+                    const emoji = c.querySelector('.emoji').textContent;
+                    if (emoji === oddItem.emoji) {
+                        c.classList.add('highlight');
+                    }
+                });
+                
+                categoryHint.textContent = `❌ The others are ${mainCategory}. ${oddItem.label} doesn't belong!`;
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1500);
+                    return;
+                }
+            }
+            
+            setTimeout(generateQuestion, 1500);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            questionsAnswered = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>

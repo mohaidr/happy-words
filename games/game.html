@@ -223,6 +223,7 @@
 <body>
     <div class="top-bar">
         <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-fun.html" class="category-btn">🎉 Fun</a>
         <h1>🚗 Car Game 🏁</h1>
     </div>
     <div class="score">Score: <span id="score">0</span> | Speed: <span id="speedDisplay">1</span></div>
@@ -479,8 +480,10 @@
             const isNewHighScore = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             highScore = GameUtils.getHighScore(GAME_KEY);
             
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
             finalScoreEl.textContent = score;
-            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('highScore').textContent = `${highScore} by ${bestPlayer}`;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
         }

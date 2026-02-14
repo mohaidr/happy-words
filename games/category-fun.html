@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun & Learning 🎮 - Happy Words</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 50%, #00b894 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease infinite;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .page-container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+        
+        .category-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .category-icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .category-title {
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .category-desc {
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            margin-top: 8px;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        
+        .game-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 22px 16px 18px;
+            text-decoration: none;
+            color: #2d3436;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        
+        .game-card:active {
+            transform: scale(0.97);
+            transition: all 0.1s ease;
+        }
+        
+        .game-card-icon {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 12px;
+            transition: transform 0.25s ease;
+        }
+        
+        .game-card:hover .game-card-icon {
+            transform: scale(1.15);
+        }
+        
+        .game-card-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d3436;
+            display: block;
+            margin-bottom: 6px;
+        }
+        
+        .game-card-desc {
+            font-size: 11px;
+            color: #636e72;
+            line-height: 1.4;
+            min-height: 30px;
+        }
+        
+        .game-card-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            color: #6b4f00;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(255,193,7,0.4);
+            display: none;
+            border: 2px solid #fff;
+        }
+        
+        .game-card-badge.has-score {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .play-btn {
+            margin-top: 12px;
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            box-shadow: 0 3px 12px rgba(0,184,148,0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .game-card:hover .play-btn {
+            box-shadow: 0 5px 20px rgba(0,184,148,0.5);
+        }
+        
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 28px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+        
+        .back-home:hover {
+            background: rgba(255,255,255,0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="category-header">
+            <span class="category-icon">🎮</span>
+            <h1 class="category-title">Fun & Learning</h1>
+            <p class="category-desc">Colors, shapes, animals, feelings and more!</p>
+        </div>
+        
+        <div class="games-grid">
+            <a href="color-match.html" class="game-card" data-game="colorMatch">
+                <span class="game-card-badge" id="badge-colorMatch">⭐ 0</span>
+                <span class="game-card-icon">🎨</span>
+                <span class="game-card-name">Color Match</span>
+                <span class="game-card-desc">Match colors with their names</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="shape-spotter.html" class="game-card" data-game="shapeSpotter">
+                <span class="game-card-badge" id="badge-shapeSpotter">⭐ 0</span>
+                <span class="game-card-icon">🔷</span>
+                <span class="game-card-name">Shape Spotter</span>
+                <span class="game-card-desc">Find and identify shapes</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="animal-sounds.html" class="game-card" data-game="animalSounds">
+                <span class="game-card-badge" id="badge-animalSounds">⭐ 0</span>
+                <span class="game-card-icon">🐮</span>
+                <span class="game-card-name">Animal Sounds</span>
+                <span class="game-card-desc">Match animals to their sounds</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="emoji-feelings.html" class="game-card" data-game="emojiFeelings">
+                <span class="game-card-badge" id="badge-emojiFeelings">⭐ 0</span>
+                <span class="game-card-icon">😊</span>
+                <span class="game-card-name">Emoji Feelings</span>
+                <span class="game-card-desc">Learn about emotions and feelings</span>
+                <span class="play-btn">Play</span>
+            </a>
+            
+            <a href="game.html" class="game-card" data-game="carGame">
+                <span class="game-card-badge" id="badge-carGame">⭐ 0</span>
+                <span class="game-card-icon">🚗</span>
+                <span class="game-card-name">Car Game</span>
+                <span class="game-card-desc">Dodge obstacles on the road</span>
+                <span class="play-btn">Play</span>
+            </a>
+        </div>
+        
+        <a href="../index.html" class="back-home">← Back to Home</a>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.game-card').forEach(card => {
+            const gameKey = card.dataset.game;
+            const score = localStorage.getItem(gameKey + '_highScore');
+            const badge = document.getElementById('badge-' + gameKey);
+            if (score && parseInt(score) > 0 && badge) {
+                badge.textContent = '⭐ ' + score;
+                badge.classList.add('has-score');
+            }
+        });
+    </script>
+</body>
+</html>

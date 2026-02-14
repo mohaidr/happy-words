@@ -42,6 +42,8 @@
             height: 340px;
             background: rgba(255,255,255,0.15);
             margin-bottom: 15px;
+            padding: 30px;
+
         }
         
         .shape {
@@ -161,8 +163,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <h1>🔷 Shape Spotter</h1>
+        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-fun.html" class="category-btn">🎉 Fun</a>        <h1>🔷 Shape Spotter</h1>
     </div>
     
     <div class="stats">
@@ -237,7 +238,8 @@
         function loadHighScore() {
             const highScore = GameUtils.getHighScore(GAME_KEY);
             if (highScore > 0) {
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${highScore} points`;
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${highScore} points by ${bestPlayer}`;
             }
         }
         

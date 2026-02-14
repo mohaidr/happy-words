@@ -21,22 +21,29 @@
         
         .objects-container {
             width: 320px;
-            height: 200px;
+            min-height: 120px;
             background: rgba(255,255,255,0.15);
             border-radius: 20px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+            align-content: center;
             justify-content: center;
-            gap: 10px;
-            padding: 20px;
+            gap: 8px;
+            padding: 15px;
             margin-bottom: 20px;
             position: relative;
+            box-sizing: border-box;
         }
         
         .object {
-            font-size: 40px;
+            font-size: 36px;
             animation: bounce 1s ease-in-out infinite;
+            line-height: 1;
+        }
+        
+        .object.small {
+            font-size: 28px;
         }
         
         .object:nth-child(odd) {
@@ -163,6 +170,7 @@
 <body>
     <div class="top-bar">
         <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-math.html" class="category-btn">🔢 Math</a>
         <h1>🔢 Counting Game</h1>
     </div>
     
@@ -212,7 +220,8 @@
         function loadHighScore() {
             const saved = GameUtils.getHighScore(GAME_KEY);
             if (saved > 0) {
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points by ${bestPlayer}`;
             }
         }
         
@@ -237,9 +246,12 @@
             const container = document.getElementById('objectsContainer');
             container.innerHTML = '';
             
+            // Use smaller size for many objects
+            const useSmall = currentCount > 8;
+            
             for (let i = 0; i < currentCount; i++) {
                 const obj = document.createElement('span');
-                obj.className = 'object';
+                obj.className = 'object' + (useSmall ? ' small' : '');
                 obj.textContent = emoji;
                 obj.style.animationDelay = (i * 0.1) + 's';
                 container.appendChild(obj);

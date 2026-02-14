@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Sounds 🐮</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #55a3ff, #00d4aa);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .sound-bubble {
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            padding: 25px 45px;
+            border-radius: 30px;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        
+        .sound-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 15px solid #f0f0f0;
+        }
+        
+        .sound-text {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2d3436;
+            font-style: italic;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .animal-card {
+            background: linear-gradient(145deg, #fff, #f5f5f5);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border: 3px solid transparent;
+        }
+        
+        .animal-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        
+        .animal-card .emoji {
+            font-size: 50px;
+        }
+        
+        .animal-card .name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .animal-card.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            border-color: #00b894;
+            animation: bounce 0.5s ease;
+        }
+        
+        .animal-card.correct .name {
+            color: white;
+        }
+        
+        .animal-card.wrong {
+            background: linear-gradient(145deg, #d63031, #e74c3c);
+            border-color: #d63031;
+            animation: shake 0.3s ease;
+        }
+        
+        .animal-card.wrong .name {
+            color: white;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        .play-sound-btn {
+            background: linear-gradient(145deg, #fdcb6e, #f39c12);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .play-sound-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #55a3ff; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-fun.html" class="category-btn">🎉 Fun</a>        <h1>🐮 Animal Sounds</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="game-area">
+        <div class="sound-bubble">
+            <span class="sound-text" id="soundText">"Moo!"</span>
+        </div>
+        
+        <button class="play-sound-btn" onclick="speakSound()" title="Hear the sound">🔊</button>
+        
+        <p class="question-text">Which animal makes this sound?</p>
+        
+        <div class="animals-grid" id="animalsGrid"></div>
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+    
+    <p class="info">Match the sound to the right animal!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'animalSounds';
+        
+        // Animals with their sounds
+        const animals = [
+            { emoji: '🐮', name: 'Cow', sound: 'Moo!' },
+            { emoji: '🐶', name: 'Dog', sound: 'Woof!' },
+            { emoji: '🐱', name: 'Cat', sound: 'Meow!' },
+            { emoji: '🐷', name: 'Pig', sound: 'Oink!' },
+            { emoji: '🐸', name: 'Frog', sound: 'Ribbit!' },
+            { emoji: '🦆', name: 'Duck', sound: 'Quack!' },
+            { emoji: '🐔', name: 'Chicken', sound: 'Cluck!' },
+            { emoji: '🐑', name: 'Sheep', sound: 'Baa!' },
+            { emoji: '🦁', name: 'Lion', sound: 'Roar!' },
+            { emoji: '🐴', name: 'Horse', sound: 'Neigh!' },
+            { emoji: '🐦', name: 'Bird', sound: 'Tweet!' },
+            { emoji: '🦉', name: 'Owl', sound: 'Hoot!' },
+            { emoji: '🐝', name: 'Bee', sound: 'Buzz!' },
+            { emoji: '🐍', name: 'Snake', sound: 'Hiss!' },
+            { emoji: '🐘', name: 'Elephant', sound: 'Trumpet!' },
+            { emoji: '🦃', name: 'Turkey', sound: 'Gobble!' },
+            { emoji: '🐺', name: 'Wolf', sound: 'Howl!' },
+            { emoji: '🐻', name: 'Bear', sound: 'Growl!' },
+            { emoji: '🐵', name: 'Monkey', sound: 'Ooh ooh!' },
+            { emoji: '🐭', name: 'Mouse', sound: 'Squeak!' },
+        ];
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let currentAnimal = null;
+        let usedAnimals = [];
+        let canAnswer = true;
+        let questionsAnswered = 0;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        const soundText = document.getElementById('soundText');
+        const animalsGrid = document.getElementById('animalsGrid');
+        
+        function getChoiceCount() {
+            if (gradeLevel === 'kg') return 4;
+            return 4 + Math.min(Math.floor(level / 2), 2);
+        }
+        
+        function speakSound() {
+            if (currentAnimal && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(currentAnimal.sound);
+                utterance.rate = 0.8;
+                utterance.pitch = 1.2;
+                speechSynthesis.speak(utterance);
+            }
+        }
+        
+        function generateQuestion() {
+            canAnswer = true;
+            
+            // Get unused animal or reset
+            const available = animals.filter(a => !usedAnimals.includes(a.name));
+            if (available.length < 4) usedAnimals = [];
+            
+            const pool = available.length >= 4 ? available : animals;
+            const shuffled = [...pool].sort(() => Math.random() - 0.5);
+            
+            currentAnimal = shuffled[0];
+            usedAnimals.push(currentAnimal.name);
+            
+            soundText.textContent = `"${currentAnimal.sound}"`;
+            
+            // Get wrong answers
+            const choices = [currentAnimal];
+            for (let i = 1; i < shuffled.length && choices.length < getChoiceCount(); i++) {
+                choices.push(shuffled[i]);
+            }
+            
+            // Shuffle choices
+            choices.sort(() => Math.random() - 0.5);
+            
+            // Create cards
+            animalsGrid.innerHTML = '';
+            choices.forEach(animal => {
+                const card = document.createElement('div');
+                card.className = 'animal-card';
+                card.innerHTML = `
+                    <span class="emoji">${animal.emoji}</span>
+                    <span class="name">${animal.name}</span>
+                `;
+                card.onclick = () => checkAnswer(card, animal);
+                animalsGrid.appendChild(card);
+            });
+            
+            // Auto-speak the sound
+            setTimeout(speakSound, 300);
+        }
+        
+        function checkAnswer(card, animal) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            const cards = animalsGrid.querySelectorAll('.animal-card');
+            cards.forEach(c => c.style.pointerEvents = 'none');
+            
+            if (animal === currentAnimal) {
+                card.classList.add('correct');
+                score += 10 * level;
+                questionsAnswered++;
+                GameUtils.playSound('correct');
+                
+                if (questionsAnswered % 5 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+            } else {
+                card.classList.add('wrong');
+                // Show correct
+                cards.forEach(c => {
+                    if (c.querySelector('.name').textContent === currentAnimal.name) {
+                        c.classList.add('correct');
+                    }
+                });
+                
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1200);
+                    return;
+                }
+            }
+            
+            setTimeout(generateQuestion, 1200);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            usedAnimals = [];
+            questionsAnswered = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>

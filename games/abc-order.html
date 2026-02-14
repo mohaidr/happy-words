@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Order 🔡</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e17055, #fdcb6e);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+
+        }
+        
+        .instruction {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+        }
+        
+        .letters-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 70px;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 20px;
+            width: 100%;
+        }
+        
+        .answer-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 70px;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            width: 100%;
+            border: 3px dashed rgba(255,255,255,0.5);
+        }
+        
+        .letter-tile {
+            min-width: 55px;
+            padding: 12px 18px;
+            height: auto;
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .slot {
+            min-width: 55px;
+            padding: 12px 18px;
+            height: 48px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 12px;
+            border: 2px dashed rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .letter-tile:hover {
+            transform: scale(1.1);
+        }
+        
+        .letter-tile.selected {
+            background: linear-gradient(145deg, #74b9ff, #0984e3);
+            color: white;
+        }
+        
+        .letter-tile.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            color: white;
+        }
+        
+        .letter-tile.wrong {
+            background: linear-gradient(145deg, #d63031, #e74c3c);
+            color: white;
+            animation: shake 0.3s ease;
+        }
+        
+        .check-btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .check-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .check-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .feedback {
+            font-size: 24px;
+            min-height: 35px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #fdcb6e; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-reading.html" class="category-btn">📚 Reading</a>        <h1>🔡 ABC Order</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="game-area">
+        <div class="instruction">Put in ABC order! (A → Z)</div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="answer-slots" id="answerSlots"></div>
+        
+        <div class="letters-pool" id="lettersPool"></div>
+        
+        <button class="check-btn" id="checkBtn" onclick="checkAnswer()">Check Order ✓</button>
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'abcOrder';
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let currentItems = [];
+        let correctOrder = [];
+        let userOrder = [];
+        let questionsAnswered = 0;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        const lettersPool = document.getElementById('lettersPool');
+        const answerSlots = document.getElementById('answerSlots');
+        const checkBtn = document.getElementById('checkBtn');
+        const feedbackEl = document.getElementById('feedback');
+        
+        // Simple words for different levels
+        const simpleWords = [
+            ['cat', 'dog', 'ant'],
+            ['ball', 'cup', 'doll'],
+            ['egg', 'fish', 'goat'],
+            ['hat', 'ice', 'jam'],
+            ['kite', 'lamp', 'moon'],
+            ['nest', 'owl', 'pig'],
+            ['queen', 'rat', 'sun'],
+            ['tree', 'umbrella', 'van'],
+            ['apple', 'banana', 'cherry'],
+            ['door', 'elephant', 'frog'],
+        ];
+        
+        function getItems() {
+            if (gradeLevel === 'kg') {
+                // Just letters for KG
+                const count = 3 + Math.floor(level / 3);
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+                const start = Math.floor(Math.random() * (26 - count));
+                return letters.slice(start, start + Math.min(count, 5));
+            } else if (gradeLevel === 'g1-3') {
+                // Mix of letters and simple words
+                if (level <= 3) {
+                    const count = 3 + Math.floor(level / 2);
+                    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+                    const start = Math.floor(Math.random() * (26 - count));
+                    return letters.slice(start, start + Math.min(count, 5));
+                } else {
+                    return simpleWords[Math.floor(Math.random() * simpleWords.length)].slice(0, 3 + Math.floor(level / 3));
+                }
+            } else {
+                // Words for older kids
+                const wordSet = simpleWords[Math.floor(Math.random() * simpleWords.length)];
+                return wordSet.slice(0, Math.min(4, wordSet.length));
+            }
+        }
+        
+        function generateQuestion() {
+            feedbackEl.textContent = '';
+            userOrder = [];
+            
+            currentItems = getItems();
+            correctOrder = [...currentItems].sort((a, b) => 
+                a.toLowerCase().localeCompare(b.toLowerCase())
+            );
+            
+            // Shuffle for display
+            const shuffled = [...currentItems].sort(() => Math.random() - 0.5);
+            
+            // Create slots
+            answerSlots.innerHTML = '';
+            for (let i = 0; i < currentItems.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.dataset.index = i;
+                slot.onclick = () => removeFromSlot(i);
+                answerSlots.appendChild(slot);
+            }
+            
+            // Create tiles
+            lettersPool.innerHTML = '';
+            shuffled.forEach((item, i) => {
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.textContent = item;
+                tile.dataset.item = item;
+                tile.onclick = () => selectTile(tile);
+                lettersPool.appendChild(tile);
+            });
+            
+            checkBtn.disabled = true;
+        }
+        
+        function selectTile(tile) {
+            if (tile.classList.contains('selected')) return;
+            if (userOrder.length >= currentItems.length) return;
+            
+            const item = tile.dataset.item;
+            userOrder.push(item);
+            tile.classList.add('selected');
+            
+            // Fill slot
+            const slotIndex = userOrder.length - 1;
+            const slot = answerSlots.children[slotIndex];
+            slot.innerHTML = '';
+            
+            const slotTile = document.createElement('div');
+            slotTile.className = 'letter-tile selected';
+            slotTile.textContent = item;
+            slotTile.dataset.item = item;
+            slot.appendChild(slotTile);
+            
+            GameUtils.playSound('click');
+            
+            // Enable check when all slots filled
+            if (userOrder.length === currentItems.length) {
+                checkBtn.disabled = false;
+            }
+        }
+        
+        function removeFromSlot(slotIndex) {
+            if (slotIndex >= userOrder.length) return;
+            
+            const item = userOrder[slotIndex];
+            userOrder.splice(slotIndex, 1);
+            
+            // Find and deselect the tile
+            const tiles = lettersPool.querySelectorAll('.letter-tile');
+            tiles.forEach(t => {
+                if (t.dataset.item === item && t.classList.contains('selected')) {
+                    t.classList.remove('selected');
+                }
+            });
+            
+            // Rebuild slots
+            rebuildSlots();
+            checkBtn.disabled = true;
+            GameUtils.playSound('click');
+        }
+        
+        function rebuildSlots() {
+            for (let i = 0; i < currentItems.length; i++) {
+                const slot = answerSlots.children[i];
+                slot.innerHTML = '';
+                
+                if (i < userOrder.length) {
+                    const tile = document.createElement('div');
+                    tile.className = 'letter-tile selected';
+                    tile.textContent = userOrder[i];
+                    tile.dataset.item = userOrder[i];
+                    slot.appendChild(tile);
+                }
+            }
+        }
+        
+        function checkAnswer() {
+            const isCorrect = userOrder.every((item, i) => 
+                item.toLowerCase() === correctOrder[i].toLowerCase()
+            );
+            
+            const slotTiles = answerSlots.querySelectorAll('.letter-tile');
+            
+            if (isCorrect) {
+                slotTiles.forEach(t => t.classList.add('correct'));
+                feedbackEl.textContent = '✅ Perfect ABC order!';
+                score += 10 * level;
+                questionsAnswered++;
+                GameUtils.playSound('correct');
+                
+                if (questionsAnswered % 4 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+                
+                setTimeout(generateQuestion, 1500);
+            } else {
+                slotTiles.forEach((t, i) => {
+                    if (userOrder[i].toLowerCase() !== correctOrder[i].toLowerCase()) {
+                        t.classList.add('wrong');
+                    } else {
+                        t.classList.add('correct');
+                    }
+                });
+                
+                feedbackEl.textContent = '❌ Try again! Correct: ' + correctOrder.join(' → ');
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1500);
+                    return;
+                }
+                
+                setTimeout(generateQuestion, 2000);
+            }
+            
+            checkBtn.disabled = true;
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            questionsAnswered = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>

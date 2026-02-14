@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opposite Match ↔️</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .word-prompt {
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            padding: 25px 50px;
+            border-radius: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #2d3436;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            min-width: 150px;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .answer-btn {
+            padding: 20px;
+            font-size: 22px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border: none;
+            border-radius: 18px;
+            background: linear-gradient(145deg, #fff, #e0e0e0);
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            min-height: 80px;
+        }
+        
+        .answer-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+        
+        .answer-btn.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            color: white;
+            animation: pulse 0.5s ease;
+        }
+        
+        .answer-btn.wrong {
+            background: linear-gradient(145deg, #d63031, #e74c3c);
+            color: white;
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        
+        .streak-bonus {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .streak-bonus.hot {
+            background: rgba(255,107,107,0.3);
+            animation: glow 1s ease infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,107,107,0.5); }
+            50% { box-shadow: 0 0 20px rgba(255,107,107,0.8); }
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #a29bfe; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-reading.html" class="category-btn">📚 Reading</a>
+        <h1>↔️ Opposite Match</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="game-area">
+        <div class="streak-bonus" id="streakBonus">🔥 Streak: 0</div>
+        
+        <p class="question-text">What is the OPPOSITE of...</p>
+        
+        <div class="word-prompt" id="wordPrompt">HOT</div>
+        
+        <div class="answer-grid" id="answerGrid"></div>
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <p>Best Streak: <span id="bestStreak">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+    
+    <p class="info">Find the word that means the opposite!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'oppositeMatch';
+        
+        // Opposite pairs by difficulty
+        const opposites = {
+            easy: [
+                ['hot', 'cold'], ['big', 'small'], ['up', 'down'],
+                ['happy', 'sad'], ['fast', 'slow'], ['day', 'night'],
+                ['old', 'young'], ['open', 'close'], ['in', 'out'],
+                ['yes', 'no'], ['stop', 'go'], ['boy', 'girl'],
+                ['tall', 'short'], ['wet', 'dry'], ['full', 'empty'],
+                ['light', 'dark'], ['soft', 'hard'], ['clean', 'dirty'],
+                ['loud', 'quiet'], ['push', 'pull'], ['top', 'bottom'],
+                ['new', 'old'], ['good', 'bad'], ['left', 'right'],
+                ['high', 'low'], ['here', 'there'], ['come', 'go'],
+                ['sit', 'stand'], ['run', 'walk'], ['sleep', 'wake'],
+                ['front', 'back'], ['near', 'far'], ['first', 'last'],
+                ['on', 'off'], ['black', 'white'], ['sun', 'moon'],
+                ['add', 'subtract'], ['over', 'under'], ['inside', 'outside'],
+                ['before', 'after'], ['above', 'below'], ['buy', 'sell'],
+                ['ask', 'answer'], ['many', 'few'], ['more', 'less'],
+                ['same', 'different'], ['early', 'late'], ['start', 'finish'],
+                ['lost', 'found'], ['hide', 'seek'], ['nice', 'mean'],
+                ['sink', 'float'], ['thin', 'fat'], ['warm', 'cool'],
+            ],
+            medium: [
+                ['brave', 'scared'], ['kind', 'mean'], ['strong', 'weak'],
+                ['sweet', 'sour'], ['rich', 'poor'], ['thick', 'thin'],
+                ['heavy', 'light'], ['rough', 'smooth'], ['sharp', 'dull'],
+                ['deep', 'shallow'], ['wide', 'narrow'], ['loose', 'tight'],
+                ['wild', 'tame'], ['asleep', 'awake'], ['begin', 'end'],
+                ['love', 'hate'], ['laugh', 'cry'], ['win', 'lose'],
+                ['remember', 'forget'], ['true', 'false'], ['give', 'take'],
+                ['friend', 'enemy'], ['peace', 'war'], ['safe', 'dangerous'],
+                ['quiet', 'noisy'], ['bright', 'dim'], ['wise', 'foolish'],
+                ['clever', 'dumb'], ['honest', 'dishonest'], ['calm', 'angry'],
+                ['tidy', 'messy'], ['lazy', 'busy'], ['proud', 'ashamed'],
+                ['fancy', 'plain'], ['fresh', 'stale'], ['ripe', 'unripe'],
+                ['whole', 'broken'], ['real', 'fake'], ['common', 'rare'],
+                ['cheap', 'expensive'], ['easy', 'hard'], ['simple', 'complex'],
+                ['boring', 'fun'], ['gentle', 'rough'], ['major', 'minor'],
+                ['public', 'private'], ['normal', 'weird'], ['silent', 'loud'],
+                ['polite', 'rude'], ['lucky', 'unlucky'], ['careful', 'careless'],
+                ['useful', 'useless'], ['helpful', 'harmful'], ['possible', 'impossible'],
+                ['visible', 'invisible'], ['legal', 'illegal'], ['active', 'inactive'],
+            ],
+            hard: [
+                ['ancient', 'modern'], ['arrive', 'depart'], ['attack', 'defend'],
+                ['boring', 'exciting'], ['capture', 'release'], ['certain', 'doubtful'],
+                ['combine', 'separate'], ['create', 'destroy'], ['expand', 'shrink'],
+                ['generous', 'selfish'], ['innocent', 'guilty'], ['maximum', 'minimum'],
+                ['permanent', 'temporary'], ['positive', 'negative'], ['polite', 'rude'],
+                ['success', 'failure'], ['accept', 'reject'], ['include', 'exclude'],
+                ['artificial', 'natural'], ['amateur', 'professional'], ['abstract', 'concrete'],
+                ['voluntary', 'mandatory'], ['frequent', 'rare'], ['gradual', 'sudden'],
+                ['humble', 'arrogant'], ['abundant', 'scarce'], ['flexible', 'rigid'],
+                ['transparent', 'opaque'], ['superior', 'inferior'], ['external', 'internal'],
+                ['vertical', 'horizontal'], ['majority', 'minority'], ['offensive', 'defensive'],
+                ['optimistic', 'pessimistic'], ['domestic', 'foreign'], ['urban', 'rural'],
+                ['courage', 'cowardice'], ['victory', 'defeat'], ['increase', 'decrease'],
+                ['complex', 'simple'], ['familiar', 'strange'], ['freedom', 'captivity'],
+                ['harmony', 'conflict'], ['ignorance', 'knowledge'], ['celebrate', 'mourn'],
+                ['confident', 'insecure'], ['advance', 'retreat'], ['approve', 'disapprove'],
+                ['benefit', 'harm'], ['construct', 'demolish'], ['encourage', 'discourage'],
+                ['entrance', 'exit'], ['genuine', 'counterfeit'], ['logical', 'illogical'],
+                ['precious', 'worthless'], ['reward', 'punish'], ['voluntary', 'compulsory'],
+            ]
+        };
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let streak = 0;
+        let bestStreak = 0;
+        let currentPair = null;
+        let usedPairs = [];
+        let canAnswer = true;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        const wordPrompt = document.getElementById('wordPrompt');
+        const answerGrid = document.getElementById('answerGrid');
+        const streakBonus = document.getElementById('streakBonus');
+        
+        function getDifficulty() {
+            if (gradeLevel === 'kg') return 'easy';
+            if (gradeLevel === 'g1-3') return level <= 3 ? 'easy' : 'medium';
+            return level <= 2 ? 'easy' : level <= 5 ? 'medium' : 'hard';
+        }
+        
+        function getUnusedPair() {
+            const difficulty = getDifficulty();
+            const pool = opposites[difficulty].filter(p => 
+                !usedPairs.some(u => u[0] === p[0])
+            );
+            
+            if (pool.length === 0) {
+                usedPairs = [];
+                return opposites[difficulty][Math.floor(Math.random() * opposites[difficulty].length)];
+            }
+            
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+        
+        function generateQuestion() {
+            canAnswer = true;
+            
+            currentPair = getUnusedPair();
+            usedPairs.push(currentPair);
+            
+            // Randomly choose which word to show
+            const showFirst = Math.random() < 0.5;
+            const promptWord = showFirst ? currentPair[0] : currentPair[1];
+            const correctAnswer = showFirst ? currentPair[1] : currentPair[0];
+            
+            wordPrompt.textContent = promptWord.toUpperCase();
+            
+            // Generate wrong answers from other pairs
+            const difficulty = getDifficulty();
+            const wrongAnswers = [];
+            const allWords = opposites[difficulty].flat();
+            
+            while (wrongAnswers.length < 3) {
+                const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+                if (randomWord !== correctAnswer && 
+                    randomWord !== promptWord && 
+                    !wrongAnswers.includes(randomWord)) {
+                    wrongAnswers.push(randomWord);
+                }
+            }
+            
+            // Combine and shuffle
+            const options = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            
+            // Create buttons
+            answerGrid.innerHTML = '';
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(btn, option, correctAnswer);
+                answerGrid.appendChild(btn);
+            });
+        }
+        
+        function checkAnswer(btn, selected, correct) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            const buttons = answerGrid.querySelectorAll('.answer-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (selected === correct) {
+                btn.classList.add('correct');
+                streak++;
+                
+                // Streak bonus scoring
+                const streakMultiplier = Math.min(streak, 5);
+                const points = 10 * level * streakMultiplier;
+                score += points;
+                
+                if (streak >= 3) {
+                    streakBonus.classList.add('hot');
+                }
+                streakBonus.textContent = `🔥 Streak: ${streak}`;
+                
+                if (streak > bestStreak) bestStreak = streak;
+                
+                GameUtils.playSound('correct');
+                
+                // Level up every 5 correct
+                if (usedPairs.length % 5 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+            } else {
+                btn.classList.add('wrong');
+                // Show correct
+                buttons.forEach(b => {
+                    if (b.textContent === correct) b.classList.add('correct');
+                });
+                
+                streak = 0;
+                streakBonus.classList.remove('hot');
+                streakBonus.textContent = `🔥 Streak: 0`;
+                
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1000);
+                    return;
+                }
+            }
+            
+            setTimeout(generateQuestion, 1200);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            streak = 0;
+            bestStreak = 0;
+            usedPairs = [];
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            streakBonus.textContent = '🔥 Streak: 0';
+            streakBonus.classList.remove('hot');
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('bestStreak').textContent = bestStreak;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>

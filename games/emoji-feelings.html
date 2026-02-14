@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Feelings 😊</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6e5f2c, #fab1a0);
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .feeling-word {
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            padding: 15px 35px;
+            border-radius: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d3436;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            color: #2d3436;
+        }
+        
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .emoji-card {
+            background: linear-gradient(145deg, #fff, #f8f8f8);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            border: 4px solid transparent;
+            min-height: 100px;
+        }
+        
+        .emoji-card:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .emoji-card .emoji {
+            font-size: 60px;
+        }
+        
+        .emoji-card.correct {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            border-color: #00b894;
+            animation: celebrate 0.6s ease;
+        }
+        
+        .emoji-card.wrong {
+            background: linear-gradient(145deg, #d63031, #e74c3c);
+            border-color: #d63031;
+            animation: shake 0.3s ease;
+        }
+        
+        .emoji-card.hint {
+            border-color: #fdcb6e;
+            box-shadow: 0 0 20px rgba(253, 203, 110, 0.5);
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-5deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            75% { transform: scale(1.15) rotate(-3deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .tip-box {
+            background: rgba(255,255,255,0.5);
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #2d3436;
+            max-width: 300px;
+            text-align: center;
+        }
+        
+        .tip-box .tip-emoji {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #ffeaa7; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+        
+        .feeling-tip {
+            font-size: 16px;
+            background: rgba(0,0,0,0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-fun.html" class="category-btn">🎉 Fun</a>
+        <h1>😊 Emoji Feelings</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="game-area">
+        <p class="question-text">Which face shows...</p>
+        
+        <div class="feeling-word" id="feelingWord">HAPPY</div>
+        
+        <div class="feeling-tip" id="feelingTip"></div>
+        
+        <div class="emoji-grid" id="emojiGrid"></div>
+        
+        <div class="tip-box">
+            <span class="tip-emoji">💡</span>
+            Understanding feelings helps us be good friends!
+        </div>
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <p>Feelings Learned: <span id="feelingsLearned">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+    
+    <p class="info">Match the feeling word to the right emoji!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'emojiFeelings';
+        
+        // Feelings with emojis and tips
+        const feelings = [
+            { emoji: '😊', word: 'Happy', tip: 'When you feel good inside!' },
+            { emoji: '😢', word: 'Sad', tip: 'When something makes you feel down.' },
+            { emoji: '😠', word: 'Angry', tip: 'When something isn\'t fair.' },
+            { emoji: '😨', word: 'Scared', tip: 'When something frightens you.' },
+            { emoji: '😲', word: 'Surprised', tip: 'When something unexpected happens!' },
+            { emoji: '😴', word: 'Tired', tip: 'When you need rest.' },
+            { emoji: '🤔', word: 'Confused', tip: 'When you don\'t understand something.' },
+            { emoji: '😍', word: 'Excited', tip: 'When you can\'t wait for something!' },
+            { emoji: '😌', word: 'Calm', tip: 'When you feel peaceful inside.' },
+            { emoji: '🥺', word: 'Worried', tip: 'When you think something bad might happen.' },
+            { emoji: '😤', word: 'Frustrated', tip: 'When something is hard and you want to give up.' },
+            { emoji: '🤗', word: 'Loving', tip: 'When you care about someone.' },
+            { emoji: '😎', word: 'Proud', tip: 'When you did something great!' },
+            { emoji: '😳', word: 'Embarrassed', tip: 'When you feel silly in front of others.' },
+            { emoji: '🤢', word: 'Sick', tip: 'When your body doesn\'t feel well.' },
+            { emoji: '😒', word: 'Bored', tip: 'When you have nothing fun to do.' },
+            { emoji: '🥰', word: 'Grateful', tip: 'When you feel thankful.' },
+            { emoji: '😤', word: 'Annoyed', tip: 'When something small bothers you.' },
+            { emoji: '😔', word: 'Lonely', tip: 'When you wish you had a friend nearby.' },
+            { emoji: '🤩', word: 'Amazed', tip: 'When something is really cool!' },
+        ];
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let currentFeeling = null;
+        let usedFeelings = [];
+        let canAnswer = true;
+        let questionsAnswered = 0;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        const feelingWord = document.getElementById('feelingWord');
+        const feelingTip = document.getElementById('feelingTip');
+        const emojiGrid = document.getElementById('emojiGrid');
+        
+        function getChoiceCount() {
+            if (gradeLevel === 'kg') return 4;
+            return 4 + Math.min(Math.floor(level / 3), 2);
+        }
+        
+        function getAvailableFeelings() {
+            // For younger kids, use simpler feelings
+            if (gradeLevel === 'kg') {
+                return feelings.slice(0, 10);
+            }
+            if (gradeLevel === 'g1-3') {
+                return feelings.slice(0, 15);
+            }
+            return feelings;
+        }
+        
+        function generateQuestion() {
+            canAnswer = true;
+            
+            const available = getAvailableFeelings().filter(f => !usedFeelings.includes(f.word));
+            if (available.length < 4) usedFeelings = [];
+            
+            const pool = available.length >= 4 ? available : getAvailableFeelings();
+            const shuffled = [...pool].sort(() => Math.random() - 0.5);
+            
+            currentFeeling = shuffled[0];
+            usedFeelings.push(currentFeeling.word);
+            
+            feelingWord.textContent = currentFeeling.word.toUpperCase();
+            feelingTip.textContent = currentFeeling.tip;
+            
+            // Get choices
+            const choices = [currentFeeling];
+            for (let i = 1; i < shuffled.length && choices.length < getChoiceCount(); i++) {
+                // Avoid similar looking emojis
+                if (shuffled[i].emoji !== currentFeeling.emoji) {
+                    choices.push(shuffled[i]);
+                }
+            }
+            
+            // Shuffle choices
+            choices.sort(() => Math.random() - 0.5);
+            
+            // Create cards
+            emojiGrid.innerHTML = '';
+            choices.forEach(feeling => {
+                const card = document.createElement('div');
+                card.className = 'emoji-card';
+                card.innerHTML = `<span class="emoji">${feeling.emoji}</span>`;
+                card.onclick = () => checkAnswer(card, feeling);
+                emojiGrid.appendChild(card);
+            });
+        }
+        
+        function checkAnswer(card, feeling) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            const cards = emojiGrid.querySelectorAll('.emoji-card');
+            cards.forEach(c => c.style.pointerEvents = 'none');
+            
+            if (feeling === currentFeeling) {
+                card.classList.add('correct');
+                score += 10 * level;
+                questionsAnswered++;
+                GameUtils.playSound('correct');
+                
+                if (questionsAnswered % 5 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+            } else {
+                card.classList.add('wrong');
+                // Show correct
+                cards.forEach(c => {
+                    if (c.querySelector('.emoji').textContent === currentFeeling.emoji) {
+                        c.classList.add('hint');
+                    }
+                });
+                
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1200);
+                    return;
+                }
+            }
+            
+            setTimeout(generateQuestion, 1200);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            usedFeelings = [];
+            questionsAnswered = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('feelingsLearned').textContent = questionsAnswered;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>

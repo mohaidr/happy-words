@@ -151,6 +151,7 @@
 <body>
     <div class="top-bar">
         <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-fun.html" class="category-btn">🎉 Fun</a>
         <h1>🎨 Color Match</h1>
     </div>
     
@@ -206,7 +207,8 @@
         function loadHighScore() {
             const saved = GameUtils.getHighScore(GAME_KEY);
             if (saved > 0) {
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points`;
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points by ${bestPlayer}`;
             }
         }
         
@@ -236,17 +238,20 @@
             // Pick target color
             currentColor = availableColors[Math.floor(Math.random() * availableColors.length)];
             
-            // Display the word (sometimes in a trick color for harder grades)
+            // Display the word
             const wordEl = document.getElementById('colorWord');
             wordEl.textContent = currentColor.name.toUpperCase();
             
+            // For KG: show word in matching color (easier)
             // For harder grades, sometimes show the word in a different color (Stroop effect)
-            if (gradeLevel === 'g3-6' && Math.random() < 0.4) {
+            if (gradeLevel === 'kg') {
+                wordEl.style.color = currentColor.hex;
+            } else if (gradeLevel === 'g3-6' && Math.random() < 0.4) {
                 const trickColors = availableColors.filter(c => c.name !== currentColor.name);
                 const trickColor = trickColors[Math.floor(Math.random() * trickColors.length)];
                 wordEl.style.color = trickColor.hex;
             } else {
-                wordEl.style.color = 'white';
+                wordEl.style.color = '#333';
             }
             
             // Create color buttons

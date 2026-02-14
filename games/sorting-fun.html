@@ -195,6 +195,7 @@
 <body>
     <div class="top-bar">
         <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-logic.html" class="category-btn">🧠 Logic</a>
         <h1>📦 Sorting Fun</h1>
     </div>
     
@@ -308,8 +309,9 @@
         function loadHighScore() {
             const highScore = GameUtils.getHighScore(GAME_KEY);
             if (highScore > 0) {
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
                 document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: ${highScore} points`;
+                    `🏆 Best: ${highScore} points by ${bestPlayer}`;
             } else {
                 document.getElementById('highScoreDisplay').innerHTML = 'Best: -- points';
             }

@@ -31,6 +31,8 @@
             width: 350px;
             height: 420px;
             margin-bottom: 15px;
+            padding: 30px;
+
         }
         
         .word-card {
@@ -133,8 +135,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <h1>👀 Sight Word Speed</h1>
+        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-reading.html" class="category-btn">📚 Reading</a>        <h1>👀 Sight Word Speed</h1>
     </div>
     
     <div class="stats">
@@ -387,8 +388,11 @@
                 highScore = score;
             }
             
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = Math.max(score, highScore);
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
             document.getElementById('wordsFound').textContent = totalWordsFound;
             document.getElementById('finalLevel').textContent = level;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";

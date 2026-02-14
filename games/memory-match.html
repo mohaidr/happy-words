@@ -166,6 +166,7 @@
 <body>
     <div class="top-bar">
         <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-logic.html" class="category-btn">🧠 Logic</a>
         <h1>🧠 Memory Match</h1>
     </div>
     
@@ -233,10 +234,13 @@
         }
         
         function loadHighScore() {
-            const highScore = GameUtils.getHighScore(getHighScoreKey());
-            if (highScore > 0) {
+            const key = getHighScoreKey();
+            const storedScore = GameUtils.getHighScore(key);
+            if (storedScore > 0) {
+                const bestMoves = 1000 - storedScore; // Convert back to moves
+                const bestPlayer = GameUtils.getHighScorePlayerName(key);
                 document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: ${highScore} moves`;
+                    `🏆 Best: ${bestMoves} moves by ${bestPlayer}`;
             } else {
                 document.getElementById('highScoreDisplay').innerHTML = 'Best: -- moves';
             }
@@ -355,21 +359,50 @@
             }
         }
         
+        function getPreviewTime() {
+            // Preview time in milliseconds based on grade level
+            if (gradeLevel === 'kg') return 5000;      // 5 seconds for KG
+            if (gradeLevel === 'g1-3') return 3500;    // 3.5 seconds for grades 1-3
+            return 2500;                               // 2.5 seconds for grades 3-6
+        }
+        
         function startGame() {
             stopTimer();
             matchedPairs = 0;
             moves = 0;
             flippedCards = [];
-            canFlip = true;
+            canFlip = false; // Disable flipping during preview
             
             document.getElementById('moves').textContent = '0';
             document.getElementById('pairs').textContent = '0';
             document.getElementById('totalPairs').textContent = pairsNeeded;
-            document.getElementById('message').textContent = 'Find all matching pairs!';
             document.getElementById('gameOver').style.display = 'none';
             
             createBoard();
-            startTimer();
+            
+            // Show all cards for preview
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => card.classList.add('flipped'));
+            
+            const previewTime = getPreviewTime();
+            document.getElementById('message').textContent = `Memorize the cards! ${previewTime/1000}s...`;
+            
+            // Countdown and then hide cards
+            let countdown = previewTime / 1000;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    document.getElementById('message').textContent = `Memorize the cards! ${countdown}s...`;
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                clearInterval(countdownInterval);
+                allCards.forEach(card => card.classList.remove('flipped'));
+                document.getElementById('message').textContent = 'Find all matching pairs!';
+                canFlip = true;
+                startTimer();
+            }, previewTime);
         }
         
         function endGame() {

@@ -23,6 +23,11 @@ const GameUtils = {
         return parseInt(localStorage.getItem(gameKey + '_highScore')) || 0;
     },
 
+    // Get player name who set the high score
+    getHighScorePlayerName(gameKey) {
+        return localStorage.getItem(gameKey + '_playerName') || 'Player';
+    },
+
     // Save high score for a game
     saveHighScore(gameKey, score, playerName) {
         const currentHigh = this.getHighScore(gameKey);

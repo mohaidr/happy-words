@@ -945,10 +945,132 @@ footer {
 .games-title {
     color: #fff;
     font-size: 1.8rem;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
 }
 
+.games-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+/* Category Grid for Home Page */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    min-height: 120px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.category-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+}
+
+.category-card:hover::before {
+    animation: cardShine 0.6s ease;
+}
+
+@keyframes cardShine {
+    0% { left: -50%; }
+    100% { left: 150%; }
+}
+
+.category-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.category-card:active {
+    transform: scale(0.95);
+}
+
+.category-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+.category-card:nth-child(2) .category-icon { animation-delay: 0.5s; }
+.category-card:nth-child(3) .category-icon { animation-delay: 1s; }
+.category-card:nth-child(4) .category-icon { animation-delay: 1.5s; }
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(3deg); }
+}
+
+.category-card:hover .category-icon {
+    animation: iconWiggle 0.5s ease;
+    transform: scale(1.2);
+}
+
+@keyframes iconWiggle {
+    0%, 100% { transform: scale(1.2) rotate(0deg); }
+    25% { transform: scale(1.2) rotate(-10deg); }
+    75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.category-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.category-count {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 4px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+.category-math {
+    background: linear-gradient(145deg, #667eea, #764ba2);
+}
+
+.category-reading {
+    background: linear-gradient(145deg, #e17055, #fdcb6e);
+}
+
+.category-logic {
+    background: linear-gradient(145deg, #a29bfe, #6c5ce7);
+}
+
+.category-fun {
+    background: linear-gradient(145deg, #00b894, #00cec9);
+}
+
+/* Old games grid - keep for backward compatibility */
 .games-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

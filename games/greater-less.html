@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greater or Less 🐊</title>
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+        }
+        
+        .compare-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .number-box {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(145deg, #fff, #f0f0f0);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: bold;
+            color: #2d3436;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .symbol-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .symbol-btn {
+            width: 80px;
+            height: 50px;
+            font-size: 32px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .symbol-btn.greater {
+            background: linear-gradient(145deg, #ff7675, #d63031);
+            color: white;
+        }
+        
+        .symbol-btn.equal {
+            background: linear-gradient(145deg, #fdcb6e, #f39c12);
+            color: white;
+        }
+        
+        .symbol-btn.less {
+            background: linear-gradient(145deg, #74b9ff, #0984e3);
+            color: white;
+        }
+        
+        .symbol-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .symbol-btn.correct {
+            animation: pulse 0.5s ease;
+            box-shadow: 0 0 20px rgba(0,255,0,0.5);
+        }
+        
+        .symbol-btn.wrong {
+            animation: shake 0.3s ease;
+            opacity: 0.5;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .croc-tip {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            margin-top: 20px;
+            max-width: 350px;
+        }
+        
+        .croc-tip span {
+            font-size: 24px;
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        
+        #gameOver h2 { color: #00b894; margin-bottom: 15px; }
+        #gameOver p { margin: 8px 0; font-size: 18px; }
+        
+        .feedback {
+            font-size: 48px;
+            height: 60px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn">← Home</a>
+        <a href="category-math.html" class="category-btn">🔢 Math</a>
+        <h1>🐊 Greater or Less</h1>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+    </div>
+    
+    <div class="feedback" id="feedback"></div>
+    
+    <div class="compare-container">
+        <div class="number-box" id="num1">5</div>
+        
+        <div class="symbol-buttons">
+            <button class="symbol-btn greater" onclick="checkAnswer('>')" title="Greater than">&gt;</button>
+            <button class="symbol-btn equal" onclick="checkAnswer('=')" title="Equal to">=</button>
+            <button class="symbol-btn less" onclick="checkAnswer('<')" title="Less than">&lt;</button>
+        </div>
+        
+        <div class="number-box" id="num2">3</div>
+    </div>
+    
+    <div class="croc-tip">
+        <span>🐊</span> The hungry crocodile always eats the BIGGER number!
+    </div>
+    
+    <div id="gameOver">
+        <h2>🎉 Great Job!</h2>
+        <p id="playerDisplay"></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <button class="btn" onclick="startGame()">Play Again</button>
+        <a href="../index.html" class="home-link">← Back to Home</a>
+    </div>
+    
+    <p class="info">Pick the symbol that goes between the numbers!</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'greaterLess';
+        
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let num1 = 0;
+        let num2 = 0;
+        let correctAnswer = '';
+        let questionsAnswered = 0;
+        let canAnswer = true;
+        
+        let highScore = GameUtils.getHighScore(GAME_KEY);
+        let playerName = GameUtils.getPlayerName();
+        let gradeLevel = GameUtils.getGradeLevel();
+        
+        function getNumberRange() {
+            if (gradeLevel === 'kg') return 10;
+            if (gradeLevel === 'g1-3') return 50 + (level * 10);
+            return 100 + (level * 20);
+        }
+        
+        function generateQuestion() {
+            canAnswer = true;
+            document.getElementById('feedback').textContent = '';
+            
+            const range = getNumberRange();
+            num1 = Math.floor(Math.random() * range) + 1;
+            num2 = Math.floor(Math.random() * range) + 1;
+            
+            // Sometimes make them equal (20% chance)
+            if (Math.random() < 0.2) {
+                num2 = num1;
+            }
+            
+            document.getElementById('num1').textContent = num1;
+            document.getElementById('num2').textContent = num2;
+            
+            if (num1 > num2) correctAnswer = '>';
+            else if (num1 < num2) correctAnswer = '<';
+            else correctAnswer = '=';
+            
+            // Reset button styles
+            document.querySelectorAll('.symbol-btn').forEach(btn => {
+                btn.classList.remove('correct', 'wrong');
+                btn.disabled = false;
+            });
+        }
+        
+        function checkAnswer(answer) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            const buttons = document.querySelectorAll('.symbol-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            const clickedBtn = document.querySelector(`.symbol-btn.${
+                answer === '>' ? 'greater' : answer === '=' ? 'equal' : 'less'
+            }`);
+            
+            if (answer === correctAnswer) {
+                clickedBtn.classList.add('correct');
+                score += 10 * level;
+                questionsAnswered++;
+                document.getElementById('feedback').textContent = '✅';
+                GameUtils.playSound('correct');
+                
+                if (questionsAnswered % 5 === 0) {
+                    level++;
+                    document.getElementById('level').textContent = level;
+                    GameUtils.playSound('levelUp');
+                }
+                
+                document.getElementById('score').textContent = score;
+            } else {
+                clickedBtn.classList.add('wrong');
+                // Show correct
+                const correctBtn = document.querySelector(`.symbol-btn.${
+                    correctAnswer === '>' ? 'greater' : correctAnswer === '=' ? 'equal' : 'less'
+                }`);
+                correctBtn.classList.add('correct');
+                
+                document.getElementById('feedback').textContent = '❌';
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                GameUtils.playSound('wrong');
+                
+                if (lives <= 0) {
+                    setTimeout(endGame, 1000);
+                    return;
+                }
+            }
+            
+            setTimeout(generateQuestion, 1200);
+        }
+        
+        function startGame() {
+            score = 0;
+            level = 1;
+            lives = 3;
+            questionsAnswered = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            
+            generateQuestion();
+        }
+        
+        function endGame() {
+            const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
+            if (isNewHigh) highScore = score;
+            
+            const bestScore = Math.max(score, highScore);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        setTimeout(() => startGame(), 500);
+    </script>
+</body>
+</html>
