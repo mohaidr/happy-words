@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-23JF9BFV2J');
+    </script>
     <title>Color Match 🎨</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -196,6 +204,12 @@
         let round = 0;
         let lives = 3;
         let totalRounds = 10;
+        
+        function getMaxLives() {
+            if (gradeLevel === 'kg') return 6;
+            if (gradeLevel === 'g1-3') return 4;
+            return 3;
+        }
         let currentColor = null;
         let gameRunning = false;
         let canClick = true;
@@ -323,11 +337,11 @@
         function startGame() {
             score = 0;
             round = 0;
-            lives = 3;
+            lives = getMaxLives();
             gameRunning = true;
             
             document.getElementById('score').textContent = '0';
-            document.getElementById('lives').textContent = '3';
+            document.getElementById('lives').textContent = lives;
             document.getElementById('gameOver').style.display = 'none';
             
             loadRound();

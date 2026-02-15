@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-23JF9BFV2J');
+    </script>
     <title>Odd One Out 🔍</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
         body {
-            background: linear-gradient(135deg, #fd79a8, #e84393);
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
         }
         
         .game-area {
@@ -116,7 +124,7 @@
             z-index: 100;
         }
         
-        #gameOver h2 { color: #fd79a8; margin-bottom: 15px; }
+        #gameOver h2 { color: #a29bfe; margin-bottom: 15px; }
         #gameOver p { margin: 8px 0; font-size: 18px; }
     </style>
 </head>
@@ -151,6 +159,7 @@
     </div>
     
     <p class="info">Find the one that's different from the others!</p>
+    <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
 
     <script src="../js/game-utils.js"></script>
     <script>
@@ -274,6 +283,12 @@
         let level = 1;
         let lives = 3;
         let oddItem = null;
+        
+        function getMaxLives() {
+            if (gradeLevel === 'kg') return 8;
+            if (gradeLevel === 'g1-3') return 5;
+            return 3;
+        }
         let mainCategory = '';
         let questionsAnswered = 0;
         let canAnswer = true;
@@ -379,10 +394,11 @@
         function startGame() {
             score = 0;
             level = 1;
-            lives = 3;
             questionsAnswered = 0;
             
             playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            lives = getMaxLives();
             gradeLevel = GameUtils.getGradeLevel();
             highScore = GameUtils.getHighScore(GAME_KEY);
             
@@ -405,10 +421,20 @@
             document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             document.getElementById('gameOver').style.display = 'block';
+            updateBestScoreDisplay();
+        }
+        
+        function updateBestScoreDisplay() {
+            const bestScore = GameUtils.getHighScore(GAME_KEY);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            if (bestScore > 0) {
+                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
+            }
         }
         
         // Initialize
         GameUtils.initSoundToggle();
+        updateBestScoreDisplay();
         setTimeout(() => startGame(), 500);
     </script>
 </body>

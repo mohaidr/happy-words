@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-23JF9BFV2J');
+    </script>
     <title>Logic & Memory 🧠 - Happy Words</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -212,10 +220,29 @@
     <script>
         document.querySelectorAll('.game-card').forEach(card => {
             const gameKey = card.dataset.game;
-            const score = localStorage.getItem(gameKey + '_highScore');
+            let displayScore = 0;
+            
+            // Pattern Puzzle stores differently (as JSON with level)
+            if (gameKey === 'patternPuzzle') {
+                const data = localStorage.getItem('patternPuzzle_highScore');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    displayScore = parsed.level || 0;
+                }
+            } else {
+                const score = localStorage.getItem(gameKey + '_highScore');
+                if (score) {
+                    displayScore = parseInt(score);
+                    // Memory Match stores 1000-moves internally, convert back to actual moves
+                    if (gameKey.startsWith('memoryMatch')) {
+                        displayScore = 1000 - displayScore;
+                    }
+                }
+            }
+            
             const badge = document.getElementById('badge-' + gameKey);
-            if (score && parseInt(score) > 0 && badge) {
-                badge.textContent = '⭐ ' + score;
+            if (displayScore > 0 && badge) {
+                badge.textContent = '⭐ ' + displayScore;
                 badge.classList.add('has-score');
             }
         });

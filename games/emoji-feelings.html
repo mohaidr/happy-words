@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-23JF9BFV2J');
+    </script>
     <title>Emoji Feelings 😊</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -172,6 +180,7 @@
     </div>
     
     <p class="info">Match the feeling word to the right emoji!</p>
+    <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
 
     <script src="../js/game-utils.js"></script>
     <script>
@@ -205,6 +214,12 @@
         let level = 1;
         let lives = 3;
         let currentFeeling = null;
+        
+        function getMaxLives() {
+            if (gradeLevel === 'kg') return 8;
+            if (gradeLevel === 'g1-3') return 5;
+            return 3;
+        }
         let usedFeelings = [];
         let canAnswer = true;
         let questionsAnswered = 0;
@@ -316,8 +331,11 @@
         function startGame() {
             score = 0;
             level = 1;
-            lives = 3;
             usedFeelings = [];
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            lives = getMaxLives();
             questionsAnswered = 0;
             
             playerName = GameUtils.getPlayerName();
@@ -344,10 +362,20 @@
             document.getElementById('feelingsLearned').textContent = questionsAnswered;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             document.getElementById('gameOver').style.display = 'block';
+            updateBestScoreDisplay();
+        }
+        
+        function updateBestScoreDisplay() {
+            const bestScore = GameUtils.getHighScore(GAME_KEY);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            if (bestScore > 0) {
+                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
+            }
         }
         
         // Initialize
         GameUtils.initSoundToggle();
+        updateBestScoreDisplay();
         setTimeout(() => startGame(), 500);
     </script>
 </body>

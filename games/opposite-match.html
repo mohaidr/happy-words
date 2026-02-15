@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-23JF9BFV2J');
+    </script>
     <title>Opposite Match ↔️</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -225,6 +233,12 @@
         let level = 1;
         let lives = 3;
         let streak = 0;
+        
+        function getMaxLives() {
+            if (gradeLevel === 'kg') return 10;
+            if (gradeLevel === 'g1-3') return 6;
+            return 3;
+        }
         let bestStreak = 0;
         let currentPair = null;
         let usedPairs = [];
@@ -359,8 +373,11 @@
         function startGame() {
             score = 0;
             level = 1;
-            lives = 3;
             streak = 0;
+            
+            playerName = GameUtils.getPlayerName();
+            gradeLevel = GameUtils.getGradeLevel();
+            lives = getMaxLives();
             bestStreak = 0;
             usedPairs = [];
             

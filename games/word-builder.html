@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-23JF9BFV2J');
+    </script>
     <title>Word Builder 🔤</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -200,8 +208,8 @@
     
     <div class="stats">
         <div>Score: <span id="score">0</span></div>
-        <div>Level: <span id="level">1</span></div>
-        <div>⭐ <span id="stars">0</span></div>
+        <div>📝 <span id="progress">1</span>/10</div>
+        <div>❤️ <span id="lives">3</span></div>
     </div>
     
     <div class="picture-box" id="picture">🐱</div>
@@ -215,15 +223,15 @@
         <button class="btn btn-check" id="checkBtn">Check ✓</button>
     </div>
     
-    <p class="hint-text">Tap letters to spell the word!</p>
+    <p class="hint-text">Tap letters to spell the word! Spell 10 words to win!</p>
+    <p class="hint-text" id="bestScoreDisplay">🏆 Best: --</p>
     
     <div id="gameOver">
         <h2>🎉 Amazing!</h2>
         <p id="playerDisplay"></p>
         <p>Final Score: <span id="finalScore">0</span></p>
         <p>🏆 High Score: <span id="highScore">0</span></p>
-        <p>Words Spelled: <span id="wordsCount">0</span></p>
-        <p>Stars Earned: <span id="finalStars">0</span>⭐</p>
+        <p>Words Spelled: <span id="wordsCount">0</span>/10</p>
         <button class="btn btn-start" onclick="startGame()">Play Again</button>
         <a href="../index.html" class="home-link">← Back to Home</a>
     </div>
@@ -268,7 +276,7 @@
         
         let score = 0;
         let level = 1;
-        let stars = 0;
+        let lives = 3;
         let wordsCompleted = 0;
         let currentWord = null;
         let currentGuess = [];
@@ -285,9 +293,15 @@
         const slotsEl = document.getElementById('slots');
         const letterBankEl = document.getElementById('letterBank');
         const scoreEl = document.getElementById('score');
-        const levelEl = document.getElementById('level');
-        const starsEl = document.getElementById('stars');
+        const progressEl = document.getElementById('progress');
+        const livesEl = document.getElementById('lives');
         const gameOverEl = document.getElementById('gameOver');
+        
+        function getMaxLives() {
+            if (gradeLevel === 'kg') return 10;
+            if (gradeLevel === 'g1-3') return 5;
+            return 3;
+        }
         
         function getWordsByLevel(lvl) {
             // Adjust available word lengths based on grade
@@ -419,10 +433,9 @@
                 slots.forEach(slot => slot.classList.add('correct'));
                 score += currentWord.word.length * 10;
                 wordsCompleted++;
-                stars++;
                 
                 scoreEl.textContent = score;
-                starsEl.textContent = stars;
+                progressEl.textContent = Math.min(wordsCompleted + 1, 10);
                 
                 // Play correct sound
                 GameUtils.playSound('correct');
@@ -432,13 +445,12 @@
                 // Level up every 3 words
                 if (wordsCompleted % 3 === 0 && level < 6) {
                     level++;
-                    levelEl.textContent = level;
                     GameUtils.playSound('levelUp');
                 }
                 
                 setTimeout(() => {
                     if (wordsCompleted >= 10) {
-                        endGame();
+                        endGame(true);
                     } else {
                         loadNewWord();
                     }
@@ -446,10 +458,18 @@
             } else {
                 // Wrong
                 slots.forEach(slot => slot.classList.add('wrong'));
+                lives--;
+                livesEl.textContent = lives;
                 GameUtils.playSound('wrong');
+                
                 setTimeout(() => {
                     slots.forEach(slot => slot.classList.remove('wrong'));
-                }, 400);
+                    clearWord();
+                    
+                    if (lives <= 0) {
+                        endGame(false);
+                    }
+                }, 600);
             }
         }
         
@@ -464,7 +484,6 @@
         function startGame() {
             score = 0;
             level = 1;
-            stars = 0;
             wordsCompleted = 0;
             usedWords = [];
             gameRunning = true;
@@ -474,15 +493,17 @@
             gradeLevel = GameUtils.getGradeLevel();
             highScore = GameUtils.getHighScore(GAME_KEY);
             
+            lives = getMaxLives();
+            
             scoreEl.textContent = '0';
-            levelEl.textContent = '1';
-            starsEl.textContent = '0';
+            progressEl.textContent = '1';
+            livesEl.textContent = lives;
             gameOverEl.style.display = 'none';
             
             loadNewWord();
         }
         
-        function endGame() {
+        function endGame(won) {
             gameRunning = false;
             
             // Save high score using GameUtils
@@ -494,12 +515,24 @@
             const bestScore = Math.max(score, highScore);
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
+            // Update title based on win/lose
+            const titleEl = gameOverEl.querySelector('h2');
+            titleEl.textContent = won ? '🎉 Amazing!' : '😅 Good Try!';
+            
             document.getElementById('finalScore').textContent = score;
             document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
             document.getElementById('wordsCount').textContent = wordsCompleted;
-            document.getElementById('finalStars').textContent = stars;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
+            updateBestScoreDisplay();
+        }
+        
+        function updateBestScoreDisplay() {
+            const bestScore = GameUtils.getHighScore(GAME_KEY);
+            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            if (bestScore > 0) {
+                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
+            }
         }
         
         // Keyboard support
@@ -551,6 +584,7 @@
 
         // Initialize sound toggle
         GameUtils.initSoundToggle();
+        updateBestScoreDisplay();
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
