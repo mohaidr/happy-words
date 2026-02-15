@@ -2,24 +2,89 @@
   "name": "Happy Words for Kids",
   "short_name": "Happy Words",
   "description": "Fun educational games and positive affirmations for kids!",
+  "id": "/",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#667eea",
   "theme_color": "#764ba2",
   "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "icons/icon-192.svg",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-192.svg",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["education", "kids", "games"]
+  "screenshots": [
+    {
+      "src": "icons/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home screen with game categories"
+    },
+    {
+      "src": "icons/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Playing a fun learning game"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fun Games",
+      "short_name": "Fun",
+      "description": "Play fun educational games",
+      "url": "/games/category-fun.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Math Games",
+      "short_name": "Math",
+      "description": "Practice math skills",
+      "url": "/games/category-math.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Reading Games",
+      "short_name": "Reading",
+      "description": "Improve reading skills",
+      "url": "/games/category-reading.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Logic Games",
+      "short_name": "Logic",
+      "description": "Brain training puzzles",
+      "url": "/games/category-logic.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["education", "kids", "games"],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false
 }
