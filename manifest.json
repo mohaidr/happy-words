@@ -26,6 +26,22 @@
       "purpose": "any"
     }
   ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Happy Words home screen with game categories"
+    },
+    {
+      "src": "icons/screenshot-narrow.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Happy Words mobile view with affirmations"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Fun Games",
