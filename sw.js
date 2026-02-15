@@ -1,4 +1,4 @@
-const CACHE_NAME = 'happy-words-v8';
+const CACHE_NAME = 'happy-words-v10';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,6 +7,8 @@ const urlsToCache = [
   '/favicon.svg',
   '/manifest.json',
   '/icons/icon-192.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
   '/css/games.css',
   '/js/game-utils.js',
   '/games/game.html',

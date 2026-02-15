@@ -22,30 +22,54 @@
         .game-board {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 350px;
+            gap: 8px;
+            width: 100%;
+            max-width: 340px;
             margin-bottom: 20px;
+            padding: 0 5px;
+            box-sizing: border-box;
+        }
+        
+        .game-board.cols-5 {
+            grid-template-columns: repeat(5, 1fr);
+            max-width: 100%;
+            width: calc(100vw - 20px);
+            max-width: min(400px, calc(100vw - 20px));
+            gap: 6px;
         }
         
         .card {
-            width: 75px;
-            height: 75px;
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 75px;
+            max-height: 75px;
             background: linear-gradient(145deg, #5a67d8, #4c51bf);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 35px;
+            font-size: clamp(22px, 6vw, 35px);
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             position: relative;
         }
         
+        .game-board.cols-5 .card {
+            max-width: 65px;
+            max-height: 65px;
+            border-radius: 8px;
+            font-size: clamp(18px, 5vw, 28px);
+        }
+        
         .card::before {
             content: '?';
-            font-size: 30px;
+            font-size: clamp(20px, 5vw, 30px);
             color: rgba(255,255,255,0.7);
+        }
+        
+        .game-board.cols-5 .card::before {
+            font-size: clamp(16px, 4vw, 24px);
         }
         
         .card.flipped::before {
@@ -288,6 +312,7 @@
         function createBoard() {
             const board = document.getElementById('gameBoard');
             board.innerHTML = '';
+            board.classList.remove('cols-5');
             
             const selectedEmojis = emojis.slice(0, pairsNeeded);
             cards = shuffle([...selectedEmojis, ...selectedEmojis]);
@@ -298,6 +323,7 @@
                 board.style.gridTemplateColumns = 'repeat(4, 1fr)';
             } else {
                 board.style.gridTemplateColumns = 'repeat(5, 1fr)';
+                board.classList.add('cols-5');
             }
             
             cards.forEach((emoji, index) => {
