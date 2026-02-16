@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
-    <title>Car Game 🚗</title>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
+    <title data-i18n="carGame.title">Car Game 🚗</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -29,6 +25,7 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 10px;
+            padding-left: 60px; /* Space for lang toggle button */
         }
         
         .score { font-size: 24px; margin-bottom: 15px; }
@@ -198,20 +195,7 @@
             box-shadow: none;
         }
         
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            display: none;
-        }
-        
-        #gameOver h2 { color: #ff6b6b; margin-bottom: 10px; }
-        #gameOver p { margin: 10px 0; }
+#gameOver h2 { color: #ff6b6b; }
         
         .home-link {
             display: block;
@@ -226,25 +210,35 @@
         }
         
         .info { margin-top: 10px; opacity: 0.8; }
+        
+        /* RTL Support */
+        body.rtl .home-btn {
+            direction: ltr;
+        }
+        
+        body.rtl .top-bar {
+            padding-left: 0;
+            padding-right: 60px; /* Space for lang toggle button */
+        }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-fun.html" class="category-btn">🎉 Fun</a>
-        <h1>🚗 Car Game 🏁</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-fun.html" class="category-btn" data-i18n="nav.fun">🎉 Fun</a>
+        <h1 data-i18n="carGame.title">🚗 Car Game 🏁</h1>
     </div>
-    <div class="score">Score: <span id="score">0</span> | Speed: <span id="speedDisplay">1</span></div>
+    <div class="score"><span data-i18n="carGame.score">Score</span>: <span id="score">0</span> | <span data-i18n="carGame.speed">Speed</span>: <span id="speedDisplay">1</span></div>
     
     <div id="gameArea">
         <div id="car" class="car-3d"></div>
         <div id="gameOver">
-            <h2>Game Over!</h2>
+            <h2 data-i18n="carGame.result">🚗 Great Driving!</h2>
             <p id="playerDisplay"></p>
-            <p>Score: <span id="finalScore">0</span></p>
-            <p>🏆 High Score: <span id="highScore">0</span></p>
-            <button id="startBtn" onclick="startGame()">Play Again</button>
-            <a href="../index.html" class="home-link">← Back to Home</a>
+            <p><span data-i18n="carGame.score">Score</span>: <span id="finalScore">0</span></p>
+            <p>🏆 <span data-i18n="carGame.highScore">High Score</span>: <span id="highScore">0</span></p>
+            <button id="startBtn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
+            <a href="../index.html" class="home-link" data-i18n="btn.back">← Back to Home</a>
         </div>
     </div>
     
@@ -257,8 +251,8 @@
         <button data-action="moveDown" onclick="moveDown()">⬇️</button>
     </div>
     
-    <p class="info">Use arrow keys, buttons, or swipe to move</p>
-    <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
+    <p class="info" data-i18n="carGame.controls">Use arrow keys, buttons, or swipe to move</p>
+    <p class="info" id="bestScoreDisplay">🏆 <span data-i18n="game.best">Best</span>: --</p>
 
     <script src="../js/game-utils.js"></script>
     <script>
@@ -492,26 +486,48 @@
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
             finalScoreEl.textContent = score;
-            document.getElementById('highScore').textContent = `${highScore} by ${bestPlayer}`;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            
+            const byLabel = typeof I18n !== 'undefined' ? I18n.t('game.by') : 'by';
+            document.getElementById('highScore').textContent = `${highScore} ${byLabel} ${bestPlayer}`;
+            
+            const playerGameText = typeof I18n !== 'undefined' 
+                ? I18n.t('carGame.game', { name: playerName })
+                : playerName + "'s Game";
+            document.getElementById('playerDisplay').textContent = playerGameText;
+            
             gameOverEl.style.display = 'block';
-            updateBestScoreDisplay();
+            loadHighScore();
         }
-
-        function updateBestScoreDisplay() {
-            const bestScore = GameUtils.getHighScore(GAME_KEY);
-            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-            if (bestScore > 0) {
-                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
+        
+        function loadHighScore() {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('bestScoreDisplay').innerHTML = highScoreText;
+            } else {
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : '🏆 Best: --';
+                document.getElementById('bestScoreDisplay').innerHTML = defaultText;
             }
         }
 
         // Initialize sound toggle
         GameUtils.initSoundToggle();
-        updateBestScoreDisplay();
+        loadHighScore();
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

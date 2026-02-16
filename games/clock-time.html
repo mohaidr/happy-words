@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Clock Time 🕐</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         body {
@@ -131,38 +127,19 @@
             animation: shake 0.3s ease;
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 { color: #667eea; margin-bottom: 15px; }
-        #gameOver p { margin: 8px 0; font-size: 18px; }
+#gameOver h2 { color: #667eea; }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-math.html" class="category-btn">🔢 Math</a>
-        <h1>🕐 Clock Time</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-math.html" class="category-btn" data-i18n="nav.math">🔢 Math</a>
+        <h1 data-i18n="clockTime.title">🕐 Clock Time</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Level: <span id="level">1</span></div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.level">Level</span>: <span id="level">1</span></div>
         <div>❤️ <span id="lives">3</span></div>
     </div>
     
@@ -173,18 +150,18 @@
             <div class="minute-hand" id="minuteHand"></div>
         </div>
         
-        <p class="question-text">What time is it?</p>
+        <p class="question-text" data-i18n="clockTime.instruction">What time is it?</p>
         
         <div class="time-options" id="options"></div>
     </div>
     
     <div id="gameOver">
-        <h2>🎉 Great Job!</h2>
+        <h2 data-i18n="clockTime.result">🎉 Great Job!</h2>
         <p id="playerDisplay"></p>
         <p>Final Score: <span id="finalScore">0</span></p>
         <p>🏆 High Score: <span id="highScore">0</span></p>
-        <button class="btn" onclick="startGame()">Play Again</button>
-        <a href="../index.html" class="home-link">← Back to Home</a>
+        <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
+        <a href="../index.html" class="home-link" data-i18n="game.home">← Back to Home</a>
     </div>
     
     <p class="info">Read the clock and pick the right time!</p>
@@ -371,6 +348,13 @@
         initClock();
         GameUtils.initSoundToggle();
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

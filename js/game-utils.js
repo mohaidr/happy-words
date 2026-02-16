@@ -39,6 +39,26 @@ const GameUtils = {
         return false;
     },
 
+    // Get max lives based on grade level and game config
+    // config = { kg: 10, 'g1-3': 5, default: 3 }
+    getMaxLives(config = {}) {
+        const gradeLevel = this.getGradeLevel();
+        if (gradeLevel === 'kg') return config.kg || 5;
+        if (gradeLevel === 'g1-3') return config['g1-3'] || 4;
+        return config.default || 3;
+    },
+
+    // Update best score display element
+    // elementId defaults to 'bestScoreDisplay'
+    updateBestScoreDisplay(gameKey, elementId = 'bestScoreDisplay') {
+        const bestScore = this.getHighScore(gameKey);
+        const bestPlayer = this.getHighScorePlayerName(gameKey);
+        const element = document.getElementById(elementId);
+        if (element && bestScore > 0) {
+            element.textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
+        }
+    },
+
     // ==================== GRADE-BASED MATH ====================
 
     // Generate math question based on grade level

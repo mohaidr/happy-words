@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Emoji Feelings 😊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         body {
@@ -116,21 +112,7 @@
             margin-bottom: 5px;
         }
         
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 { color: #ffeaa7; margin-bottom: 15px; }
-        #gameOver p { margin: 8px 0; font-size: 18px; }
+        #gameOver h2 { color: #ffeaa7; }
         
         .feeling-tip {
             font-size: 16px;
@@ -143,19 +125,19 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-fun.html" class="category-btn">🎉 Fun</a>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-fun.html" class="category-btn" data-i18n="nav.fun">🎉 Fun</a>
         <h1>😊 Emoji Feelings</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Level: <span id="level">1</span></div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.level">Level</span>: <span id="level">1</span></div>
         <div>❤️ <span id="lives">3</span></div>
     </div>
     
     <div class="game-area">
-        <p class="question-text">Which face shows...</p>
+        <p class="question-text" data-i18n="emojiFeelings.whichFace">Which face shows...</p>
         
         <div class="feeling-word" id="feelingWord">HAPPY</div>
         
@@ -165,61 +147,70 @@
         
         <div class="tip-box">
             <span class="tip-emoji">💡</span>
-            Understanding feelings helps us be good friends!
+            <span data-i18n="emojiFeelings.tip">Understanding feelings helps us be good friends!</span>
         </div>
     </div>
     
     <div id="gameOver">
-        <h2>🎉 Great Job!</h2>
+        <h2 data-i18n="emojiFeelings.result">🎉 Great Job!</h2>
         <p id="playerDisplay"></p>
-        <p>Final Score: <span id="finalScore">0</span></p>
-        <p>🏆 High Score: <span id="highScore">0</span></p>
-        <p>Feelings Learned: <span id="feelingsLearned">0</span></p>
-        <button class="btn" onclick="startGame()">Play Again</button>
-        <a href="../index.html" class="home-link">← Back to Home</a>
+        <p><span data-i18n="emojiFeelings.finalScore">Final Score</span>: <span id="finalScore">0</span></p>
+        <p>🏆 <span data-i18n="game.highScore">High Score</span>: <span id="highScore">0</span></p>
+        <p><span data-i18n="emojiFeelings.feelingsLearned">Feelings Learned</span>: <span id="feelingsLearned">0</span></p>
+        <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
+        <a href="../index.html" class="home-link" data-i18n="game.backToHome">← Back to Home</a>
     </div>
     
-    <p class="info">Match the feeling word to the right emoji!</p>
+    <p class="info" data-i18n="emojiFeelings.instruction">Match the feeling word to the right emoji!</p>
     <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
 
     <script src="../js/game-utils.js"></script>
     <script>
         const GAME_KEY = 'emojiFeelings';
         
-        // Feelings with emojis and tips
+        // Feelings with emojis and i18n keys
         const feelings = [
-            { emoji: '😊', word: 'Happy', tip: 'When you feel good inside!' },
-            { emoji: '😢', word: 'Sad', tip: 'When something makes you feel down.' },
-            { emoji: '😠', word: 'Angry', tip: 'When something isn\'t fair.' },
-            { emoji: '😨', word: 'Scared', tip: 'When something frightens you.' },
-            { emoji: '😲', word: 'Surprised', tip: 'When something unexpected happens!' },
-            { emoji: '😴', word: 'Tired', tip: 'When you need rest.' },
-            { emoji: '🤔', word: 'Confused', tip: 'When you don\'t understand something.' },
-            { emoji: '😍', word: 'Excited', tip: 'When you can\'t wait for something!' },
-            { emoji: '😌', word: 'Calm', tip: 'When you feel peaceful inside.' },
-            { emoji: '🥺', word: 'Worried', tip: 'When you think something bad might happen.' },
-            { emoji: '😤', word: 'Frustrated', tip: 'When something is hard and you want to give up.' },
-            { emoji: '🤗', word: 'Loving', tip: 'When you care about someone.' },
-            { emoji: '😎', word: 'Proud', tip: 'When you did something great!' },
-            { emoji: '😳', word: 'Embarrassed', tip: 'When you feel silly in front of others.' },
-            { emoji: '🤢', word: 'Sick', tip: 'When your body doesn\'t feel well.' },
-            { emoji: '😒', word: 'Bored', tip: 'When you have nothing fun to do.' },
-            { emoji: '🥰', word: 'Grateful', tip: 'When you feel thankful.' },
-            { emoji: '😤', word: 'Annoyed', tip: 'When something small bothers you.' },
-            { emoji: '😔', word: 'Lonely', tip: 'When you wish you had a friend nearby.' },
-            { emoji: '🤩', word: 'Amazed', tip: 'When something is really cool!' },
+            { emoji: '😊', key: 'happy' },
+            { emoji: '😢', key: 'sad' },
+            { emoji: '😠', key: 'angry' },
+            { emoji: '😨', key: 'scared' },
+            { emoji: '😲', key: 'surprised' },
+            { emoji: '😴', key: 'tired' },
+            { emoji: '🤔', key: 'confused' },
+            { emoji: '😍', key: 'excited' },
+            { emoji: '😌', key: 'calm' },
+            { emoji: '🥺', key: 'worried' },
+            { emoji: '😤', key: 'frustrated' },
+            { emoji: '🤗', key: 'loving' },
+            { emoji: '😎', key: 'proud' },
+            { emoji: '😳', key: 'embarrassed' },
+            { emoji: '🤢', key: 'sick' },
+            { emoji: '😒', key: 'bored' },
+            { emoji: '🥰', key: 'grateful' },
+            { emoji: '😤', key: 'annoyed' },
+            { emoji: '😔', key: 'lonely' },
+            { emoji: '🤩', key: 'amazed' },
         ];
+        
+        function getFeelingWord(feeling) {
+            if (typeof I18n !== 'undefined') {
+                return I18n.t('feeling.' + feeling.key);
+            }
+            return feeling.key.charAt(0).toUpperCase() + feeling.key.slice(1);
+        }
+        
+        function getFeelingTip(feeling) {
+            if (typeof I18n !== 'undefined') {
+                return I18n.t('feeling.' + feeling.key + '.tip');
+            }
+            return '';
+        }
         
         let score = 0;
         let level = 1;
         let lives = 3;
         let currentFeeling = null;
         
-        function getMaxLives() {
-            if (gradeLevel === 'kg') return 8;
-            if (gradeLevel === 'g1-3') return 5;
-            return 3;
-        }
         let usedFeelings = [];
         let canAnswer = true;
         let questionsAnswered = 0;
@@ -251,17 +242,17 @@
         function generateQuestion() {
             canAnswer = true;
             
-            const available = getAvailableFeelings().filter(f => !usedFeelings.includes(f.word));
+            const available = getAvailableFeelings().filter(f => !usedFeelings.includes(f.key));
             if (available.length < 4) usedFeelings = [];
             
             const pool = available.length >= 4 ? available : getAvailableFeelings();
             const shuffled = [...pool].sort(() => Math.random() - 0.5);
             
             currentFeeling = shuffled[0];
-            usedFeelings.push(currentFeeling.word);
+            usedFeelings.push(currentFeeling.key);
             
-            feelingWord.textContent = currentFeeling.word.toUpperCase();
-            feelingTip.textContent = currentFeeling.tip;
+            feelingWord.textContent = getFeelingWord(currentFeeling).toUpperCase();
+            feelingTip.textContent = getFeelingTip(currentFeeling);
             
             // Get choices
             const choices = [currentFeeling];
@@ -335,7 +326,7 @@
             
             playerName = GameUtils.getPlayerName();
             gradeLevel = GameUtils.getGradeLevel();
-            lives = getMaxLives();
+            lives = GameUtils.getMaxLives({kg: 8, 'g1-3': 5, default: 3});
             questionsAnswered = 0;
             
             playerName = GameUtils.getPlayerName();
@@ -350,6 +341,22 @@
             generateQuestion();
         }
         
+        function loadHighScore() {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('bestScoreDisplay').innerHTML = highScoreText;
+            } else {
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : 'Best: -- points';
+                document.getElementById('bestScoreDisplay').innerHTML = defaultText;
+            }
+        }
+        
         function endGame() {
             const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             if (isNewHigh) highScore = score;
@@ -362,21 +369,20 @@
             document.getElementById('feelingsLearned').textContent = questionsAnswered;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             document.getElementById('gameOver').style.display = 'block';
-            updateBestScoreDisplay();
-        }
-        
-        function updateBestScoreDisplay() {
-            const bestScore = GameUtils.getHighScore(GAME_KEY);
-            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-            if (bestScore > 0) {
-                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
-            }
+            loadHighScore();
         }
         
         // Initialize
         GameUtils.initSoundToggle();
-        updateBestScoreDisplay();
+        loadHighScore();
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

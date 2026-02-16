@@ -166,6 +166,24 @@ const categoryLabels = {
     gratitude: "🙏 Gratitude"
 };
 
+// Message translation keys - map category+index to translation key
+const msgKeys = {};
+happyMessages.forEach((msg, i) => {
+    // Count how many of this category came before
+    const categoryCount = happyMessages.slice(0, i).filter(m => m.category === msg.category).length + 1;
+    msgKeys[i] = `msg.${msg.category}.${categoryCount}`;
+});
+
+// Helper to get translated message text
+function getMessageText(message, messageIndex) {
+    const key = msgKeys[messageIndex];
+    // Use I18n translation if available, otherwise fall back to English word
+    if (typeof I18n !== 'undefined' && I18n.translations && I18n.translations[key]) {
+        return I18n.t(key, { name: studentName });
+    }
+    return message.word.replace('{name}', studentName);
+}
+
 // Track app state
 let lastIndex = -1;
 let studentName = "Friend";
@@ -401,9 +419,12 @@ function generateHappyWord() {
     
     lastIndex = randomIndex;
     const message = filteredMessages[randomIndex];
+    
+    // Find the original index in happyMessages for translation lookup
+    const originalIndex = happyMessages.indexOf(message);
 
-    // Replace {name} placeholder with actual name
-    const personalizedWord = message.word.replace('{name}', studentName);
+    // Get translated message text
+    const personalizedWord = getMessageText(message, originalIndex);
 
     // Add pop animation
     wordDisplay.classList.remove('pop');
@@ -591,12 +612,16 @@ function showFavorites() {
         <div class="favorites-content">
             <h2>💖 Your Favorites</h2>
             <div class="favorites-list">
-                ${favorites.map((f, i) => `
+                ${favorites.map((f, i) => {
+                    // Find original index for translation
+                    const origIdx = happyMessages.findIndex(m => m.word === f.word && m.emoji === f.emoji);
+                    const text = origIdx >= 0 ? getMessageText(f, origIdx) : f.word.replace('{name}', studentName);
+                    return `
                     <div class="favorite-item">
-                        <span>${f.emoji} ${f.word.replace('{name}', studentName)}</span>
+                        <span>${f.emoji} ${text}</span>
                         <button onclick="removeFavorite(${i})" class="remove-fav">✕</button>
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
             <button onclick="closeFavoritesModal()" class="close-modal-btn">Close</button>
         </div>
@@ -800,6 +825,21 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedData();
     updateFavoritesCount();
+    
+    // Listen for language changes to update displayed message
+    window.addEventListener('languageChanged', () => {
+        const wordElement = document.getElementById('word');
+        const wordDisplay = document.getElementById('wordDisplay');
+        if (wordElement && wordDisplay && wordDisplay.dataset.currentMessage) {
+            try {
+                const message = JSON.parse(wordDisplay.dataset.currentMessage);
+                const origIdx = happyMessages.findIndex(m => m.word === message.word && m.emoji === message.emoji);
+                if (origIdx >= 0) {
+                    wordElement.textContent = getMessageText(message, origIdx);
+                }
+            } catch (e) {}
+        }
+    });
     
     // Load voices for speech synthesis
     if ('speechSynthesis' in window) {
@@ -1130,4 +1170,28 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         moveCarRight();
     }
+});
+
+// ==================== LANGUAGE TOGGLE ====================
+
+function toggleLanguage() {
+    if (typeof I18n !== 'undefined') {
+        I18n.toggleLanguage();
+        const btn = document.getElementById('langToggle');
+        if (btn) {
+            btn.textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+        }
+    }
+}
+
+// Update language toggle button on load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        if (typeof I18n !== 'undefined' && I18n.isLoaded) {
+            const btn = document.getElementById('langToggle');
+            if (btn) {
+                btn.textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+            }
+        }
+    }, 100);
 });

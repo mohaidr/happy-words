@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="../js/i18n.js"></script>
     <title>Reading & Language 📚 - Happy Words</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -173,56 +171,57 @@
     </style>
 </head>
 <body>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLang()">عربي</button>
     <div class="page-container">
         <div class="category-header">
             <span class="category-icon">📚</span>
-            <h1 class="category-title">Reading & Language</h1>
-            <p class="category-desc">Build words, learn vocabulary, and have fun!</p>
+            <h1 class="category-title" data-i18n="category.reading">Reading & Language</h1>
+            <p class="category-desc" data-i18n="category.readingDesc">Build words, learn vocabulary, and have fun!</p>
         </div>
         
         <div class="games-grid">
             <a href="sight-words.html" class="game-card" data-game="sightWords">
                 <span class="game-card-badge" id="badge-sightWords">⭐ 0</span>
                 <span class="game-card-icon">👀</span>
-                <span class="game-card-name">Sight Words</span>
-                <span class="game-card-desc">Practice reading common words</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.sightWords">Sight Words</span>
+                <span class="game-card-desc" data-i18n="game.sightWordsDesc">Practice reading common words</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="word-builder.html" class="game-card" data-game="wordBuilder">
                 <span class="game-card-badge" id="badge-wordBuilder">⭐ 0</span>
                 <span class="game-card-icon">🔤</span>
-                <span class="game-card-name">Word Builder</span>
-                <span class="game-card-desc">Spell words by arranging letters</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.wordBuilder">Word Builder</span>
+                <span class="game-card-desc" data-i18n="game.wordBuilderDesc">Spell words by arranging letters</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="abc-order.html" class="game-card" data-game="abcOrder">
                 <span class="game-card-badge" id="badge-abcOrder">⭐ 0</span>
                 <span class="game-card-icon">🔡</span>
-                <span class="game-card-name">ABC Order</span>
-                <span class="game-card-desc">Put words in alphabetical order</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.abcOrder">ABC Order</span>
+                <span class="game-card-desc" data-i18n="game.abcOrderDesc">Put words in alphabetical order</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="rhyme-time.html" class="game-card" data-game="rhymeTime">
                 <span class="game-card-badge" id="badge-rhymeTime">⭐ 0</span>
                 <span class="game-card-icon">🎵</span>
-                <span class="game-card-name">Rhyme Time</span>
-                <span class="game-card-desc">Find words that rhyme together</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.rhymeTime">Rhyme Time</span>
+                <span class="game-card-desc" data-i18n="game.rhymeTimeDesc">Find words that rhyme together</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="opposite-match.html" class="game-card" data-game="oppositeMatch">
                 <span class="game-card-badge" id="badge-oppositeMatch">⭐ 0</span>
                 <span class="game-card-icon">↔️</span>
-                <span class="game-card-name">Opposite Match</span>
-                <span class="game-card-desc">Match words to their opposites</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.oppositeMatch">Opposite Match</span>
+                <span class="game-card-desc" data-i18n="game.oppositeMatchDesc">Match words to their opposites</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
         </div>
         
-        <a href="../index.html" class="back-home">← Back to Home</a>
+        <a href="../index.html" class="back-home" data-i18n="btn.back">← Back to Home</a>
     </div>
     
     <script>
@@ -234,6 +233,20 @@
                 badge.textContent = '⭐ ' + score;
                 badge.classList.add('has-score');
             }
+        });
+
+        function toggleLang() {
+            if (typeof I18n !== 'undefined') {
+                I18n.toggleLanguage();
+                document.getElementById('langToggle').textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof I18n !== 'undefined') {
+                    document.getElementById('langToggle').textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+                }
+            }, 100);
         });
     </script>
 </body>

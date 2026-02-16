@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
-    <title>Color Match 🎨</title>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
+    <title data-i18n="colorMatch.title">Color Match 🎨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -117,40 +113,6 @@
             font-size: 14px;
         }
         
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-        
-        #gameOver p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        
-        .new-high {
-            color: #ffd700;
-            font-weight: bold;
-            animation: glow 1s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #ffd700; }
-            to { text-shadow: 0 0 20px #ffd700; }
-        }
-        
         .lives {
             font-size: 24px;
         }
@@ -158,20 +120,20 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-fun.html" class="category-btn">🎉 Fun</a>
-        <h1>🎨 Color Match</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-fun.html" class="category-btn" data-i18n="nav.fun">🎉 Fun</a>
+        <h1 data-i18n="colorMatch.title">🎨 Color Match</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Round: <span id="round">1</span>/10</div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span>/10</div>
         <div class="lives">❤️ <span id="lives">3</span></div>
     </div>
     
     <div class="color-word" id="colorWord">RED</div>
     
-    <div class="instruction">Tap the color that matches the word!</div>
+    <div class="instruction" data-i18n="colorMatch.instruction">Tap the color that matches the word!</div>
     
     <div class="colors-grid" id="colorsGrid"></div>
     
@@ -180,36 +142,36 @@
     <div class="high-score" id="highScoreDisplay">Best: -- points</div>
     
     <div id="gameOver">
-        <h2>🎨 Game Over!</h2>
-        <p>Score: <span id="finalScore">0</span></p>
+        <h2 data-i18n="colorMatch.result">🎨 Great Matching!</h2>
+        <p><span data-i18n="game.score">Score</span>: <span id="finalScore">0</span></p>
         <p id="highScoreMsg"></p>
-        <button class="btn btn-game" onclick="startGame()">Play Again</button>
+        <button class="btn btn-game" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
 
     <script src="../js/game-utils.js"></script>
     <script>
         const colors = [
-            { name: 'Red', hex: '#ff4444' },
-            { name: 'Blue', hex: '#4444ff' },
-            { name: 'Green', hex: '#44aa44' },
-            { name: 'Yellow', hex: '#ffdd00' },
-            { name: 'Orange', hex: '#ff8800' },
-            { name: 'Purple', hex: '#aa44aa' },
-            { name: 'Pink', hex: '#ff69b4' },
-            { name: 'Brown', hex: '#8b4513' },
-            { name: 'Black', hex: '#222222' },
+            { name: 'Red', key: 'color.red', hex: '#ff4444' },
+            { name: 'Blue', key: 'color.blue', hex: '#4444ff' },
+            { name: 'Green', key: 'color.green', hex: '#44aa44' },
+            { name: 'Yellow', key: 'color.yellow', hex: '#ffdd00' },
+            { name: 'Orange', key: 'color.orange', hex: '#ff8800' },
+            { name: 'Purple', key: 'color.purple', hex: '#aa44aa' },
+            { name: 'Pink', key: 'color.pink', hex: '#ff69b4' },
+            { name: 'Brown', key: 'color.brown', hex: '#8b4513' },
+            { name: 'Black', key: 'color.black', hex: '#222222' },
         ];
+        
+        // Helper to get translated color name
+        function getColorName(color) {
+            return typeof I18n !== 'undefined' ? I18n.t(color.key) : color.name;
+        }
         
         let score = 0;
         let round = 0;
         let lives = 3;
         let totalRounds = 10;
         
-        function getMaxLives() {
-            if (gradeLevel === 'kg') return 6;
-            if (gradeLevel === 'g1-3') return 4;
-            return 3;
-        }
         let currentColor = null;
         let gameRunning = false;
         let canClick = true;
@@ -222,7 +184,10 @@
             const saved = GameUtils.getHighScore(GAME_KEY);
             if (saved > 0) {
                 const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points by ${bestPlayer}`;
+                const bestLabel = typeof I18n !== 'undefined' ? I18n.t('game.best') : 'Best';
+                const pointsLabel = typeof I18n !== 'undefined' ? I18n.t('game.points') : 'points';
+                const byLabel = typeof I18n !== 'undefined' ? I18n.t('game.by') : 'by';
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 ${bestLabel}: ${saved} ${pointsLabel} ${byLabel} ${bestPlayer}`;
             }
         }
         
@@ -254,7 +219,7 @@
             
             // Display the word
             const wordEl = document.getElementById('colorWord');
-            wordEl.textContent = currentColor.name.toUpperCase();
+            wordEl.textContent = getColorName(currentColor).toUpperCase();
             
             // For KG: show word in matching color (easier)
             // For harder grades, sometimes show the word in a different color (Stroop effect)
@@ -303,7 +268,7 @@
                 // Correct!
                 score += 10;
                 document.getElementById('score').textContent = score;
-                document.getElementById('message').textContent = '✨ Correct!';
+                document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('game.correct') : '✓ Correct!';
                 btn.classList.add('correct');
                 GameUtils.playSound('correct');
                 
@@ -319,7 +284,7 @@
                 // Wrong
                 lives--;
                 document.getElementById('lives').textContent = lives;
-                document.getElementById('message').textContent = '❌ Try again!';
+                document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('game.wrong') : '✗ Try again!';
                 btn.classList.add('wrong');
                 GameUtils.playSound('wrong');
                 
@@ -337,7 +302,7 @@
         function startGame() {
             score = 0;
             round = 0;
-            lives = getMaxLives();
+            lives = GameUtils.getMaxLives({kg: 6, 'g1-3': 4, default: 3});
             gameRunning = true;
             
             document.getElementById('score').textContent = '0';
@@ -357,10 +322,12 @@
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
-                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                const newRecordText = typeof I18n !== 'undefined' ? I18n.t('game.newRecord') : '🏆 NEW HIGH SCORE!';
+                highMsg.innerHTML = `<span class="new-high">${newRecordText}</span>`;
                 GameUtils.playSound('levelUp');
             } else {
-                highMsg.textContent = 'Great job, ' + playerName + '!';
+                const goodJobText = typeof I18n !== 'undefined' ? I18n.t('game.goodJob') : 'Good job!';
+                highMsg.textContent = goodJobText + ' ' + playerName;
             }
             
             document.getElementById('gameOver').style.display = 'block';
@@ -374,6 +341,13 @@
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

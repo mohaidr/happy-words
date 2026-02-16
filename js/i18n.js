@@ -1,0 +1,1223 @@
+/**
+ * Internationalization (i18n) Utility
+ * Supports English and Arabic with RTL
+ */
+
+const I18n = {
+    currentLang: 'en',
+    translations: {},
+    isLoaded: false,
+
+    // Available languages
+    languages: {
+        en: { name: 'English', dir: 'ltr', font: "'Fredoka', Arial, sans-serif" },
+        ar: { name: 'العربية', dir: 'rtl', font: "'Baloo Bhaijaan 2', sans-serif" }
+    },
+
+    // Embedded translations (no fetch needed)
+    locales: {
+        en: {
+            "app.title": "Happy Words for Kids! 🌟",
+            "app.name": "✨ Happy Words! ✨",
+            "app.subtitle": "Click the button to see something wonderful!",
+            "app.streak": "day streak!",
+            "app.footer": "Made with 💖 for awesome kids!",
+            "onboarding.askName": "What's your name? 😊",
+            "onboarding.namePlaceholder": "Type your name here...",
+            "onboarding.askGrade": "What grade are you in? 📚",
+            "onboarding.gradeKG": "🌟 KG",
+            "onboarding.grade13": "📖 Grade 1-3",
+            "onboarding.grade36": "🎓 Grade 3-6",
+            "onboarding.letsGo": "Let's Go! 🚀",
+            "category.all": "✨ All",
+            "category.praise": "🌟 Praise",
+            "category.growth": "🌱 Growth",
+            "category.kindness": "💝 Kindness",
+            "category.ican": "💪 I Can!",
+            "category.calm": "🧘 Calm",
+            "category.gratitude": "🙏 Gratitude",
+            "btn.showMagic": "🎉 Inspire Me! 🎉",
+            "btn.switchPlayer": "👤 Switch Player",
+            "btn.home": "← Home",
+            "btn.back": "← Back to Home",
+            "btn.play": "Play",
+            "btn.playAgain": "🔄 Play Again!",
+            "btn.exit": "👋 Exit",
+            "btn.print": "Print",
+            "btn.readAloud": "Read aloud",
+            "btn.addFavorite": "Add to favorites",
+            "games.title": "🎮 Fun Games!",
+            "games.subtitle": "18 games to play!",
+            "games.score": "Score",
+            "games.level": "Level",
+            "games.lives": "Lives",
+            "games.moves": "Moves",
+            "games.pairs": "Pairs",
+            "games.time": "Time",
+            "games.best": "🏆 Best: {score} by {player}",
+            "games.newHighScore": "🏆 NEW HIGH SCORE!",
+            "category.fun": "Fun",
+            "category.funDesc": "Colors, shapes, animals, feelings and more!",
+            "category.math": "Math Games",
+            "category.mathDesc": "Practice numbers, counting and arithmetic!",
+            "category.reading": "Reading",
+            "category.readingDesc": "Words, letters and reading skills!",
+            "category.logic": "Logic",
+            "category.logicDesc": "Puzzles, patterns and brain training!",
+            "game.carGame": "Car Game",
+            "game.carGameDesc": "Dodge obstacles on the road",
+            "game.colorMatch": "Color Match",
+            "game.colorMatchDesc": "Match colors with their names",
+            "game.shapeSpotter": "Shape Spotter",
+            "game.shapeSpotterDesc": "Find and identify shapes",
+            "game.emojiFeelings": "Emoji Feelings",
+            "game.emojiFeelingsDesc": "Learn about emotions and feelings",
+            "game.balloonMath": "Balloon Math",
+            "game.balloonMathDesc": "Pop balloons with correct answers",
+            "game.greaterLess": "Greater or Less",
+            "game.greaterLessDesc": "Compare numbers",
+            "game.countingGame": "Counting Fun",
+            "game.countingGameDesc": "Count objects and learn numbers",
+            "game.mathRacing": "Math Racing",
+            "game.mathRacingDesc": "Race while solving math problems",
+            "game.numberMuncher": "Number Muncher",
+            "game.numberMuncherDesc": "Eat the correct numbers",
+            "game.sightWords": "Sight Words",
+            "game.sightWordsDesc": "Learn common sight words",
+            "game.rhymeTime": "Rhyme Time",
+            "game.rhymeTimeDesc": "Find words that rhyme",
+            "game.abcOrder": "ABC Order",
+            "game.abcOrderDesc": "Put letters in alphabetical order",
+            "game.wordBuilder": "Word Builder",
+            "game.wordBuilderDesc": "Build words from letters",
+            "game.oppositeMatch": "Opposite Match",
+            "game.oppositeMatchDesc": "Match words with their opposites",
+            "game.memoryMatch": "Memory Match",
+            "game.memoryMatchDesc": "Find matching pairs",
+            "game.patternPuzzle": "Pattern Puzzle",
+            "game.patternPuzzleDesc": "Complete the pattern sequence",
+            "game.sortingFun": "Sorting Fun",
+            "game.sortingFunDesc": "Sort items into categories",
+            "game.oddOneOut": "Odd One Out",
+            "game.oddOneOutDesc": "Find the item that doesn't belong",
+            "result.greatJob": "🎉 Great Job!",
+            "result.amazing": "🎉 Amazing!",
+            "result.goodTry": "⭐ Good Try!",
+            "result.greatRacing": "🏁 Great Racing!",
+            "result.greatDriving": "🚗 Great Driving!",
+            "result.greatMatching": "🎨 Great Matching!",
+            "result.greatCounting": "🎉 Great Counting!",
+            "result.greatSorting": "🎉 Great Sorting!",
+            "result.greatSpotting": "🔷 Great Spotting!",
+            "result.youWon": "🎉 You Won!",
+            "result.timesUp": "⏱️ Time's Up!",
+            "game.findMatching": "Find all matching pairs!",
+            "game.matchFound": "✨ Match found!",
+            "game.tryAgain": "Try again!",
+            "game.correct": "Correct!",
+            "game.wrong": "Wrong!",
+            "stats.gamesCount": "games",
+            "level.easy": "Easy",
+            "level.medium": "Medium",
+            "level.hard": "Hard",
+
+            // Praise Messages
+            "msg.praise.1": "{name}, you are a SUPERSTAR!",
+            "msg.praise.2": "{name} is BEAUTIFUL inside and out!",
+            "msg.praise.3": "{name} can do ANYTHING!",
+            "msg.praise.4": "{name} makes the world COLORFUL!",
+            "msg.praise.5": "{name} is SO STRONG!",
+            "msg.praise.6": "{name} is SO CREATIVE!",
+            "msg.praise.7": "{name} is LOVED!",
+            "msg.praise.8": "{name} SHINES like the sun!",
+            "msg.praise.9": "{name} is BRAVE like a lion!",
+            "msg.praise.10": "{name} makes everyone HAPPY!",
+            "msg.praise.11": "{name} is SPECIAL!",
+            "msg.praise.12": "{name} is WONDERFUL!",
+            "msg.praise.13": "{name} is FUN to be with!",
+            "msg.praise.14": "{name} is a WINNER!",
+            "msg.praise.15": "{name} is a TREASURE!",
+            "msg.praise.16": "{name} is MAGICAL!",
+            "msg.praise.17": "{name}'s smile is MUSIC!",
+            "msg.praise.18": "{name} is DREAMY!",
+            "msg.praise.19": "{name} is SO LUCKY!",
+            "msg.praise.20": "{name} is a GIFT!",
+            "msg.praise.21": "{name} is GENTLE and KIND!",
+            "msg.praise.22": "{name} has SUPER POWERS!",
+            "msg.praise.23": "{name} is AWESOME!",
+            "msg.praise.24": "{name} is SWEET!",
+            "msg.praise.25": "{name} can FLY HIGH!",
+            "msg.praise.26": "{name}'s dreams will come TRUE!",
+            "msg.praise.27": "{name} is UNIQUE!",
+            "msg.praise.28": "{name} gives the best HUGS!",
+            "msg.praise.29": "Today is {name}'s day!",
+            "msg.praise.30": "{name} brightens everyone's day!",
+            "msg.praise.31": "{name}'s heart is GOLDEN!",
+            "msg.praise.32": "{name} is a MASTERPIECE!",
+            "msg.praise.33": "{name} makes the world BETTER!",
+            "msg.praise.34": "{name} is COOL!",
+            "msg.praise.35": "{name} is SMART!",
+            "msg.praise.36": "{name} is a CHAMPION!",
+            "msg.praise.37": "{name} is PRECIOUS!",
+            "msg.praise.38": "{name} is PLAYFUL and FUN!",
+            "msg.praise.39": "{name} is GROWING every day!",
+            "msg.praise.40": "{name} is ROYALTY!",
+            "msg.praise.41": "{name} is SO CLEVER!",
+            "msg.praise.42": "{name} is OUT OF THIS WORLD!",
+            "msg.praise.43": "{name} deserves a GOLD MEDAL!",
+            "msg.praise.44": "{name} is a SUPERHERO!",
+            "msg.praise.45": "{name} is an AMAZING learner!",
+            "msg.praise.46": "{name} is a GREAT friend!",
+            "msg.praise.47": "{name}'s voice MATTERS!",
+            "msg.praise.48": "{name} solves problems like a PRO!",
+            "msg.praise.49": "{name} is UNSTOPPABLE!",
+            "msg.praise.50": "{name} is SO INTELLIGENT!",
+            "msg.praise.51": "{name} has BRILLIANT ideas!",
+            "msg.praise.52": "{name} can build ANYTHING!",
+            "msg.praise.53": "{name} will SOAR HIGH!",
+            "msg.praise.54": "Everyone is PROUD of {name}!",
+            "msg.praise.55": "{name} is BLOOMING beautifully!",
+            "msg.praise.56": "{name} is a TEAM PLAYER!",
+            "msg.praise.57": "{name} is TALENTED!",
+            "msg.praise.58": "{name} is ON FIRE today!",
+            "msg.praise.59": "{name} is NUMBER ONE!",
+            "msg.praise.60": "{name} brings JOY everywhere!",
+            "msg.praise.61": "{name} never gives up!",
+            "msg.praise.62": "{name} works SO HARD!",
+            "msg.praise.63": "{name} always does their BEST!",
+            "msg.praise.64": "{name} is TRANSFORMING into greatness!",
+            "msg.praise.65": "{name} is ONE OF A KIND!",
+            "msg.praise.66": "{name} keeps going STRONG!",
+            "msg.praise.67": "{name} has an AMAZING imagination!",
+
+            // Growth Mindset Messages
+            "msg.growth.1": "Mistakes help {name} LEARN and GROW!",
+            "msg.growth.2": "{name} loves a good CHALLENGE!",
+            "msg.growth.3": "{name} is getting BETTER every day!",
+            "msg.growth.4": "{name} says 'I can't do it YET!'",
+            "msg.growth.5": "{name} finds ways to IMPROVE!",
+            "msg.growth.6": "{name}'s effort leads to SUCCESS!",
+            "msg.growth.7": "{name} turns problems into OPPORTUNITIES!",
+            "msg.growth.8": "Practice makes {name} STRONGER!",
+            "msg.growth.9": "{name} is a LEARNING MACHINE!",
+            "msg.growth.10": "Hard work is {name}'s superpower!",
+            "msg.growth.11": "{name}'s brain grows when they try hard things!",
+            "msg.growth.12": "Every mistake makes {name} WISER!",
+            "msg.growth.13": "{name} believes in themselves!",
+            "msg.growth.14": "{name} never stops trying!",
+            "msg.growth.15": "{name} climbs mountains one step at a time!",
+
+            // Kindness Messages
+            "msg.kindness.1": "{name} can make someone SMILE today!",
+            "msg.kindness.2": "{name} can give a COMPLIMENT today!",
+            "msg.kindness.3": "{name} can HELP a friend today!",
+            "msg.kindness.4": "{name} can write a NICE note today!",
+            "msg.kindness.5": "{name} can SHARE something today!",
+            "msg.kindness.6": "{name} can be a good LISTENER today!",
+            "msg.kindness.7": "{name} can include someone NEW today!",
+            "msg.kindness.8": "{name} can say THANK YOU today!",
+            "msg.kindness.9": "{name} can spread KINDNESS everywhere!",
+            "msg.kindness.10": "{name} is a KINDNESS superhero!",
+            "msg.kindness.11": "{name}'s kindness makes the world BRIGHTER!",
+            "msg.kindness.12": "{name} can be someone's SUNSHINE today!",
+            "msg.kindness.13": "{name} can cheer someone UP today!",
+            "msg.kindness.14": "{name} can do something NICE today!",
+            "msg.kindness.15": "{name}'s kindness blooms like FLOWERS!",
+
+            // I Can Messages
+            "msg.ican.1": "{name} can do HARD things!",
+            "msg.ican.2": "{name} can CREATE amazing things!",
+            "msg.ican.3": "{name} can LEARN anything!",
+            "msg.ican.4": "{name} can speak up BRAVELY!",
+            "msg.ican.5": "{name} can solve ANY problem!",
+            "msg.ican.6": "{name} can reach their GOALS!",
+            "msg.ican.7": "{name} can make GOOD choices!",
+            "msg.ican.8": "{name} can be a GREAT friend!",
+            "msg.ican.9": "{name} can write WONDERFUL stories!",
+            "msg.ican.10": "{name} can master MATH!",
+            "msg.ican.11": "{name} can make MUSIC!",
+            "msg.ican.12": "{name} can achieve ANYTHING!",
+            "msg.ican.13": "{name} can change the WORLD!",
+            "msg.ican.14": "{name} can discover NEW things!",
+            "msg.ican.15": "{name} can make DREAMS come true!",
+
+            // Calm Messages
+            "msg.calm.1": "{name}, take a deep breath. You've got this!",
+            "msg.calm.2": "{name} is calm like the OCEAN!",
+            "msg.calm.3": "{name}, let worries float away like CLOUDS!",
+            "msg.calm.4": "{name} is peaceful and RELAXED!",
+            "msg.calm.5": "{name}, everything will be OKAY!",
+            "msg.calm.6": "{name} is safe and LOVED!",
+            "msg.calm.7": "After the storm, {name} will see SUNSHINE!",
+            "msg.calm.8": "{name} is light like a LEAF in the wind!",
+            "msg.calm.9": "{name}, breathe in PEACE, breathe out WORRY!",
+            "msg.calm.10": "{name} is stronger than any problem!",
+            "msg.calm.11": "{name}, this feeling will PASS!",
+            "msg.calm.12": "{name} can handle ANYTHING!",
+            "msg.calm.13": "{name} is doing GREAT!",
+            "msg.calm.14": "{name}, it's okay to take it SLOW!",
+            "msg.calm.15": "{name} is exactly where they need to BE!",
+
+            // Gratitude Messages
+            "msg.gratitude.1": "{name} has so much to be THANKFUL for!",
+            "msg.gratitude.2": "{name} is grateful for their FAMILY!",
+            "msg.gratitude.3": "{name} is thankful for FRIENDS!",
+            "msg.gratitude.4": "{name} appreciates their cozy HOME!",
+            "msg.gratitude.5": "{name} is thankful for this BEAUTIFUL day!",
+            "msg.gratitude.6": "{name} is grateful for LEARNING!",
+            "msg.gratitude.7": "{name} is thankful for yummy FOOD!",
+            "msg.gratitude.8": "{name} appreciates FUN times!",
+            "msg.gratitude.9": "{name} is grateful for ANIMALS!",
+            "msg.gratitude.10": "{name} appreciates NATURE!",
+            "msg.gratitude.11": "{name} is thankful for LOVE!",
+            "msg.gratitude.12": "{name} is grateful for MUSIC!",
+            "msg.gratitude.13": "{name} appreciates good BOOKS!",
+            "msg.gratitude.14": "{name} is thankful for BEAUTIFUL things!",
+            "msg.gratitude.15": "{name} is grateful for HAPPINESS!",
+
+            // Game Common UI
+            "game.home": "← Home",
+            "game.start": "Start Game",
+            "game.startBtn": "🎮 Start",
+            "game.playAgain": "🔄 Play Again",
+            "game.score": "Score",
+            "game.round": "Round",
+            "game.level": "Level",
+            "game.lives": "Lives",
+            "game.moves": "Moves",
+            "game.pairs": "Pairs",
+            "game.time": "Time",
+            "game.seconds": "seconds",
+            "game.points": "points",
+            "game.best": "Best",
+            "game.by": "by",
+            "game.newRecord": "🏆 NEW RECORD!",
+            "game.correct": "✓ Correct!",
+            "game.wrong": "✗ Try again!",
+            "game.great": "Great!",
+            "game.amazing": "Amazing!",
+            "game.perfect": "Perfect!",
+            "game.awesome": "Awesome!",
+            "game.goodJob": "Good job!",
+            "game.keepGoing": "Keep going!",
+            "game.almost": "Almost!",
+            "game.tryAgain": "Try again!",
+            "game.oops": "Oops!",
+            "game.timeUp": "⏱️ Time's Up!",
+            "game.gameOver": "Game Over",
+            "game.youWon": "🎉 You Won!",
+            "game.greatJob": "🎉 Great Job!",
+            "game.finalScore": "Final Score",
+            "game.info.fewestMoves": "Score is based on fewest moves",
+
+            // Level names
+            "level.easy": "Easy",
+            "level.medium": "Medium",
+            "level.hard": "Hard",
+
+            // Color Match Game
+            "colorMatch.title": "🎨 Color Match",
+            "colorMatch.instruction": "Tap the color that matches the word!",
+            "colorMatch.result": "🎨 Great Matching!",
+            "color.red": "Red",
+            "color.blue": "Blue",
+            "color.green": "Green",
+            "color.yellow": "Yellow",
+            "color.orange": "Orange",
+            "color.purple": "Purple",
+            "color.pink": "Pink",
+            "color.brown": "Brown",
+            "color.black": "Black",
+            "color.white": "White",
+
+            // Memory Match Game
+            "memoryMatch.title": "🧠 Memory Match",
+            "memoryMatch.instruction": "Find all matching pairs!",
+            "memoryMatch.matchFound": "✨ Match found!",
+            "memoryMatch.result": "🎉 You Won!",
+
+            // Shape Spotter Game
+            "shapeSpotter.title": "🔷 Shape Spotter",
+            "shapeSpotter.instruction": "Find the {shape}!",
+            "shapeSpotter.result": "🔷 Great Spotting!",
+            "shape.circle": "Circle",
+            "shape.square": "Square",
+            "shape.triangle": "Triangle",
+            "shape.rectangle": "Rectangle",
+            "shape.star": "Star",
+            "shape.heart": "Heart",
+            "shape.diamond": "Diamond",
+            "shape.oval": "Oval",
+            "shape.pentagon": "Pentagon",
+            "shape.hexagon": "Hexagon",
+
+            // Emoji Feelings Game
+            "emojiFeelings.title": "😊 Emoji Feelings",
+            "emojiFeelings.instruction": "How does this emoji feel?",
+            "emojiFeelings.result": "🎉 Great Job!",
+            "emojiFeelings.feelingsLearned": "Feelings Learned",
+            "emojiFeelings.finalScore": "Final Score",
+            "feeling.happy": "Happy",
+            "feeling.happy.tip": "When you feel good inside!",
+            "feeling.sad": "Sad",
+            "feeling.sad.tip": "When something makes you feel down.",
+            "feeling.angry": "Angry",
+            "feeling.angry.tip": "When something isn't fair.",
+            "feeling.scared": "Scared",
+            "feeling.scared.tip": "When something frightens you.",
+            "feeling.surprised": "Surprised",
+            "feeling.surprised.tip": "When something unexpected happens!",
+            "feeling.tired": "Tired",
+            "feeling.tired.tip": "When you need rest.",
+            "feeling.confused": "Confused",
+            "feeling.confused.tip": "When you don't understand something.",
+            "feeling.excited": "Excited",
+            "feeling.excited.tip": "When you can't wait for something!",
+            "feeling.calm": "Calm",
+            "feeling.calm.tip": "When you feel peaceful inside.",
+            "feeling.worried": "Worried",
+            "feeling.worried.tip": "When you think something bad might happen.",
+            "feeling.frustrated": "Frustrated",
+            "feeling.frustrated.tip": "When something is hard and you want to give up.",
+            "feeling.loving": "Loving",
+            "feeling.loving.tip": "When you care about someone.",
+            "feeling.proud": "Proud",
+            "feeling.proud.tip": "When you did something great!",
+            "feeling.embarrassed": "Embarrassed",
+            "feeling.embarrassed.tip": "When you feel silly in front of others.",
+            "feeling.sick": "Sick",
+            "feeling.sick.tip": "When your body doesn't feel well.",
+            "feeling.bored": "Bored",
+            "feeling.bored.tip": "When you have nothing fun to do.",
+            "feeling.grateful": "Grateful",
+            "feeling.grateful.tip": "When you feel thankful.",
+            "feeling.annoyed": "Annoyed",
+            "feeling.annoyed.tip": "When something small bothers you.",
+            "feeling.lonely": "Lonely",
+            "feeling.lonely.tip": "When you wish you had a friend nearby.",
+            "feeling.amazed": "Amazed",
+            "feeling.amazed.tip": "When something is really cool!",
+
+            // Balloon Math Game
+            "balloonMath.title": "🎈 Balloon Math",
+            "balloonMath.instruction": "Pop the balloon with the correct answer!",
+            "balloonMath.hint": "Pop the correct answer!",
+            "balloonMath.questionsCorrect": "Questions Correct",
+            "balloonMath.result": "🎈 Great Popping!",
+
+            // Greater Less Game
+            "greaterLess.title": "⚖️ Greater or Less",
+            "greaterLess.instruction": "Which number is greater?",
+            "greaterLess.result": "⚖️ Great Comparing!",
+            "greaterLess.greater": "Greater",
+            "greaterLess.less": "Less",
+            "greaterLess.equal": "Equal",
+
+            // Counting Game
+            "countingGame.title": "🔢 Counting Fun",
+            "countingGame.instruction": "How many do you see?",
+            "countingGame.result": "🎉 Great Counting!",
+
+            // Math Racing Game
+            "mathRacing.title": "🏎️ Math Racing",
+            "mathRacing.instruction": "Solve to speed up!",
+            "mathRacing.result": "🏁 Great Racing!",
+
+            // Number Muncher Game
+            "numberMuncher.title": "🐛 Number Muncher",
+            "numberMuncher.instruction": "Munch the numbers that match the rule!",
+            "numberMuncher.result": "🐛 Great Munching!",
+            "numberMuncher.even": "even numbers",
+            "numberMuncher.odd": "odd numbers",
+            "numberMuncher.multiples": "multiples of {n}",
+            "numberMuncher.squareNumbers": "square numbers",
+            "numberMuncher.primeNumbers": "prime numbers",
+            "numberMuncher.lessThan5": "numbers less than 5",
+            "numberMuncher.greaterThan5": "numbers greater than 5",
+            "numberMuncher.number1": "number 1",
+            "numberMuncher.number5": "number 5",
+            "numberMuncher.lessThan10": "numbers less than 10",
+            "numberMuncher.greaterThan15": "numbers greater than 15",
+            "numberMuncher.between10and20": "numbers between 10-20",
+
+            // Sight Words Game
+            "sightWords.title": "📖 Sight Words",
+            "sightWords.instruction": "Find the word: {word}",
+            "sightWords.result": "📖 Great Reading!",
+
+            // Rhyme Time Game
+            "rhymeTime.title": "🎵 Rhyme Time",
+            "rhymeTime.instruction": "Find words that rhyme with {word}!",
+            "rhymeTime.result": "🎵 Great Rhyming!",
+
+            // ABC Order Game
+            "abcOrder.title": "🔤 ABC Order",
+            "abcOrder.instruction": "Put the letters in order!",
+            "abcOrder.result": "🔤 Great Ordering!",
+
+            // Word Builder Game
+            "wordBuilder.title": "🧱 Word Builder",
+            "wordBuilder.instruction": "Build the word!",
+            "wordBuilder.hint": "Hint",
+            "wordBuilder.result": "🧱 Great Building!",
+
+            // Opposite Match Game
+            "oppositeMatch.title": "↔️ Opposite Match",
+            "oppositeMatch.instruction": "Find the opposite of {word}!",
+            "oppositeMatch.result": "↔️ Great Matching!",
+
+            // Pattern Puzzle Game
+            "patternPuzzle.title": "🧩 Pattern Puzzle",
+            "patternPuzzle.instruction": "What comes next?",
+            "patternPuzzle.watch": "Watch carefully...",
+            "patternPuzzle.yourTurn": "Your turn! Repeat the pattern",
+            "patternPuzzle.showHints": "✨ Show hints",
+            "patternPuzzle.result": "🧩 Great Pattern Finding!",
+            "result.keepPracticing": "Keep practicing, {name}!",
+
+            // Sorting Fun Game
+            "sortingFun.title": "📦 Sorting Fun",
+            "sortingFun.instruction": "Sort items into the right category!",
+            "sortingFun.dragInstruction": "Drag items to the correct bins!",
+            "sortingFun.result": "📦 Great Sorting!",
+
+            // Odd One Out Game
+            "oddOneOut.title": "🔍 Odd One Out",
+            "oddOneOut.instruction": "Find the one that doesn't belong!",
+            "oddOneOut.result": "🔍 Great Finding!",
+
+            // Clock Time Game
+            "clockTime.title": "🕐 Clock Time",
+            "clockTime.instruction": "What time is it?",
+            "clockTime.result": "🕐 Great Time Telling!",
+
+            // Animal Sounds Game
+            "animalSounds.title": "🐮 Animal Sounds",
+            "animalSounds.instruction": "What sound does this animal make?",
+            "animalSounds.result": "🐮 Great Job!",
+
+            // Car Game
+            "carGame.title": "🚗 Car Game 🏁",
+            "carGame.result": "🚗 Great Driving!",
+            "carGame.score": "Score",
+            "carGame.speed": "Speed",
+            "carGame.highScore": "High Score",
+            "carGame.controls": "Use arrow keys, buttons, or swipe to move",
+            "carGame.game": "{name}'s Game",
+
+            // Category Navigation
+            "nav.fun": "🎉 Fun",
+            "nav.math": "🔢 Math",
+            "nav.reading": "📚 Reading",
+            "nav.logic": "🧠 Logic",
+
+            // Additional Game UI
+            "shapeSpotter.findAll": "Find all the shapes!",
+            "shapeSpotter.found": "Found",
+            "emojiFeelings.whichFace": "Which face shows this feeling?",
+            "emojiFeelings.tip": "Tap the emoji that matches the feeling!",
+            "greaterLess.tip": "The crocodile eats the bigger number!",
+            "countingGame.question": "How many do you count?",
+            "mathRacing.speed": "Speed",
+            "mathRacing.controls": "Use arrow keys or tap to move",
+            "numberMuncher.munchThe": "Munch the",
+            "sightWords.findAll": "Find all",
+            "sightWords.hint": "Look for words you know!",
+            "rhymeTime.hint": "Words that sound the same at the end!",
+            "oppositeMatch.hint": "Find the word that means the opposite!",
+            "wordBuilder.clear": "Clear",
+            "wordBuilder.check": "Check",
+
+            // Dynamic game text templates
+            "countingGame.howMany": "How many {emoji} do you see?",
+            "game.highScorePoints": "🏆 Best: {score} points by {player}",
+            "game.highScoreMoves": "🏆 Best: {score} moves by {player}",
+            "game.defaultHighScore": "Best: -- points",
+            "game.defaultHighScoreMoves": "Best: -- moves",
+            "game.highScoreLevel": "🏆 Best: Level {level} by {player}",
+            "game.defaultHighScoreLevel": "Best: --",
+            "game.streak": "Streak",
+            "game.finalScoreLabel": "Final Score",
+            "game.levelReached": "Level Reached",
+            "game.wordsFound": "Words Found",
+            "result.goodJob": "Great job, {name}!",
+            "game.roundComplete": "🎉 Round complete!",
+
+            // Level buttons with counts
+            "level.easyCount": "Easy ({count})",
+            "level.mediumCount": "Medium ({count})",
+            "level.hardCount": "Hard ({count})",
+
+            // Time display
+            "game.timeSeconds": "{time}s",
+            "game.secondsShort": "s"
+        },
+        ar: {
+            "app.title": "كلمات سعيدة للأطفال! 🌟",
+            "app.name": "✨ كلمات سعيدة! ✨",
+            "app.subtitle": "اضغط الزر لترى شيئاً رائعاً!",
+            "app.streak": "يوم متتالي!",
+            "app.footer": "صُنع بـ 💖 للأطفال الرائعين!",
+            "onboarding.askName": "ما اسمك؟ 😊",
+            "onboarding.namePlaceholder": "اكتب اسمك هنا...",
+            "onboarding.askGrade": "في أي صف أنت؟ 📚",
+            "onboarding.gradeKG": "🌟 الروضة",
+            "onboarding.grade13": "📖 الصف ١-٣",
+            "onboarding.grade36": "🎓 الصف ٣-٦",
+            "onboarding.letsGo": "هيا بنا! 🚀",
+            "category.all": "✨ الكل",
+            "category.praise": "🌟 الثناء",
+            "category.growth": "🌱 النمو",
+            "category.kindness": "💝 اللطف",
+            "category.ican": "💪 أستطيع!",
+            "category.calm": "🧘 الهدوء",
+            "category.gratitude": "🙏 الامتنان",
+            "btn.showMagic": "🎉 ألهمني! 🎉",
+            "btn.switchPlayer": "👤 تغيير اللاعب",
+            "btn.home": "الرئيسية →",
+            "btn.back": "العودة للرئيسية →",
+            "btn.play": "العب",
+            "btn.playAgain": "🔄 العب مرة أخرى!",
+            "btn.exit": "👋 خروج",
+            "btn.print": "طباعة",
+            "btn.readAloud": "اقرأ بصوت عالٍ",
+            "btn.addFavorite": "أضف للمفضلة",
+            "games.title": "🎮 ألعاب ممتعة!",
+            "games.subtitle": "١٨ لعبة للعب!",
+            "games.score": "النقاط",
+            "games.level": "المستوى",
+            "games.lives": "الأرواح",
+            "games.moves": "الحركات",
+            "games.pairs": "الأزواج",
+            "games.time": "الوقت",
+            "games.best": "🏆 الأفضل: {score} بواسطة {player}",
+            "games.newHighScore": "🏆 رقم قياسي جديد!",
+            "category.fun": "مرح",
+            "category.funDesc": "ألوان وأشكال وحيوانات ومشاعر والمزيد!",
+            "category.math": "ألعاب الرياضيات",
+            "category.mathDesc": "تدرب على الأرقام والعد والحساب!",
+            "category.reading": "القراءة",
+            "category.readingDesc": "الكلمات والحروف ومهارات القراءة!",
+            "category.logic": "المنطق",
+            "category.logicDesc": "ألغاز وأنماط وتدريب الدماغ!",
+            "game.carGame": "لعبة السيارة",
+            "game.carGameDesc": "تجنب العوائق على الطريق",
+            "game.colorMatch": "مطابقة الألوان",
+            "game.colorMatchDesc": "طابق الألوان مع أسمائها",
+            "game.shapeSpotter": "اكتشف الأشكال",
+            "game.shapeSpotterDesc": "ابحث عن الأشكال وحددها",
+            "game.emojiFeelings": "مشاعر الإيموجي",
+            "game.emojiFeelingsDesc": "تعلم عن المشاعر والأحاسيس",
+            "game.balloonMath": "بالونات الرياضيات",
+            "game.balloonMathDesc": "فرقع البالونات بالإجابات الصحيحة",
+            "game.greaterLess": "أكبر أو أصغر",
+            "game.greaterLessDesc": "قارن بين الأرقام",
+            "game.countingGame": "متعة العد",
+            "game.countingGameDesc": "عد الأشياء وتعلم الأرقام",
+            "game.mathRacing": "سباق الرياضيات",
+            "game.mathRacingDesc": "تسابق أثناء حل مسائل الرياضيات",
+            "game.numberMuncher": "آكل الأرقام",
+            "game.numberMuncherDesc": "كل الأرقام الصحيحة",
+            "game.sightWords": "كلمات بصرية",
+            "game.sightWordsDesc": "تعلم الكلمات الشائعة",
+            "game.rhymeTime": "وقت القافية",
+            "game.rhymeTimeDesc": "ابحث عن الكلمات المتناغمة",
+            "game.abcOrder": "ترتيب الحروف",
+            "game.abcOrderDesc": "رتب الحروف أبجدياً",
+            "game.wordBuilder": "بناء الكلمات",
+            "game.wordBuilderDesc": "ابنِ كلمات من الحروف",
+            "game.oppositeMatch": "مطابقة الأضداد",
+            "game.oppositeMatchDesc": "طابق الكلمات مع أضدادها",
+            "game.memoryMatch": "مطابقة الذاكرة",
+            "game.memoryMatchDesc": "ابحث عن الأزواج المتطابقة",
+            "game.patternPuzzle": "ألغاز الأنماط",
+            "game.patternPuzzleDesc": "أكمل تسلسل النمط",
+            "game.sortingFun": "متعة التصنيف",
+            "game.sortingFunDesc": "صنف العناصر في فئات",
+            "game.oddOneOut": "الغريب بينهم",
+            "game.oddOneOutDesc": "ابحث عن العنصر المختلف",
+            "result.greatJob": "🎉 أحسنت!",
+            "result.amazing": "🎉 رائع!",
+            "result.goodTry": "⭐ محاولة جيدة!",
+            "result.greatRacing": "🏁 سباق رائع!",
+            "result.greatDriving": "🚗 قيادة رائعة!",
+            "result.greatMatching": "🎨 مطابقة رائعة!",
+            "result.greatCounting": "🎉 عد رائع!",
+            "result.greatSorting": "🎉 تصنيف رائع!",
+            "result.greatSpotting": "🔷 اكتشاف رائع!",
+            "result.youWon": "🎉 فزت!",
+            "result.timesUp": "⏱️ انتهى الوقت!",
+            "game.findMatching": "ابحث عن جميع الأزواج المتطابقة!",
+            "game.matchFound": "✨ وجدت تطابق!",
+            "game.tryAgain": "حاول مرة أخرى!",
+            "game.correct": "صحيح!",
+            "game.wrong": "خطأ!",
+            "stats.gamesCount": "ألعاب",
+            "level.easy": "سهل",
+            "level.medium": "متوسط",
+            "level.hard": "صعب",
+
+            // Praise Messages (رسائل الثناء)
+            "msg.praise.1": "{name}، أنت نجم لامع!",
+            "msg.praise.2": "{name} جميل من الداخل والخارج!",
+            "msg.praise.3": "{name} يستطيع فعل أي شيء!",
+            "msg.praise.4": "{name} يجعل العالم ملوناً!",
+            "msg.praise.5": "{name} قوي جداً!",
+            "msg.praise.6": "{name} مبدع جداً!",
+            "msg.praise.7": "{name} محبوب!",
+            "msg.praise.8": "{name} يشرق كالشمس!",
+            "msg.praise.9": "{name} شجاع كالأسد!",
+            "msg.praise.10": "{name} يُسعد الجميع!",
+            "msg.praise.11": "{name} مميز!",
+            "msg.praise.12": "{name} رائع!",
+            "msg.praise.13": "{name} ممتع في الصحبة!",
+            "msg.praise.14": "{name} فائز!",
+            "msg.praise.15": "{name} كنز ثمين!",
+            "msg.praise.16": "{name} ساحر!",
+            "msg.praise.17": "ابتسامة {name} موسيقى!",
+            "msg.praise.18": "{name} حالم!",
+            "msg.praise.19": "{name} محظوظ جداً!",
+            "msg.praise.20": "{name} هدية!",
+            "msg.praise.21": "{name} لطيف وحنون!",
+            "msg.praise.22": "{name} لديه قوى خارقة!",
+            "msg.praise.23": "{name} مذهل!",
+            "msg.praise.24": "{name} حلو!",
+            "msg.praise.25": "{name} يستطيع التحليق عالياً!",
+            "msg.praise.26": "أحلام {name} ستتحقق!",
+            "msg.praise.27": "{name} فريد من نوعه!",
+            "msg.praise.28": "{name} يعطي أفضل العناق!",
+            "msg.praise.29": "اليوم يوم {name}!",
+            "msg.praise.30": "{name} يُشرق يوم الجميع!",
+            "msg.praise.31": "قلب {name} من ذهب!",
+            "msg.praise.32": "{name} تحفة فنية!",
+            "msg.praise.33": "{name} يجعل العالم أفضل!",
+            "msg.praise.34": "{name} رائع!",
+            "msg.praise.35": "{name} ذكي!",
+            "msg.praise.36": "{name} بطل!",
+            "msg.praise.37": "{name} ثمين!",
+            "msg.praise.38": "{name} مرح وممتع!",
+            "msg.praise.39": "{name} ينمو كل يوم!",
+            "msg.praise.40": "{name} ملكي!",
+            "msg.praise.41": "{name} ذكي جداً!",
+            "msg.praise.42": "{name} خارج هذا العالم!",
+            "msg.praise.43": "{name} يستحق ميدالية ذهبية!",
+            "msg.praise.44": "{name} بطل خارق!",
+            "msg.praise.45": "{name} متعلم مذهل!",
+            "msg.praise.46": "{name} صديق رائع!",
+            "msg.praise.47": "صوت {name} مهم!",
+            "msg.praise.48": "{name} يحل المشاكل كالمحترفين!",
+            "msg.praise.49": "{name} لا يمكن إيقافه!",
+            "msg.praise.50": "{name} ذكي جداً!",
+            "msg.praise.51": "{name} لديه أفكار رائعة!",
+            "msg.praise.52": "{name} يستطيع بناء أي شيء!",
+            "msg.praise.53": "{name} سيحلق عالياً!",
+            "msg.praise.54": "الجميع فخور بـ{name}!",
+            "msg.praise.55": "{name} يزدهر بجمال!",
+            "msg.praise.56": "{name} لاعب فريق!",
+            "msg.praise.57": "{name} موهوب!",
+            "msg.praise.58": "{name} متألق اليوم!",
+            "msg.praise.59": "{name} رقم واحد!",
+            "msg.praise.60": "{name} يجلب الفرح أينما ذهب!",
+            "msg.praise.61": "{name} لا يستسلم أبداً!",
+            "msg.praise.62": "{name} يعمل بجد!",
+            "msg.praise.63": "{name} دائماً يبذل قصارى جهده!",
+            "msg.praise.64": "{name} يتحول إلى العظمة!",
+            "msg.praise.65": "{name} واحد من نوعه!",
+            "msg.praise.66": "{name} يستمر بقوة!",
+            "msg.praise.67": "{name} لديه خيال مذهل!",
+
+            // Growth Mindset Messages (رسائل النمو)
+            "msg.growth.1": "الأخطاء تساعد {name} على التعلم والنمو!",
+            "msg.growth.2": "{name} يحب التحديات!",
+            "msg.growth.3": "{name} يتحسن كل يوم!",
+            "msg.growth.4": "{name} يقول 'لم أستطع بعد!'",
+            "msg.growth.5": "{name} يجد طرقاً للتحسن!",
+            "msg.growth.6": "جهد {name} يؤدي للنجاح!",
+            "msg.growth.7": "{name} يحول المشاكل إلى فرص!",
+            "msg.growth.8": "التمرين يجعل {name} أقوى!",
+            "msg.growth.9": "{name} آلة تعلم!",
+            "msg.growth.10": "العمل الجاد قوة {name} الخارقة!",
+            "msg.growth.11": "دماغ {name} ينمو عندما يحاول أشياء صعبة!",
+            "msg.growth.12": "كل خطأ يجعل {name} أحكم!",
+            "msg.growth.13": "{name} يؤمن بنفسه!",
+            "msg.growth.14": "{name} لا يتوقف عن المحاولة!",
+            "msg.growth.15": "{name} يتسلق الجبال خطوة بخطوة!",
+
+            // Kindness Messages (رسائل اللطف)
+            "msg.kindness.1": "{name} يستطيع أن يُبتسم أحداً اليوم!",
+            "msg.kindness.2": "{name} يستطيع مدح شخص اليوم!",
+            "msg.kindness.3": "{name} يستطيع مساعدة صديق اليوم!",
+            "msg.kindness.4": "{name} يستطيع كتابة رسالة لطيفة اليوم!",
+            "msg.kindness.5": "{name} يستطيع المشاركة اليوم!",
+            "msg.kindness.6": "{name} يستطيع أن يكون مستمعاً جيداً اليوم!",
+            "msg.kindness.7": "{name} يستطيع إشراك شخص جديد اليوم!",
+            "msg.kindness.8": "{name} يستطيع قول شكراً اليوم!",
+            "msg.kindness.9": "{name} ينشر اللطف في كل مكان!",
+            "msg.kindness.10": "{name} بطل اللطف الخارق!",
+            "msg.kindness.11": "لطف {name} يجعل العالم أكثر إشراقاً!",
+            "msg.kindness.12": "{name} يستطيع أن يكون شمس أحدهم اليوم!",
+            "msg.kindness.13": "{name} يستطيع إسعاد أحدهم اليوم!",
+            "msg.kindness.14": "{name} يستطيع فعل شيء لطيف اليوم!",
+            "msg.kindness.15": "لطف {name} يزهر كالورود!",
+
+            // I Can Messages (رسائل أستطيع)
+            "msg.ican.1": "{name} يستطيع فعل الأشياء الصعبة!",
+            "msg.ican.2": "{name} يستطيع إبداع أشياء مذهلة!",
+            "msg.ican.3": "{name} يستطيع تعلم أي شيء!",
+            "msg.ican.4": "{name} يستطيع التحدث بشجاعة!",
+            "msg.ican.5": "{name} يستطيع حل أي مشكلة!",
+            "msg.ican.6": "{name} يستطيع تحقيق أهدافه!",
+            "msg.ican.7": "{name} يستطيع اتخاذ قرارات جيدة!",
+            "msg.ican.8": "{name} يستطيع أن يكون صديقاً رائعاً!",
+            "msg.ican.9": "{name} يستطيع كتابة قصص رائعة!",
+            "msg.ican.10": "{name} يستطيع إتقان الرياضيات!",
+            "msg.ican.11": "{name} يستطيع صنع الموسيقى!",
+            "msg.ican.12": "{name} يستطيع تحقيق أي شيء!",
+            "msg.ican.13": "{name} يستطيع تغيير العالم!",
+            "msg.ican.14": "{name} يستطيع اكتشاف أشياء جديدة!",
+            "msg.ican.15": "{name} يستطيع تحقيق الأحلام!",
+
+            // Calm Messages (رسائل الهدوء)
+            "msg.calm.1": "{name}، خذ نفساً عميقاً. أنت تستطيع!",
+            "msg.calm.2": "{name} هادئ كالمحيط!",
+            "msg.calm.3": "{name}، دع القلق يطير كالغيوم!",
+            "msg.calm.4": "{name} مسترخي وهادئ!",
+            "msg.calm.5": "{name}، كل شيء سيكون بخير!",
+            "msg.calm.6": "{name} آمن ومحبوب!",
+            "msg.calm.7": "بعد العاصفة، {name} سيرى الشمس!",
+            "msg.calm.8": "{name} خفيف كورقة في الريح!",
+            "msg.calm.9": "{name}، استنشق السلام، أخرج القلق!",
+            "msg.calm.10": "{name} أقوى من أي مشكلة!",
+            "msg.calm.11": "{name}، هذا الشعور سيمر!",
+            "msg.calm.12": "{name} يستطيع التعامل مع أي شيء!",
+            "msg.calm.13": "{name} يبلي بلاءً حسناً!",
+            "msg.calm.14": "{name}، لا بأس أن تأخذ وقتك!",
+            "msg.calm.15": "{name} في المكان الصحيح!",
+
+            // Gratitude Messages (رسائل الامتنان)
+            "msg.gratitude.1": "{name} لديه الكثير ليشكر عليه!",
+            "msg.gratitude.2": "{name} ممتن لعائلته!",
+            "msg.gratitude.3": "{name} شاكر للأصدقاء!",
+            "msg.gratitude.4": "{name} يقدر بيته الدافئ!",
+            "msg.gratitude.5": "{name} شاكر لهذا اليوم الجميل!",
+            "msg.gratitude.6": "{name} ممتن للتعلم!",
+            "msg.gratitude.7": "{name} شاكر للطعام اللذيذ!",
+            "msg.gratitude.8": "{name} يقدر الأوقات الممتعة!",
+            "msg.gratitude.9": "{name} ممتن للحيوانات!",
+            "msg.gratitude.10": "{name} يقدر الطبيعة!",
+            "msg.gratitude.11": "{name} شاكر للحب!",
+            "msg.gratitude.12": "{name} ممتن للموسيقى!",
+            "msg.gratitude.13": "{name} يقدر الكتب الجيدة!",
+            "msg.gratitude.14": "{name} شاكر للأشياء الجميلة!",
+            "msg.gratitude.15": "{name} ممتن للسعادة!",
+
+            // Game Common UI (واجهة الألعاب)
+            "game.home": "الرئيسية →",
+            "game.start": "ابدأ اللعبة",
+            "game.startBtn": "🎮 ابدأ",
+            "game.playAgain": "🔄 العب مرة أخرى",
+            "game.score": "النقاط",
+            "game.round": "الجولة",
+            "game.level": "المستوى",
+            "game.lives": "الأرواح",
+            "game.moves": "الحركات",
+            "game.pairs": "الأزواج",
+            "game.time": "الوقت",
+            "game.seconds": "ثانية",
+            "game.points": "نقطة",
+            "game.best": "الأفضل",
+            "game.by": "بواسطة",
+            "game.newRecord": "🏆 رقم قياسي جديد!",
+            "game.correct": "✓ صحيح!",
+            "game.wrong": "✗ حاول مرة أخرى!",
+            "game.great": "رائع!",
+            "game.amazing": "مذهل!",
+            "game.perfect": "ممتاز!",
+            "game.awesome": "روعة!",
+            "game.goodJob": "أحسنت!",
+            "game.keepGoing": "استمر!",
+            "game.almost": "قاربت!",
+            "game.tryAgain": "حاول مرة أخرى!",
+            "game.oops": "أوبس!",
+            "game.timeUp": "⏱️ انتهى الوقت!",
+            "game.gameOver": "انتهت اللعبة",
+            "game.youWon": "🎉 فزت!",
+            "game.greatJob": "🎉 أحسنت!",
+            "game.finalScore": "النتيجة النهائية",
+            "game.info.fewestMoves": "النتيجة بناءً على أقل عدد حركات",
+
+            // Level names (مستويات)
+            "level.easy": "سهل",
+            "level.medium": "متوسط",
+            "level.hard": "صعب",
+
+            // Color Match Game (لعبة مطابقة الألوان)
+            "colorMatch.title": "🎨 مطابقة الألوان",
+            "colorMatch.instruction": "اضغط على اللون المطابق للكلمة!",
+            "colorMatch.result": "🎨 مطابقة رائعة!",
+            "color.red": "أحمر",
+            "color.blue": "أزرق",
+            "color.green": "أخضر",
+            "color.yellow": "أصفر",
+            "color.orange": "برتقالي",
+            "color.purple": "بنفسجي",
+            "color.pink": "وردي",
+            "color.brown": "بني",
+            "color.black": "أسود",
+            "color.white": "أبيض",
+
+            // Memory Match Game (لعبة الذاكرة)
+            "memoryMatch.title": "🧠 مطابقة الذاكرة",
+            "memoryMatch.instruction": "ابحث عن جميع الأزواج المتطابقة!",
+            "memoryMatch.matchFound": "✨ وجدت تطابق!",
+            "memoryMatch.result": "🎉 فزت!",
+
+            // Shape Spotter Game (لعبة الأشكال)
+            "shapeSpotter.title": "🔷 اكتشف الأشكال",
+            "shapeSpotter.instruction": "ابحث عن {shape}!",
+            "shapeSpotter.result": "🔷 اكتشاف رائع!",
+            "shape.circle": "الدائرة",
+            "shape.square": "المربع",
+            "shape.triangle": "المثلث",
+            "shape.rectangle": "المستطيل",
+            "shape.star": "النجمة",
+            "shape.heart": "القلب",
+            "shape.diamond": "المعين",
+            "shape.oval": "البيضاوي",
+            "shape.pentagon": "الخماسي",
+            "shape.hexagon": "السداسي",
+
+            // Emoji Feelings Game (لعبة المشاعر)
+            "emojiFeelings.title": "😊 مشاعر الإيموجي",
+            "emojiFeelings.instruction": "كيف يشعر هذا الإيموجي؟",
+            "emojiFeelings.result": "🎉 أحسنت!",
+            "emojiFeelings.feelingsLearned": "المشاعر المتعلمة",
+            "emojiFeelings.finalScore": "النتيجة النهائية",
+            "feeling.happy": "سعيد",
+            "feeling.happy.tip": "عندما تشعر بالراحة من الداخل!",
+            "feeling.sad": "حزين",
+            "feeling.sad.tip": "عندما يجعلك شيء تشعر بالضيق.",
+            "feeling.angry": "غاضب",
+            "feeling.angry.tip": "عندما يكون شيء غير عادل.",
+            "feeling.scared": "خائف",
+            "feeling.scared.tip": "عندما يخيفك شيء.",
+            "feeling.surprised": "متفاجئ",
+            "feeling.surprised.tip": "عندما يحدث شيء غير متوقع!",
+            "feeling.tired": "تعبان",
+            "feeling.tired.tip": "عندما تحتاج للراحة.",
+            "feeling.confused": "مرتبك",
+            "feeling.confused.tip": "عندما لا تفهم شيئاً.",
+            "feeling.excited": "متحمس",
+            "feeling.excited.tip": "عندما لا تستطيع الانتظار!",
+            "feeling.calm": "هادئ",
+            "feeling.calm.tip": "عندما تشعر بالسلام من الداخل.",
+            "feeling.worried": "قلق",
+            "feeling.worried.tip": "عندما تظن أن شيئاً سيئاً قد يحدث.",
+            "feeling.frustrated": "محبط",
+            "feeling.frustrated.tip": "عندما يكون شيء صعباً وتريد الاستسلام.",
+            "feeling.loving": "محب",
+            "feeling.loving.tip": "عندما تهتم بشخص ما.",
+            "feeling.proud": "فخور",
+            "feeling.proud.tip": "عندما تفعل شيئاً رائعاً!",
+            "feeling.embarrassed": "محرج",
+            "feeling.embarrassed.tip": "عندما تشعر بالخجل أمام الآخرين.",
+            "feeling.sick": "مريض",
+            "feeling.sick.tip": "عندما لا يشعر جسمك بالراحة.",
+            "feeling.bored": "ملول",
+            "feeling.bored.tip": "عندما ليس لديك شيء ممتع لتفعله.",
+            "feeling.grateful": "ممتن",
+            "feeling.grateful.tip": "عندما تشعر بالشكر.",
+            "feeling.annoyed": "منزعج",
+            "feeling.annoyed.tip": "عندما يزعجك شيء صغير.",
+            "feeling.lonely": "وحيد",
+            "feeling.lonely.tip": "عندما تتمنى وجود صديق بجانبك.",
+            "feeling.amazed": "منبهر",
+            "feeling.amazed.tip": "عندما يكون شيء رائع حقاً!",
+
+            // Balloon Math Game (لعبة بالونات الرياضيات)
+            "balloonMath.title": "🎈 بالونات الرياضيات",
+            "balloonMath.instruction": "فرقع البالون بالإجابة الصحيحة!",
+            "balloonMath.hint": "فرقع الإجابة الصحيحة!",
+            "balloonMath.questionsCorrect": "الأسئلة الصحيحة",
+            "balloonMath.result": "🎈 تفريقع رائع!",
+
+            // Greater Less Game (لعبة أكبر وأصغر)
+            "greaterLess.title": "⚖️ أكبر أو أصغر",
+            "greaterLess.instruction": "أي رقم أكبر؟",
+            "greaterLess.result": "⚖️ مقارنة رائعة!",
+            "greaterLess.greater": "أكبر",
+            "greaterLess.less": "أصغر",
+            "greaterLess.equal": "متساوي",
+
+            // Counting Game (لعبة العد)
+            "countingGame.title": "🔢 متعة العد",
+            "countingGame.instruction": "كم عدد ما تراه؟",
+            "countingGame.result": "🎉 عد رائع!",
+
+            // Math Racing Game (لعبة سباق الرياضيات)
+            "mathRacing.title": "🏎️ سباق الرياضيات",
+            "mathRacing.instruction": "حل لتسرع!",
+            "mathRacing.result": "🏁 سباق رائع!",
+
+            // Number Muncher Game (لعبة آكل الأرقام)
+            "numberMuncher.title": "🐛 آكل الأرقام",
+            "numberMuncher.instruction": "كل الأرقام التي تطابق القاعدة!",
+            "numberMuncher.result": "🐛 أكل رائع!",
+            "numberMuncher.even": "الأرقام الزوجية",
+            "numberMuncher.odd": "الأرقام الفردية",
+            "numberMuncher.multiples": "مضاعفات {n}",
+            "numberMuncher.squareNumbers": "الأرقام المربعة",
+            "numberMuncher.primeNumbers": "الأرقام الأولية",
+            "numberMuncher.lessThan5": "أرقام أصعر من 5",
+            "numberMuncher.greaterThan5": "أرقام أكبر من 5",
+            "numberMuncher.number1": "رقم 1",
+            "numberMuncher.number5": "رقم 5",
+            "numberMuncher.lessThan10": "أرقام أصغر من 10",
+            "numberMuncher.greaterThan15": "أرقام أكبر من 15",
+            "numberMuncher.between10and20": "أرقام بين 10 و 20",
+
+            // Sight Words Game (لعبة الكلمات البصرية)
+            "sightWords.title": "📖 كلمات بصرية",
+            "sightWords.instruction": "ابحث عن الكلمة: {word}",
+            "sightWords.result": "📖 قراءة رائعة!",
+
+            // Rhyme Time Game (لعبة القافية)
+            "rhymeTime.title": "🎵 وقت القافية",
+            "rhymeTime.instruction": "ابحث عن كلمات تقافي {word}!",
+            "rhymeTime.result": "🎵 قافية رائعة!",
+
+            // ABC Order Game (لعبة ترتيب الحروف)
+            "abcOrder.title": "🔤 ترتيب الحروف",
+            "abcOrder.instruction": "رتب الحروف بالترتيب!",
+            "abcOrder.result": "🔤 ترتيب رائع!",
+
+            // Word Builder Game (لعبة بناء الكلمات)
+            "wordBuilder.title": "🧱 بناء الكلمات",
+            "wordBuilder.instruction": "ابنِ الكلمة!",
+            "wordBuilder.hint": "تلميح",
+            "wordBuilder.result": "🧱 بناء رائع!",
+
+            // Opposite Match Game (لعبة الأضداد)
+            "oppositeMatch.title": "↔️ مطابقة الأضداد",
+            "oppositeMatch.instruction": "ابحث عن عكس {word}!",
+            "oppositeMatch.result": "↔️ مطابقة رائعة!",
+
+            // Pattern Puzzle Game (لعبة الأنماط)
+            "patternPuzzle.title": "🧩 ألغاز الأنماط",
+            "patternPuzzle.instruction": "ماذا يأتي بعد؟",
+            "patternPuzzle.watch": "راقب جيداً...",
+            "patternPuzzle.yourTurn": "دورك! كرر النمط",
+            "patternPuzzle.showHints": "✨ إظهار التلميحات",
+            "patternPuzzle.result": "🧩 اكتشاف نمط رائع!",
+            "result.keepPracticing": "استمر بالتدرب يا {name}!",
+
+            // Sorting Fun Game (لعبة التصنيف)
+            "sortingFun.title": "📦 متعة التصنيف",
+            "sortingFun.instruction": "صنف العناصر في الفئة الصحيحة!",
+            "sortingFun.dragInstruction": "اسحب العناصر إلى الصناديق الصحيحة!",
+            "sortingFun.result": "📦 تصنيف رائع!",
+
+            // Odd One Out Game (لعبة الغريب)
+            "oddOneOut.title": "🔍 الغريب بينهم",
+            "oddOneOut.instruction": "ابحث عن العنصر المختلف!",
+            "oddOneOut.result": "🔍 اكتشاف رائع!",
+
+            // Clock Time Game (لعبة الساعة)
+            "clockTime.title": "🕐 معرفة الوقت",
+            "clockTime.instruction": "كم الساعة؟",
+            "clockTime.result": "🕐 قراءة وقت رائعة!",
+
+            // Animal Sounds Game (لعبة أصوات الحيوانات)
+            "animalSounds.title": "🐮 أصوات الحيوانات",
+            "animalSounds.instruction": "ما صوت هذا الحيوان؟",
+            "animalSounds.result": "🐮 أحسنت!",
+
+            // Car Game (لعبة السيارة)
+            "carGame.title": "🚗 لعبة السيارة 🏁",
+            "carGame.result": "🚗 قيادة رائعة!",
+            "carGame.score": "النقاط",
+            "carGame.speed": "السرعة",
+            "carGame.highScore": "أعلى نتيجة",
+            "carGame.controls": "استخدم الأسهم أو الأزرار أو اسحب للتحرك",
+            "carGame.game": "لعبة {name}",
+
+            // Category Navigation (التنقل)
+            "nav.fun": "🎉 مرح",
+            "nav.math": "🔢 رياضيات",
+            "nav.reading": "📚 قراءة",
+            "nav.logic": "🧠 منطق",
+
+            // Additional Game UI (واجهة إضافية)
+            "shapeSpotter.findAll": "ابحث عن جميع الأشكال!",
+            "shapeSpotter.found": "وجدت",
+            "emojiFeelings.whichFace": "أي وجه يُظهر هذا الشعور؟",
+            "emojiFeelings.tip": "اضغط على الإيموجي المطابق للشعور!",
+            "greaterLess.tip": "التمساح يأكل الرقم الأكبر!",
+            "countingGame.question": "كم عدد ما تراه؟",
+            "mathRacing.speed": "السرعة",
+            "mathRacing.controls": "استخدم الأسهم أو اضغط للتحرك",
+            "numberMuncher.munchThe": "كل",
+            "sightWords.findAll": "ابحث عن جميع الكلمات",
+            "sightWords.hint": "ابحث عن الكلمات التي تعرفها!",
+            "rhymeTime.hint": "كلمات لها نفس النهاية!",
+            "oppositeMatch.hint": "ابحث عن الكلمة المعاكسة!",
+            "wordBuilder.clear": "مسح",
+            "wordBuilder.check": "تحقق",
+
+            // Dynamic game text templates (قوالب النص الديناميكي)
+            "countingGame.howMany": "كم {emoji} ترى/ي؟",
+            "game.highScorePoints": "🏆 الأفضل: {score} نقطة بواسطة {player}",
+            "game.highScoreMoves": "🏆 الأفضل: {score} حركة بواسطة {player}",
+            "game.defaultHighScore": "الأفضل: -- نقطة",
+            "game.defaultHighScoreMoves": "الأفضل: -- حركة",
+            "game.highScoreLevel": "🏆 الأفضل: المستوى {level} بواسطة {player}",
+            "game.defaultHighScoreLevel": "الأفضل: --",
+            "game.streak": "متتالي",
+            "game.finalScoreLabel": "النتيجة النهائية",
+            "game.levelReached": "المستوى الذي وصلت إليه",
+            "game.wordsFound": "الكلمات التي وجدتها",
+            "result.goodJob": "أحسنت يا {name}!",
+            "game.roundComplete": "🎉 أكملت الجولة!",
+
+            // Level buttons with counts (أزرار المستوى)
+            "level.easyCount": "سهل ({count})",
+            "level.mediumCount": "متوسط ({count})",
+            "level.hardCount": "صعب ({count})",
+
+            // Time display (عرض الوقت)
+            "game.timeSeconds": "{time} ث",
+            "game.secondsShort": "ث"
+        }
+    },
+
+    // Get saved language or detect from browser
+    getSavedLanguage() {
+        const saved = localStorage.getItem('happyWords_language');
+        if (saved && this.languages[saved]) return saved;
+        
+        // Detect from browser
+        const browserLang = navigator.language.split('-')[0];
+        return this.languages[browserLang] ? browserLang : 'en';
+    },
+
+    // Initialize i18n
+    init() {
+        this.currentLang = this.getSavedLanguage();
+        this.loadTranslations(this.currentLang);
+        this.applyLanguage();
+        this.isLoaded = true;
+        return this;
+    },
+
+    // Load translations for a language (from embedded data)
+    loadTranslations(lang) {
+        this.translations = this.locales[lang] || this.locales.en;
+        this.currentLang = lang;
+    },
+
+    // Get translation by key
+    t(key, replacements = {}) {
+        let text = this.translations[key] || key;
+        
+        // Handle replacements like {name}, {score}
+        Object.keys(replacements).forEach(k => {
+            text = text.replace(new RegExp(`{${k}}`, 'g'), replacements[k]);
+        });
+        
+        return text;
+    },
+
+    // Apply language to document
+    applyLanguage() {
+        const lang = this.languages[this.currentLang];
+        
+        // Set document direction and language
+        document.documentElement.lang = this.currentLang;
+        document.documentElement.dir = lang.dir;
+        document.body.style.fontFamily = lang.font;
+        
+        // Add RTL class for styling
+        if (lang.dir === 'rtl') {
+            document.body.classList.add('rtl');
+        } else {
+            document.body.classList.remove('rtl');
+        }
+        
+        // Translate all elements with data-i18n attribute
+        this.translatePage();
+    },
+
+    // Translate all elements on page
+    translatePage() {
+        // Translate text content
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.textContent = this.t(key);
+        });
+        
+        // Translate placeholders
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            el.placeholder = this.t(key);
+        });
+        
+        // Translate titles
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const key = el.getAttribute('data-i18n-title');
+            el.title = this.t(key);
+        });
+        
+        // Translate page title
+        const titleKey = document.querySelector('title')?.getAttribute('data-i18n');
+        if (titleKey) {
+            document.title = this.t(titleKey);
+        }
+    },
+
+    // Switch language
+    setLanguage(lang) {
+        if (!this.languages[lang]) return;
+        
+        localStorage.setItem('happyWords_language', lang);
+        this.loadTranslations(lang);
+        this.applyLanguage();
+        
+        // Dispatch event for components that need to react
+        window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
+    },
+
+    // Toggle between languages
+    toggleLanguage() {
+        const newLang = this.currentLang === 'en' ? 'ar' : 'en';
+        this.setLanguage(newLang);
+        return newLang;
+    },
+
+    // Create language selector button
+    createLanguageToggle() {
+        const btn = document.createElement('button');
+        btn.className = 'lang-toggle';
+        btn.id = 'langToggle';
+        btn.title = 'Switch Language';
+        btn.textContent = this.currentLang === 'en' ? 'عربي' : 'EN';
+        
+        btn.addEventListener('click', () => {
+            this.toggleLanguage();
+            btn.textContent = this.currentLang === 'en' ? 'عربي' : 'EN';
+        });
+        
+        return btn;
+    }
+};
+
+// Load translations immediately (no async needed since embedded)
+// This ensures I18n.t() works even before DOMContentLoaded
+I18n.loadTranslations(I18n.getSavedLanguage());
+I18n.isLoaded = true;
+
+// Apply language to page when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => I18n.applyLanguage());
+} else {
+    I18n.applyLanguage();
+}

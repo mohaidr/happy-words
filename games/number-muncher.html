@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Number Muncher 🐛</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -108,21 +104,7 @@
             filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
         }
         
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 { color: #00b894; margin-bottom: 15px; }
-        #gameOver p { margin: 8px 0; font-size: 18px; }
+        #gameOver h2 { color: #00b894; }
         
         .btn {
             background: linear-gradient(145deg, #fdcb6e, #e17055);
@@ -139,36 +121,36 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-math.html" class="category-btn">🔢 Math</a>
-        <h1>🐛 Number Muncher</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-math.html" class="category-btn" data-i18n="nav.math">🔢 Math</a>
+        <h1 data-i18n="numberMuncher.title">🐛 Number Muncher</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Level: <span id="level">1</span></div>
-        <div class="lives">❤️ <span id="lives">3</span></div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.level">Level</span>: <span id="level">1</span></div>
+        <div class="lives"><span data-i18n="game.lives">Lives</span>: ❤️ <span id="lives">3</span></div>
     </div>
     
     <div class="rule-display">
-        Munch the <span id="ruleText">even numbers</span>!
+        <span data-i18n="numberMuncher.munchThe">Munch the</span> <span id="ruleText">even numbers</span>!
     </div>
     
     <div id="gameArea">
         <div id="muncher" class="muncher">🐛</div>
         <div id="gameOver">
-            <h2>🎉 Great Job!</h2>
+            <h2 data-i18n="numberMuncher.result">🎉 Great Job!</h2>
             <p id="playerDisplay"></p>
-            <p>Final Score: <span id="finalScore">0</span></p>
-            <p>🏆 High Score: <span id="highScore">0</span></p>
-            <p>Level Reached: <span id="finalLevel">1</span></p>
-            <button class="btn" onclick="startGame()">Play Again</button>
-            <a href="../index.html" class="home-link">← Back to Home</a>
+            <p><span data-i18n="game.finalScore">Final Score</span>: <span id="finalScore">0</span></p>
+            <p>🏆 <span data-i18n="game.highScore">High Score</span>: <span id="highScore">0</span></p>
+            <p><span data-i18n="game.levelReached">Level Reached</span>: <span id="finalLevel">1</span></p>
+            <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
+            <a href="../index.html" class="home-link" data-i18n="game.backHome">← Back to Home</a>
         </div>
     </div>
     
-    <p class="info">Click or tap on numbers that match the rule. Don't eat the wrong ones!</p>
-    <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
+    <p class="info" data-i18n="numberMuncher.instruction">Click or tap on numbers that match the rule. Don't eat the wrong ones!</p>
+    <p class="info" id="bestScoreDisplay">🏆 <span data-i18n="game.best">Best</span>: --</p>
 
     <script src="../js/game-utils.js"></script>
     <script>
@@ -179,11 +161,6 @@
         let lives = 3;
         let gameRunning = false;
         
-        function getMaxLives() {
-            if (gradeLevel === 'kg') return 8;
-            if (gradeLevel === 'g1-3') return 5;
-            return 3;
-        }
         let currentRule = null;
         let correctCount = 0;
         let targetCorrect = 8;
@@ -193,33 +170,59 @@
         let playerName = GameUtils.getPlayerName();
         let gradeLevel = GameUtils.getGradeLevel();
         
-        // Grade-specific rules
+        function loadHighScore() {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('bestScoreDisplay').innerHTML = highScoreText;
+            } else {
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : 'Best: -- points';
+                document.getElementById('bestScoreDisplay').innerHTML = '🏆 ' + defaultText;
+            }
+        }
+        
+        // Grade-specific rules with i18n keys
         const rulesKG = [
-            { name: "numbers less than 5", check: n => n < 5 },
-            { name: "numbers greater than 5", check: n => n > 5 },
-            { name: "number 1", check: n => n === 1 },
-            { name: "number 5", check: n => n === 5 },
+            { key: "numberMuncher.lessThan5", name: "numbers less than 5", check: n => n < 5 },
+            { key: "numberMuncher.greaterThan5", name: "numbers greater than 5", check: n => n > 5 },
+            { key: "numberMuncher.number1", name: "number 1", check: n => n === 1 },
+            { key: "numberMuncher.number5", name: "number 5", check: n => n === 5 },
         ];
         
         const rulesG13 = [
-            { name: "even numbers", check: n => n % 2 === 0 },
-            { name: "odd numbers", check: n => n % 2 !== 0 },
-            { name: "multiples of 5", check: n => n % 5 === 0 },
-            { name: "numbers less than 10", check: n => n < 10 },
-            { name: "numbers greater than 15", check: n => n > 15 },
-            { name: "numbers between 10-20", check: n => n >= 10 && n <= 20 },
+            { key: "numberMuncher.even", name: "even numbers", check: n => n % 2 === 0 },
+            { key: "numberMuncher.odd", name: "odd numbers", check: n => n % 2 !== 0 },
+            { key: "numberMuncher.multiples", n: 5, name: "multiples of 5", check: n => n % 5 === 0 },
+            { key: "numberMuncher.lessThan10", name: "numbers less than 10", check: n => n < 10 },
+            { key: "numberMuncher.greaterThan15", name: "numbers greater than 15", check: n => n > 15 },
+            { key: "numberMuncher.between10and20", name: "numbers between 10-20", check: n => n >= 10 && n <= 20 },
         ];
         
         const rulesG36 = [
-            { name: "even numbers", check: n => n % 2 === 0 },
-            { name: "odd numbers", check: n => n % 2 !== 0 },
-            { name: "multiples of 3", check: n => n % 3 === 0 },
-            { name: "multiples of 4", check: n => n % 4 === 0 },
-            { name: "multiples of 6", check: n => n % 6 === 0 },
-            { name: "multiples of 7", check: n => n % 7 === 0 },
-            { name: "prime numbers", check: n => isPrime(n) },
-            { name: "square numbers", check: n => Math.sqrt(n) % 1 === 0 },
+            { key: "numberMuncher.even", name: "even numbers", check: n => n % 2 === 0 },
+            { key: "numberMuncher.odd", name: "odd numbers", check: n => n % 2 !== 0 },
+            { key: "numberMuncher.multiples", n: 3, name: "multiples of 3", check: n => n % 3 === 0 },
+            { key: "numberMuncher.multiples", n: 4, name: "multiples of 4", check: n => n % 4 === 0 },
+            { key: "numberMuncher.multiples", n: 6, name: "multiples of 6", check: n => n % 6 === 0 },
+            { key: "numberMuncher.multiples", n: 7, name: "multiples of 7", check: n => n % 7 === 0 },
+            { key: "numberMuncher.primeNumbers", name: "prime numbers", check: n => isPrime(n) },
+            { key: "numberMuncher.squareNumbers", name: "square numbers", check: n => Math.sqrt(n) % 1 === 0 },
         ];
+        
+        function getRuleName(rule) {
+            if (typeof I18n !== 'undefined') {
+                if (rule.n) {
+                    return I18n.t(rule.key, { n: rule.n });
+                }
+                return I18n.t(rule.key);
+            }
+            return rule.name;
+        }
         
         function isPrime(n) {
             if (n < 2) return false;
@@ -364,7 +367,7 @@
             if (level % 2 === 1) {
                 const rules = getRules();
                 currentRule = rules[Math.floor(Math.random() * rules.length)];
-                ruleText.textContent = currentRule.name;
+                ruleText.textContent = getRuleName(currentRule);
             }
             
             // Bonus life every 3 levels
@@ -395,7 +398,7 @@
             // Refresh player data
             playerName = GameUtils.getPlayerName();
             gradeLevel = GameUtils.getGradeLevel();
-            lives = getMaxLives();
+            lives = GameUtils.getMaxLives({kg: 8, 'g1-3': 5, default: 3});
             gameRunning = true;
             
             // Refresh player data
@@ -411,7 +414,7 @@
             // Pick random rule
             const rules = getRules();
             currentRule = rules[Math.floor(Math.random() * rules.length)];
-            ruleText.textContent = currentRule.name;
+            ruleText.textContent = getRuleName(currentRule);
             
             // Reset muncher position
             muncher.style.left = '130px';
@@ -438,23 +441,22 @@
             document.getElementById('highScore').textContent = Math.max(score, highScore);
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            updateBestScoreDisplay();
-        }
-
-        function updateBestScoreDisplay() {
-            const bestScore = GameUtils.getHighScore(GAME_KEY);
-            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-            if (bestScore > 0) {
-                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
-            }
+            loadHighScore();
         }
 
         // Initialize sound toggle
         GameUtils.initSoundToggle();
-        updateBestScoreDisplay();
+        loadHighScore();
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

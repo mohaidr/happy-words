@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
-    <title>Math Games 🔢 - Happy Words</title>
+    <script src="../js/analytics.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="../js/i18n.js"></script>
+    <title data-i18n="category.math">Math Games 🔢 - Happy Words</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
         body {
@@ -173,56 +171,57 @@
     </style>
 </head>
 <body>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLang()">عربي</button>
     <div class="page-container">
         <div class="category-header">
             <span class="category-icon">🔢</span>
-            <h1 class="category-title">Math Games</h1>
-            <p class="category-desc">Practice numbers, counting, and math skills!</p>
+            <h1 class="category-title" data-i18n="category.math">Math Games</h1>
+            <p class="category-desc" data-i18n="category.mathDesc">Practice numbers, counting, and math skills!</p>
         </div>
         
         <div class="games-grid">
             <a href="counting-game.html" class="game-card" data-game="countingGame">
                 <span class="game-card-badge" id="badge-countingGame">⭐ 0</span>
                 <span class="game-card-icon">🔢</span>
-                <span class="game-card-name">Counting Game</span>
-                <span class="game-card-desc">Count objects and pick the right number</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.countingGame">Counting Game</span>
+                <span class="game-card-desc" data-i18n="game.countingGameDesc">Count objects and pick the right number</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="balloon-math.html" class="game-card" data-game="balloonMath">
                 <span class="game-card-badge" id="badge-balloonMath">⭐ 0</span>
                 <span class="game-card-icon">🎈</span>
-                <span class="game-card-name">Balloon Math</span>
-                <span class="game-card-desc">Pop balloons with the right answer</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.balloonMath">Balloon Math</span>
+                <span class="game-card-desc" data-i18n="game.balloonMathDesc">Pop balloons with the right answer</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="greater-less.html" class="game-card" data-game="greaterLess">
                 <span class="game-card-badge" id="badge-greaterLess">⭐ 0</span>
                 <span class="game-card-icon">🐊</span>
-                <span class="game-card-name">Greater or Less</span>
-                <span class="game-card-desc">Compare numbers with &gt;, &lt;, and =</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.greaterLess">Greater or Less</span>
+                <span class="game-card-desc" data-i18n="game.greaterLessDesc">Compare numbers with &gt;, &lt;, and =</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="number-muncher.html" class="game-card" data-game="numberMuncher">
                 <span class="game-card-badge" id="badge-numberMuncher">⭐ 0</span>
                 <span class="game-card-icon">🐛</span>
-                <span class="game-card-name">Number Muncher</span>
-                <span class="game-card-desc">Munch numbers that match the rule</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.numberMuncher">Number Muncher</span>
+                <span class="game-card-desc" data-i18n="game.numberMuncherDesc">Munch numbers that match the rule</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="math-racing.html" class="game-card" data-game="mathRacing">
                 <span class="game-card-badge" id="badge-mathRacing">⭐ 0</span>
                 <span class="game-card-icon">🏎️</span>
-                <span class="game-card-name">Math Racing</span>
-                <span class="game-card-desc">Race and solve math problems</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.mathRacing">Math Racing</span>
+                <span class="game-card-desc" data-i18n="game.mathRacingDesc">Race and solve math problems</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
         </div>
         
-        <a href="../index.html" class="back-home">← Back to Home</a>
+        <a href="../index.html" class="back-home" data-i18n="btn.back">← Back to Home</a>
     </div>
     
     <script>
@@ -235,6 +234,21 @@
                 badge.textContent = '⭐ ' + score;
                 badge.classList.add('has-score');
             }
+        });
+    </script>
+    <script>
+        function toggleLang() {
+            if (typeof I18n !== 'undefined') {
+                I18n.toggleLanguage();
+                document.getElementById('langToggle').textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof I18n !== 'undefined') {
+                    document.getElementById('langToggle').textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+                }
+            }, 100);
         });
     </script>
 </body>

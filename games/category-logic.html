@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="../js/i18n.js"></script>
     <title>Logic & Memory 🧠 - Happy Words</title>
     <link rel="stylesheet" href="../css/games.css">
     <style>
@@ -173,48 +171,49 @@
     </style>
 </head>
 <body>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLang()">عربي</button>
     <div class="page-container">
         <div class="category-header">
             <span class="category-icon">🧠</span>
-            <h1 class="category-title">Logic & Memory</h1>
-            <p class="category-desc">Train your brain with puzzles and memory games!</p>
+            <h1 class="category-title" data-i18n="category.logic">Logic & Memory</h1>
+            <p class="category-desc" data-i18n="category.logicDesc">Train your brain with puzzles and memory games!</p>
         </div>
         
         <div class="games-grid">
             <a href="memory-match.html" class="game-card" data-game="memoryMatch_easy">
                 <span class="game-card-badge" id="badge-memoryMatch_easy">⭐ 0</span>
                 <span class="game-card-icon">🧠</span>
-                <span class="game-card-name">Memory Match</span>
-                <span class="game-card-desc">Find matching pairs of cards</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.memoryMatch">Memory Match</span>
+                <span class="game-card-desc" data-i18n="game.memoryMatchDesc">Find matching pairs of cards</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="pattern-puzzle.html" class="game-card" data-game="patternPuzzle">
                 <span class="game-card-badge" id="badge-patternPuzzle">⭐ 0</span>
                 <span class="game-card-icon">🔮</span>
-                <span class="game-card-name">Pattern Puzzle</span>
-                <span class="game-card-desc">Remember and repeat patterns</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.patternPuzzle">Pattern Puzzle</span>
+                <span class="game-card-desc" data-i18n="game.patternPuzzleDesc">Remember and repeat patterns</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="sorting-fun.html" class="game-card" data-game="sortingFun">
                 <span class="game-card-badge" id="badge-sortingFun">⭐ 0</span>
                 <span class="game-card-icon">📦</span>
-                <span class="game-card-name">Sorting Fun</span>
-                <span class="game-card-desc">Sort items into the right groups</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.sortingFun">Sorting Fun</span>
+                <span class="game-card-desc" data-i18n="game.sortingFunDesc">Sort items into the right groups</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
             
             <a href="odd-one-out.html" class="game-card" data-game="oddOneOut">
                 <span class="game-card-badge" id="badge-oddOneOut">⭐ 0</span>
                 <span class="game-card-icon">🔍</span>
-                <span class="game-card-name">Odd One Out</span>
-                <span class="game-card-desc">Find the item that doesn't belong</span>
-                <span class="play-btn">Play</span>
+                <span class="game-card-name" data-i18n="game.oddOneOut">Odd One Out</span>
+                <span class="game-card-desc" data-i18n="game.oddOneOutDesc">Find the item that doesn't belong</span>
+                <span class="play-btn" data-i18n="btn.play">Play</span>
             </a>
         </div>
         
-        <a href="../index.html" class="back-home">← Back to Home</a>
+        <a href="../index.html" class="back-home" data-i18n="btn.back">← Back to Home</a>
     </div>
     
     <script>
@@ -245,6 +244,20 @@
                 badge.textContent = '⭐ ' + displayScore;
                 badge.classList.add('has-score');
             }
+        });
+
+        function toggleLang() {
+            if (typeof I18n !== 'undefined') {
+                I18n.toggleLanguage();
+                document.getElementById('langToggle').textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof I18n !== 'undefined') {
+                    document.getElementById('langToggle').textContent = I18n.currentLang === 'en' ? 'عربي' : 'EN';
+                }
+            }, 100);
         });
     </script>
 </body>

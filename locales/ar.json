@@ -1,0 +1,116 @@
+{
+  "app.title": "كلمات سعيدة للأطفال! 🌟",
+  "app.name": "✨ كلمات سعيدة! ✨",
+  "app.subtitle": "اضغط الزر لترى شيئاً رائعاً!",
+  "app.streak": "{count} يوم متتالي!",
+  "app.footer": "صُنع بـ 💖 للأطفال الرائعين!",
+  
+  "onboarding.askName": "ما اسمك؟ 😊",
+  "onboarding.namePlaceholder": "اكتب اسمك هنا...",
+  "onboarding.askGrade": "في أي صف أنت؟ 📚",
+  "onboarding.gradeKG": "🌟 الروضة",
+  "onboarding.grade13": "📖 الصف ١-٣",
+  "onboarding.grade36": "🎓 الصف ٣-٦",
+  "onboarding.letsGo": "هيا بنا! 🚀",
+  
+  "category.all": "✨ الكل",
+  "category.praise": "🌟 الثناء",
+  "category.growth": "🌱 النمو",
+  "category.kindness": "💝 اللطف",
+  "category.ican": "💪 أستطيع!",
+  "category.calm": "🧘 الهدوء",
+  "category.gratitude": "🙏 الامتنان",
+  
+  "btn.showMagic": "🎉 ألهمني! 🎉",
+  "btn.switchPlayer": "👤 تغيير اللاعب",
+  "btn.home": "الرئيسية →",
+  "btn.back": "العودة للرئيسية →",
+  "btn.play": "العب",
+  "btn.playAgain": "🔄 العب مرة أخرى!",
+  "btn.exit": "👋 خروج",
+  "btn.favorites": "💖",
+  "btn.print": "🏆 طباعة",
+  "btn.readAloud": "اقرأ بصوت عالٍ",
+  "btn.addFavorite": "أضف للمفضلة",
+  
+  "games.title": "🎮 ألعاب ممتعة!",
+  "games.subtitle": "١٨ لعبة للعب!",
+  "games.score": "النقاط",
+  "games.level": "المستوى",
+  "games.lives": "الأرواح",
+  "games.moves": "الحركات",
+  "games.pairs": "الأزواج",
+  "games.time": "الوقت",
+  "games.best": "🏆 الأفضل: {score} بواسطة {player}",
+  "games.newHighScore": "🏆 رقم قياسي جديد!",
+  
+  "category.fun": "مرح",
+  "category.funDesc": "ألوان وأشكال وحيوانات ومشاعر والمزيد!",
+  "category.math": "ألعاب الرياضيات",
+  "category.mathDesc": "تدرب على الأرقام والعد والحساب!",
+  "category.reading": "القراءة",
+  "category.readingDesc": "الكلمات والحروف ومهارات القراءة!",
+  "category.logic": "المنطق",
+  "category.logicDesc": "ألغاز وأنماط وتدريب الدماغ!",
+  
+  "game.carGame": "لعبة السيارة",
+  "game.carGameDesc": "تجنب العوائق على الطريق",
+  "game.colorMatch": "مطابقة الألوان",
+  "game.colorMatchDesc": "طابق الألوان مع أسمائها",
+  "game.shapeSpotter": "اكتشف الأشكال",
+  "game.shapeSpotterDesc": "ابحث عن الأشكال وحددها",
+  "game.emojiFeelings": "مشاعر الإيموجي",
+  "game.emojiFeelingsDesc": "تعلم عن المشاعر والأحاسيس",
+  "game.balloonMath": "بالونات الرياضيات",
+  "game.balloonMathDesc": "فرقع البالونات بالإجابات الصحيحة",
+  "game.greaterLess": "أكبر أو أصغر",
+  "game.greaterLessDesc": "قارن بين الأرقام",
+  "game.countingGame": "متعة العد",
+  "game.countingGameDesc": "عد الأشياء وتعلم الأرقام",
+  "game.mathRacing": "سباق الرياضيات",
+  "game.mathRacingDesc": "تسابق أثناء حل مسائل الرياضيات",
+  "game.numberMuncher": "آكل الأرقام",
+  "game.numberMuncherDesc": "كل الأرقام الصحيحة",
+  "game.sightWords": "كلمات بصرية",
+  "game.sightWordsDesc": "تعلم الكلمات الشائعة",
+  "game.rhymeTime": "وقت القافية",
+  "game.rhymeTimeDesc": "ابحث عن الكلمات المتناغمة",
+  "game.abcOrder": "ترتيب الحروف",
+  "game.abcOrderDesc": "رتب الحروف أبجدياً",
+  "game.wordBuilder": "بناء الكلمات",
+  "game.wordBuilderDesc": "ابنِ كلمات من الحروف",
+  "game.oppositeMatch": "مطابقة الأضداد",
+  "game.oppositeMatchDesc": "طابق الكلمات مع أضدادها",
+  "game.memoryMatch": "مطابقة الذاكرة",
+  "game.memoryMatchDesc": "ابحث عن الأزواج المتطابقة",
+  "game.patternPuzzle": "ألغاز الأنماط",
+  "game.patternPuzzleDesc": "أكمل تسلسل النمط",
+  "game.sortingFun": "متعة التصنيف",
+  "game.sortingFunDesc": "صنف العناصر في فئات",
+  "game.oddOneOut": "الغريب بينهم",
+  "game.oddOneOutDesc": "ابحث عن العنصر المختلف",
+  
+  "result.greatJob": "🎉 أحسنت!",
+  "result.amazing": "🎉 رائع!",
+  "result.goodTry": "⭐ محاولة جيدة!",
+  "result.greatRacing": "🏁 سباق رائع!",
+  "result.greatDriving": "🚗 قيادة رائعة!",
+  "result.greatMatching": "🎨 مطابقة رائعة!",
+  "result.greatCounting": "🎉 عد رائع!",
+  "result.greatSorting": "🎉 تصنيف رائع!",
+  "result.greatSpotting": "🔷 اكتشاف رائع!",
+  "result.youWon": "🎉 فزت!",
+  "result.timesUp": "⏱️ انتهى الوقت!",
+  
+  "game.findMatching": "ابحث عن جميع الأزواج المتطابقة!",
+  "game.matchFound": "✨ وجدت تطابق!",
+  "game.tryAgain": "حاول مرة أخرى!",
+  "game.correct": "صحيح!",
+  "game.wrong": "خطأ!",
+  
+  "stats.gamesCount": "{count} ألعاب",
+  
+  "level.easy": "سهل",
+  "level.medium": "متوسط",
+  "level.hard": "صعب"
+}

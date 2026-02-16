@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Sorting Fun 📦</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -164,52 +160,18 @@
             border-radius: 10px;
             font-size: 14px;
         }
-        
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-        
-        #gameOver p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        
-        .new-high {
-            color: #ffd700;
-            font-weight: bold;
-            animation: glow 1s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #ffd700; }
-            to { text-shadow: 0 0 20px #ffd700; }
-        }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-logic.html" class="category-btn">🧠 Logic</a>
-        <h1>📦 Sorting Fun</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-logic.html" class="category-btn" data-i18n="nav.logic">🧠 Logic</a>
+        <h1 data-i18n="sortingFun.title">📦 Sorting Fun</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Round: <span id="round">1</span>/5</div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span>/5</div>
         <div>⏱️ <span id="time">0</span>s</div>
     </div>
     
@@ -219,18 +181,18 @@
     
     <div class="items-container" id="itemsContainer"></div>
     
-    <div class="message" id="message">Drag items to the correct bins!</div>
+    <div class="message" id="message" data-i18n="sortingFun.dragInstruction">Drag items to the correct bins!</div>
     
     <button id="startBtn" style="display: none;">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best: -- points</div>
     
     <div id="gameOver">
-        <h2>🎉 Great Sorting!</h2>
-        <p>Score: <span id="finalScore">0</span></p>
+        <h2 data-i18n="sortingFun.result">🎉 Great Sorting!</h2>
+        <p><span data-i18n="game.score">Score</span>: <span id="finalScore">0</span></p>
         <p>Time: <span id="finalTime">0</span> seconds</p>
         <p id="highScoreMsg"></p>
-        <button onclick="startGame()">Play Again</button>
+        <button onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
 
     <script src="../js/game-utils.js"></script>
@@ -315,13 +277,18 @@
         }
         
         function loadHighScore() {
-            const highScore = GameUtils.getHighScore(GAME_KEY);
-            if (highScore > 0) {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
                 const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-                document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: ${highScore} points by ${bestPlayer}`;
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('highScoreDisplay').innerHTML = highScoreText;
             } else {
-                document.getElementById('highScoreDisplay').innerHTML = 'Best: -- points';
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : 'Best: -- points';
+                document.getElementById('highScoreDisplay').innerHTML = defaultText;
             }
         }
         
@@ -460,7 +427,8 @@
                 // Correct!
                 score += 10;
                 document.getElementById('score').textContent = score;
-                document.getElementById('message').textContent = '✨ Correct!';
+                const correctMsg = typeof I18n !== 'undefined' ? I18n.t('game.correct') : '✨ Correct!';
+                document.getElementById('message').textContent = correctMsg;
                 GameUtils.playSound('correct');
                 
                 // Move to bin
@@ -481,7 +449,8 @@
                         endGame();
                     } else {
                         document.getElementById('round').textContent = round;
-                        document.getElementById('message').textContent = '🎉 Round complete!';
+                        const roundCompleteMsg = typeof I18n !== 'undefined' ? I18n.t('game.roundComplete') : '🎉 Round complete!';
+                        document.getElementById('message').textContent = roundCompleteMsg;
                         GameUtils.playSound('levelUp');
                         setTimeout(setupRound, 1000);
                     }
@@ -490,7 +459,8 @@
                 // Wrong!
                 score = Math.max(0, score - 5);
                 document.getElementById('score').textContent = score;
-                document.getElementById('message').textContent = '❌ Try again!';
+                const wrongMsg = typeof I18n !== 'undefined' ? I18n.t('game.wrong') : '❌ Try again!';
+                document.getElementById('message').textContent = wrongMsg;
                 GameUtils.playSound('wrong');
                 
                 if (itemElement) {
@@ -526,7 +496,8 @@
             
             document.getElementById('score').textContent = '0';
             document.getElementById('round').textContent = '1';
-            document.getElementById('message').textContent = 'Drag items to the correct bins!';
+            const dragText = typeof I18n !== 'undefined' ? I18n.t('sortingFun.dragInstruction') : 'Drag items to the correct bins!';
+            document.getElementById('message').textContent = dragText;
             document.getElementById('gameOver').style.display = 'none';
             
             setupRound();
@@ -544,10 +515,12 @@
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
-                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                const newRecordText = typeof I18n !== 'undefined' ? I18n.t('game.newRecord') : '🏆 NEW HIGH SCORE!';
+                highMsg.innerHTML = `<span class="new-high">${newRecordText}</span>`;
                 GameUtils.playSound('levelUp');
             } else {
-                highMsg.textContent = 'Great sorting, ' + playerName + '!';
+                const goodJobText = typeof I18n !== 'undefined' ? I18n.t('result.goodJob', { name: playerName }) : 'Great sorting, ' + playerName + '!';
+                highMsg.textContent = goodJobText;
             }
             
             document.getElementById('gameOver').style.display = 'block';
@@ -561,6 +534,13 @@
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

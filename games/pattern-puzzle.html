@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Pattern Puzzle 🔮</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -110,30 +106,7 @@
             font-size: 14px;
         }
         
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-        
-        #gameOver p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        
-        #gameOver button {
+#gameOver button {
             background: linear-gradient(145deg, #e94560, #c73e54);
             border: none;
             padding: 15px 40px;
@@ -149,17 +122,6 @@
         #gameOver button:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(233,69,96,0.6);
-        }
-        
-        .new-high {
-            color: #ffd700;
-            font-weight: bold;
-            animation: glow 1s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #ffd700; }
-            to { text-shadow: 0 0 20px #ffd700; }
         }
         
         .pattern-indicator {
@@ -242,18 +204,18 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-logic.html" class="category-btn">🧠 Logic</a>        <h1>🔮 Pattern Puzzle</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>        <a href="category-logic.html" class="category-btn" data-i18n="nav.logic">🧠 Logic</a>        <h1 data-i18n="patternPuzzle.title">🔮 Pattern Puzzle</h1>
     </div>
     
     <div class="stats">
-        <div>Level: <span id="level">1</span></div>
-        <div>Score: <span id="score">0</span></div>
+        <div><span data-i18n="game.level">Level</span>: <span id="level">1</span></div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
     </div>
     
     <div class="hints-toggle" onclick="document.getElementById('hintsToggle').click()">
         <input type="checkbox" id="hintsToggle">
         <span class="toggle-switch"></span>
-        <label for="hintsToggle">✨ Show hints</label>
+        <label for="hintsToggle" data-i18n="patternPuzzle.showHints">✨ Show hints</label>
     </div>
     
     <div class="pattern-indicator" id="patternIndicator"></div>
@@ -272,11 +234,11 @@
     <div class="high-score" id="highScoreDisplay">Best Level: --</div>
     
     <div id="gameOver">
-        <h2 id="gameOverTitle">Game Over!</h2>
+        <h2 id="gameOverTitle" data-i18n="patternPuzzle.result">Game Over!</h2>
         <p>You reached Level <span id="finalLevel">0</span></p>
         <p>Score: <span id="finalScore">0</span></p>
         <p id="highScoreMsg"></p>
-        <button onclick="startGame()">Try Again</button>
+        <button onclick="startGame()" data-i18n="game.playAgain">Try Again</button>
     </div>
 
     <script src="../js/game-utils.js"></script>
@@ -306,10 +268,15 @@
             const highScoreData = localStorage.getItem('patternPuzzle_highScore');
             if (highScoreData) {
                 const data = JSON.parse(highScoreData);
-                document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: Level ${data.level} by ${data.name}`;
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScoreLevel', { level: data.level, player: data.name })
+                    : `🏆 Best: Level ${data.level} by ${data.name}`;
+                document.getElementById('highScoreDisplay').innerHTML = highScoreText;
             } else {
-                document.getElementById('highScoreDisplay').innerHTML = 'Best Level: --';
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScoreLevel')
+                    : 'Best Level: --';
+                document.getElementById('highScoreDisplay').innerHTML = defaultText;
             }
         }
         
@@ -375,7 +342,8 @@
         
         async function showPattern() {
             isShowingPattern = true;
-            document.getElementById('message').textContent = 'Watch carefully...';
+            const watchText = typeof I18n !== 'undefined' ? I18n.t('patternPuzzle.watch') : 'Watch carefully...';
+            document.getElementById('message').textContent = watchText;
             
             updatePatternIndicator();
             
@@ -386,7 +354,8 @@
             }
             
             isShowingPattern = false;
-            document.getElementById('message').textContent = 'Your turn! Repeat the pattern';
+            const yourTurnText = typeof I18n !== 'undefined' ? I18n.t('patternPuzzle.yourTurn') : 'Your turn! Repeat the pattern';
+            document.getElementById('message').textContent = yourTurnText;
             playerPattern = [];
             updatePatternIndicator();
         }
@@ -442,15 +411,17 @@
             const isNewHigh = saveHighScore(level - 1, score);
             loadHighScore();
             
-            document.getElementById('gameOverTitle').textContent = level > 5 ? '🎉 Great Job!' : '😅 Game Over!';
+            document.getElementById('gameOverTitle').textContent = level > 5 ? '🎉 Amazing!' : '⭐ Good Try!';
             document.getElementById('finalLevel').textContent = level - 1;
             document.getElementById('finalScore').textContent = score;
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
-                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                const newRecordText = typeof I18n !== 'undefined' ? I18n.t('game.newRecord') : '🏆 NEW HIGH SCORE!';
+                highMsg.innerHTML = `<span class="new-high">${newRecordText}</span>`;
             } else {
-                highMsg.textContent = 'Keep practicing, ' + playerName + '!';
+                const practiceText = typeof I18n !== 'undefined' ? I18n.t('result.keepPracticing', { name: playerName }) : 'Keep practicing, ' + playerName + '!';
+                highMsg.textContent = practiceText;
             }
             
             document.getElementById('gameOver').style.display = 'block';
@@ -491,6 +462,13 @@
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

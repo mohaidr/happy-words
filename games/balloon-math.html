@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Balloon Pop Math 🎈</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -41,23 +37,7 @@
             100% { transform: scale(1); }
         }
         
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.98);
-            color: #2d3436;
-            padding: 30px 40px;
-            border-radius: 25px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        
-        #gameOver h2 { color: #6c5ce7; margin-bottom: 15px; }
-        #gameOver p { margin: 8px 0; font-size: 18px; }
+        #gameOver h2 { color: #6c5ce7; }
         
         .streak {
             position: fixed;
@@ -99,29 +79,29 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-math.html" class="category-btn">🔢 Math</a>        <h1>🎈 Balloon Pop Math</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>        <a href="category-math.html" class="category-btn" data-i18n="nav.math">🔢 Math</a>        <h1>🎈 Balloon Pop Math</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Level: <span id="level">1</span></div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.level">Level</span>: <span id="level">1</span></div>
         <div>🔥 <span id="streak">0</span></div>
     </div>
     
     <div class="question-box">
         <div id="question">5 + 3 = ?</div>
-        <div class="hint">Pop the correct answer!</div>
+        <div class="hint" data-i18n="balloonMath.hint">Pop the correct answer!</div>
     </div>
     
     <div id="gameArea" class="game-area">
-        <div id="gameOver">
-            <h2>🎉 Time's Up!</h2>
+        <div id="gameOver" class="light-theme">
+            <h2 data-i18n="balloonMath.result">🎉 Time's Up!</h2>
             <p id="playerDisplay"></p>
-            <p>Final Score: <span id="finalScore">0</span></p>
-            <p>🏆 High Score: <span id="highScore">0</span></p>
-            <p>Questions Correct: <span id="correctCount">0</span></p>
-            <button class="btn btn-purple" onclick="startGame()">Play Again</button>
-            <a href="../index.html" class="home-link">← Back to Home</a>
+            <p><span data-i18n="emojiFeelings.finalScore">Final Score</span>: <span id="finalScore">0</span></p>
+            <p>🏆 <span data-i18n="game.highScore">High Score</span>: <span id="highScore">0</span></p>
+            <p><span data-i18n="balloonMath.questionsCorrect">Questions Correct</span>: <span id="correctCount">0</span></p>
+            <button class="btn btn-purple" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
+            <a href="../index.html" class="home-link" data-i18n="game.backToHome">← Back to Home</a>
         </div>
     </div>
     
@@ -129,7 +109,7 @@
         <div class="timer-fill" id="timerFill"></div>
     </div>
     
-    <p class="info">Pop balloons with the correct answer before time runs out!</p>
+    <p class="info" data-i18n="balloonMath.instruction">Pop balloons with the correct answer before time runs out!</p>
     <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
 
     <script src="../js/game-utils.js"></script>
@@ -157,6 +137,22 @@
         
         document.getElementById('highScore').textContent = highScore;
         
+        function loadHighScore() {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('bestScoreDisplay').innerHTML = highScoreText;
+            } else {
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : 'Best: -- points';
+                document.getElementById('bestScoreDisplay').innerHTML = '🏆 ' + defaultText;
+            }
+        }
+        
         // DOM elements
         const gameArea = document.getElementById('gameArea');
         const questionEl = document.getElementById('question');
@@ -172,7 +168,15 @@
             // Use shared utility for math question generation
             const question = GameUtils.generateMathQuestion(gradeLevel, level);
             currentAnswer = question.answer;
-            questionEl.textContent = `${question.question} = ?`;
+            
+            // Use proper question mark direction for RTL
+            // Wrap math expression in LTR span to prevent number reversal
+            const isRTL = document.body.classList.contains('rtl');
+            if (isRTL) {
+                questionEl.innerHTML = `<span dir="ltr">${question.question}</span> = ؟`;
+            } else {
+                questionEl.textContent = `${question.question} = ?`;
+            }
             
             // Clear old balloons
             balloons.forEach(b => b.el.remove());
@@ -332,23 +336,22 @@
             document.getElementById('correctCount').textContent = correctCount;
             document.getElementById('playerDisplay').textContent = playerName + "'s Game";
             gameOverEl.style.display = 'block';
-            updateBestScoreDisplay();
-        }
-
-        function updateBestScoreDisplay() {
-            const bestScore = GameUtils.getHighScore(GAME_KEY);
-            const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-            if (bestScore > 0) {
-                document.getElementById('bestScoreDisplay').textContent = `🏆 Best: ${bestScore} by ${bestPlayer}`;
-            }
+            loadHighScore();
         }
 
         // Initialize sound toggle
         GameUtils.initSoundToggle();
-        updateBestScoreDisplay();
+        loadHighScore();
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

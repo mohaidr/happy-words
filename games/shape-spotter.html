@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Shape Spotter 🔷</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -133,55 +129,21 @@
             border-radius: 10px;
             font-size: 14px;
         }
-        
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-        
-        #gameOver p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        
-        .new-high {
-            color: #ffd700;
-            font-weight: bold;
-            animation: glow 1s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #ffd700; }
-            to { text-shadow: 0 0 20px #ffd700; }
-        }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>        <a href="category-fun.html" class="category-btn">🎉 Fun</a>        <h1>🔷 Shape Spotter</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>        <a href="category-fun.html" class="category-btn" data-i18n="nav.fun">🎉 Fun</a>        <h1>🔷 Shape Spotter</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Round: <span id="round">1</span>/5</div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span>/5</div>
         <div>⏱️ <span id="time">30</span>s</div>
     </div>
     
     <div class="target-area">
-        <div class="target-label">Find all the:</div>
+        <div class="target-label" data-i18n="shapeSpotter.findAll">Find all the:</div>
         <div class="target-shape" id="targetShape">⭐</div>
         <div class="target-name" id="targetName">Stars</div>
     </div>
@@ -192,7 +154,7 @@
         <div class="progress-fill" id="progressFill"></div>
     </div>
     
-    <div class="found-display">Found: <span id="found">0</span>/<span id="total">5</span></div>
+    <div class="found-display"><span data-i18n="shapeSpotter.found">Found</span>: <span id="found">0</span>/<span id="total">5</span></div>
     
     <div class="message" id="message"></div>
     
@@ -201,11 +163,11 @@
     <div class="high-score" id="highScoreDisplay">Best: -- points</div>
     
     <div id="gameOver">
-        <h2>🔷 Great Spotting!</h2>
-        <p>Score: <span id="finalScore">0</span></p>
-        <p>Shapes Found: <span id="totalFound">0</span></p>
+        <h2 data-i18n="shapeSpotter.result">🔷 Great Spotting!</h2>
+        <p><span data-i18n="game.score">Score</span>: <span id="finalScore">0</span></p>
+        <p><span data-i18n="shapeSpotter.shapesFound">Shapes Found</span>: <span id="totalFound">0</span></p>
         <p id="highScoreMsg"></p>
-        <button class="btn" onclick="startGame()">Play Again</button>
+        <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
 
     <script src="../js/game-utils.js"></script>
@@ -244,10 +206,18 @@
         const GAME_KEY = 'shapeSpotter';
         
         function loadHighScore() {
-            const highScore = GameUtils.getHighScore(GAME_KEY);
-            if (highScore > 0) {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
                 const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${highScore} points by ${bestPlayer}`;
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('highScoreDisplay').innerHTML = highScoreText;
+            } else {
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : 'Best: -- points';
+                document.getElementById('highScoreDisplay').innerHTML = defaultText;
             }
         }
         
@@ -375,7 +345,8 @@
                 
                 // Check if all found
                 if (foundCount >= targetCount) {
-                    document.getElementById('message').textContent = '✨ All found! +20 bonus!';
+                    const allFoundMsg = typeof I18n !== 'undefined' ? I18n.t('shapeSpotter.allFound') : '✨ All found! +20 bonus!';
+                    document.getElementById('message').textContent = allFoundMsg;
                     score += 20;
                     document.getElementById('score').textContent = score;
                     GameUtils.playSound('levelUp');
@@ -393,7 +364,8 @@
                 shape.classList.add('wrong');
                 score = Math.max(0, score - 5);
                 document.getElementById('score').textContent = score;
-                document.getElementById('message').textContent = '❌ Not that one!';
+                const notThatOneMsg = typeof I18n !== 'undefined' ? I18n.t('shapeSpotter.notThatOne') : '❌ Not that one!';
+                document.getElementById('message').textContent = notThatOneMsg;
                 
                 // Play wrong sound
                 GameUtils.playSound('wrong');
@@ -412,8 +384,9 @@
                 
                 if (timeLeft <= 0) {
                     // Time up for this round
+                    const timeUpMsg = typeof I18n !== 'undefined' ? I18n.t('game.timeUp') : '⏰ Time up!';
                     if (round < totalRounds) {
-                        document.getElementById('message').textContent = '⏰ Time up!';
+                        document.getElementById('message').textContent = timeUpMsg;
                         setTimeout(() => loadRound(), 1000);
                     } else {
                         endGame();
@@ -455,10 +428,12 @@
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
-                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                const newRecordText = typeof I18n !== 'undefined' ? I18n.t('game.newRecord') : '🏆 NEW HIGH SCORE!';
+                highMsg.innerHTML = `<span class="new-high">${newRecordText}</span>`;
                 GameUtils.playSound('levelUp');
             } else {
-                highMsg.textContent = 'Great spotting, ' + playerName + '!';
+                const goodJobText = typeof I18n !== 'undefined' ? I18n.t('result.goodJob', { name: playerName }) : 'Great spotting, ' + playerName + '!';
+                highMsg.textContent = goodJobText;
             }
             
             document.getElementById('gameOver').style.display = 'block';
@@ -472,6 +447,13 @@
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Counting Game 🔢</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific styles */
@@ -136,40 +132,6 @@
             font-size: 14px;
         }
         
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-        
-        #gameOver p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        
-        .new-high {
-            color: #ffd700;
-            font-weight: bold;
-            animation: glow 1s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #ffd700; }
-            to { text-shadow: 0 0 20px #ffd700; }
-        }
-        
         .streak {
             color: #ffd700;
         }
@@ -177,18 +139,18 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-math.html" class="category-btn">🔢 Math</a>
-        <h1>🔢 Counting Game</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-math.html" class="category-btn" data-i18n="nav.math">🔢 Math</a>
+        <h1 data-i18n="countingGame.title">🔢 Counting Game</h1>
     </div>
     
     <div class="stats">
-        <div>Score: <span id="score">0</span></div>
-        <div>Round: <span id="round">1</span>/10</div>
+        <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
+        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span>/10</div>
         <div class="streak">🔥 <span id="streak">0</span></div>
     </div>
     
-    <div class="question" id="question">How many do you see?</div>
+    <div class="question" id="question" data-i18n="countingGame.question">How many do you see?</div>
     
     <div class="objects-container" id="objectsContainer"></div>
     
@@ -196,14 +158,14 @@
     
     <div class="message" id="message"></div>
     
-    <div class="high-score" id="highScoreDisplay">Best: -- points</div>
+    <div class="high-score" id="highScoreDisplay"><span data-i18n="game.best">Best</span>: -- <span data-i18n="game.points">points</span></div>
     
     <div id="gameOver">
-        <h2>🎉 Great Counting!</h2>
-        <p>Score: <span id="finalScore">0</span></p>
-        <p>Best Streak: <span id="bestStreak">0</span> 🔥</p>
+        <h2 data-i18n="countingGame.result">🎉 Great Counting!</h2>
+        <p><span data-i18n="game.score">Score</span>: <span id="finalScore">0</span></p>
+        <p><span data-i18n="countingGame.bestStreak">Best Streak</span>: <span id="bestStreak">0</span> 🔥</p>
         <p id="highScoreMsg"></p>
-        <button class="btn" onclick="startGame()">Play Again</button>
+        <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
 
     <script src="../js/game-utils.js"></script>
@@ -229,7 +191,15 @@
             const saved = GameUtils.getHighScore(GAME_KEY);
             if (saved > 0) {
                 const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
-                document.getElementById('highScoreDisplay').innerHTML = `🏆 Best: ${saved} points by ${bestPlayer}`;
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('highScoreDisplay').innerHTML = highScoreText;
+            } else {
+                const defaultText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.defaultHighScore')
+                    : 'Best: -- points';
+                document.getElementById('highScoreDisplay').innerHTML = defaultText;
             }
         }
         
@@ -266,7 +236,11 @@
             }
             
             // Update question
-            document.getElementById('question').textContent = `How many ${emoji} do you see?`;
+            const questionKey = 'countingGame.howMany';
+            const questionText = typeof I18n !== 'undefined' && I18n.translations[questionKey] 
+                ? I18n.t(questionKey, { emoji: emoji })
+                : `How many ${emoji} do you see?`;
+            document.getElementById('question').textContent = questionText;
             
             // Generate answer options
             const answers = [currentCount];
@@ -381,9 +355,11 @@
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
-                highMsg.innerHTML = '<span class="new-high">🏆 NEW HIGH SCORE!</span>';
+                const newRecordText = typeof I18n !== 'undefined' ? I18n.t('game.newRecord') : '🏆 NEW HIGH SCORE!';
+                highMsg.innerHTML = `<span class="new-high">${newRecordText}</span>`;
             } else {
-                highMsg.textContent = 'Great counting, ' + playerName + '!';
+                const goodJobText = typeof I18n !== 'undefined' ? I18n.t('result.goodJob', { name: playerName }) : 'Great counting, ' + playerName + '!';
+                highMsg.textContent = goodJobText;
             }
             
             document.getElementById('gameOver').style.display = 'block';
@@ -397,6 +373,13 @@
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>

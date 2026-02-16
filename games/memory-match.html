@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-23JF9BFV2J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-23JF9BFV2J');
-    </script>
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
     <title>Memory Match 🧠</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/games.css">
     <style>
         /* Game-specific background */
@@ -139,40 +135,6 @@
             font-size: 14px;
         }
         
-        #gameOver {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-        }
-        
-        #gameOver h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-        
-        #gameOver p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        
-        .new-high {
-            color: #ffd700;
-            font-weight: bold;
-            animation: glow 1s infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #ffd700; }
-            to { text-shadow: 0 0 20px #ffd700; }
-        }
-        
         .level-select {
             display: flex;
             gap: 10px;
@@ -197,26 +159,26 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn">← Home</a>
-        <a href="category-logic.html" class="category-btn">🧠 Logic</a>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-logic.html" class="category-btn" data-i18n="nav.logic">🧠 Logic</a>
         <h1>🧠 Memory Match</h1>
     </div>
     
     <div class="stats">
-        <div>Moves: <span id="moves">0</span></div>
-        <div>Pairs: <span id="pairs">0</span>/<span id="totalPairs">8</span></div>
+        <div><span data-i18n="game.moves">Moves</span>: <span id="moves">0</span></div>
+        <div><span data-i18n="game.pairs">Pairs</span>: <span id="pairs">0</span>/<span id="totalPairs">8</span></div>
         <div>⏱️ <span id="time">0</span>s</div>
     </div>
     
     <div class="level-select">
-        <button class="level-btn active" data-level="easy">Easy (8)</button>
-        <button class="level-btn" data-level="medium">Medium (12)</button>
-        <button class="level-btn" data-level="hard">Hard (15)</button>
+        <button class="level-btn active" data-level="easy" data-i18n="level.easy">Easy (8)</button>
+        <button class="level-btn" data-level="medium" data-i18n="level.medium">Medium (12)</button>
+        <button class="level-btn" data-level="hard" data-i18n="level.hard">Hard (15)</button>
     </div>
     
     <div class="game-board" id="gameBoard"></div>
     
-    <div class="message" id="message">Find all matching pairs!</div>
+    <div class="message" id="message" data-i18n="memoryMatch.instruction">Find all matching pairs!</div>
     
     <button id="startBtn" class="start-btn" style="display:none">Start Game</button>
     
@@ -224,11 +186,11 @@
     <p class="info" style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Score is based on fewest moves</p>
     
     <div id="gameOver">
-        <h2>🎉 You Won!</h2>
-        <p>Moves: <span id="finalMoves">0</span></p>
-        <p>Time: <span id="finalTime">0</span> seconds</p>
+        <h2 data-i18n="memoryMatch.result">🎉 You Won!</h2>
+        <p><span data-i18n="game.moves">Moves</span>: <span id="finalMoves">0</span></p>
+        <p><span data-i18n="game.time">Time</span>: <span id="finalTime">0</span> <span data-i18n="game.seconds">seconds</span></p>
         <p id="highScoreMsg"></p>
-        <button class="start-btn" onclick="startGame()">Play Again</button>
+        <button class="start-btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
 
     <script src="../js/game-utils.js"></script>
@@ -277,10 +239,15 @@
                 const bestMoves = 1000 - storedScore; // Convert back to moves
                 const bestPlayer = GameUtils.getHighScorePlayerName(key);
                 const bestTime = localStorage.getItem(key + '_time') || '?';
+                const bestLabel = typeof I18n !== 'undefined' ? I18n.t('game.best') : 'Best';
+                const movesLabel = typeof I18n !== 'undefined' ? I18n.t('game.moves').toLowerCase() : 'moves';
+                const byLabel = typeof I18n !== 'undefined' ? I18n.t('game.by') : 'by';
                 document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 Best: ${bestMoves} moves in ${bestTime}s by ${bestPlayer}`;
+                    `🏆 ${bestLabel}: ${bestMoves} ${movesLabel} in ${bestTime}s ${byLabel} ${bestPlayer}`;
             } else {
-                document.getElementById('highScoreDisplay').innerHTML = 'Best: -- moves';
+                const bestLabel = typeof I18n !== 'undefined' ? I18n.t('game.best') : 'Best';
+                const movesLabel = typeof I18n !== 'undefined' ? I18n.t('game.moves').toLowerCase() : 'moves';
+                document.getElementById('highScoreDisplay').innerHTML = `${bestLabel}: -- ${movesLabel}`;
             }
         }
         
@@ -364,7 +331,7 @@
                         card2.classList.add('matched');
                         matchedPairs++;
                         document.getElementById('pairs').textContent = matchedPairs;
-                        document.getElementById('message').textContent = '✨ Match found!';
+                        document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('memoryMatch.matchFound') : '✨ Match found!';
                         GameUtils.playSound('correct');
                         
                         if (matchedPairs === pairsNeeded) {
@@ -380,7 +347,7 @@
                     setTimeout(() => {
                         card1.classList.remove('flipped');
                         card2.classList.remove('flipped');
-                        document.getElementById('message').textContent = 'Try again!';
+                        document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('game.wrong') : 'Try again!';
                         flippedCards = [];
                         canFlip = true;
                     }, 800);
@@ -430,21 +397,23 @@
             allCards.forEach(card => card.classList.add('flipped'));
             
             const previewTime = getPreviewTime();
-            document.getElementById('message').textContent = `Memorize the cards! ${previewTime/1000}s...`;
+            const memorizeText = typeof I18n !== 'undefined' ? I18n.t('memoryMatch.memorize') : 'Memorize the cards!';
+            document.getElementById('message').textContent = `${memorizeText} ${previewTime/1000}s...`;
             
             // Countdown and then hide cards
             let countdown = previewTime / 1000;
             const countdownInterval = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
-                    document.getElementById('message').textContent = `Memorize the cards! ${countdown}s...`;
+                    const memorizeText = typeof I18n !== 'undefined' ? I18n.t('memoryMatch.memorize') : 'Memorize the cards!';
+                    document.getElementById('message').textContent = `${memorizeText} ${countdown}s...`;
                 }
             }, 1000);
             
             setTimeout(() => {
                 clearInterval(countdownInterval);
                 allCards.forEach(card => card.classList.remove('flipped'));
-                document.getElementById('message').textContent = 'Find all matching pairs!';
+                document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('memoryMatch.instruction') : 'Find all matching pairs!';
                 canFlip = true;
                 startTimer();
             }, previewTime);
@@ -464,7 +433,8 @@
             if (isNewHigh) {
                 highMsg.innerHTML = '<span class="new-high">🏆 NEW BEST SCORE!</span>';
             } else {
-                highMsg.textContent = 'Great job, ' + playerName + '!';
+                const goodJobText = typeof I18n !== 'undefined' ? I18n.t('result.goodJob', { name: playerName }) : 'Great job, ' + playerName + '!';
+                highMsg.textContent = goodJobText;
             }
             
             document.getElementById('gameOver').style.display = 'block';
@@ -493,6 +463,13 @@
         
         // Auto-start game on load
         setTimeout(() => startGame(), 500);
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
     </script>
 </body>
 </html>
