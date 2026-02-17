@@ -129,139 +129,152 @@
     <div id="gameOver">
         <h2 data-i18n="oddOneOut.result">🎉 Great Job!</h2>
         <p id="playerDisplay"></p>
-        <p>Final Score: <span id="finalScore">0</span></p>
-        <p>🏆 High Score: <span id="highScore">0</span></p>
+        <p id="finalScoreText"></p>
+        <p id="highScoreText"></p>
         <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
         <a href="../index.html" class="home-link" data-i18n="game.home">← Back to Home</a>
     </div>
     
-    <p class="info">Find the one that's different from the others!</p>
+    <p class="info" data-i18n="oddOneOut.info">Find the one that's different from the others!</p>
     <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
 
     <script src="../js/game-utils.js"></script>
     <script>
         const GAME_KEY = 'oddOneOut';
         
-        // Categories with items
+        // Categories with items (using i18n keys)
         const categories = {
             fruits: {
-                name: 'Fruits',
+                nameKey: 'cat.fruits',
                 items: [
-                    { emoji: '🍎', label: 'Apple' },
-                    { emoji: '🍌', label: 'Banana' },
-                    { emoji: '🍇', label: 'Grapes' },
-                    { emoji: '🍊', label: 'Orange' },
-                    { emoji: '🍓', label: 'Strawberry' },
-                    { emoji: '🍑', label: 'Peach' },
+                    { emoji: '🍎', labelKey: 'item.apple' },
+                    { emoji: '🍌', labelKey: 'item.banana' },
+                    { emoji: '🍇', labelKey: 'item.grapes' },
+                    { emoji: '🍊', labelKey: 'item.orange' },
+                    { emoji: '🍓', labelKey: 'item.strawberry' },
+                    { emoji: '🍑', labelKey: 'item.peach' },
                 ]
             },
             animals: {
-                name: 'Animals',
+                nameKey: 'cat.animals',
                 items: [
-                    { emoji: '🐶', label: 'Dog' },
-                    { emoji: '🐱', label: 'Cat' },
-                    { emoji: '🐰', label: 'Rabbit' },
-                    { emoji: '🐻', label: 'Bear' },
-                    { emoji: '🦁', label: 'Lion' },
-                    { emoji: '🐘', label: 'Elephant' },
+                    { emoji: '🐶', labelKey: 'item.dog' },
+                    { emoji: '🐱', labelKey: 'item.cat' },
+                    { emoji: '🐰', labelKey: 'item.rabbit' },
+                    { emoji: '🐻', labelKey: 'item.bear' },
+                    { emoji: '🦁', labelKey: 'item.lion' },
+                    { emoji: '🐘', labelKey: 'item.elephant' },
                 ]
             },
             vehicles: {
-                name: 'Vehicles',
+                nameKey: 'cat.vehicles',
                 items: [
-                    { emoji: '🚗', label: 'Car' },
-                    { emoji: '🚌', label: 'Bus' },
-                    { emoji: '🚁', label: 'Helicopter' },
-                    { emoji: '🚂', label: 'Train' },
-                    { emoji: '🚲', label: 'Bike' },
-                    { emoji: '✈️', label: 'Plane' },
+                    { emoji: '🚗', labelKey: 'item.car' },
+                    { emoji: '🚌', labelKey: 'item.bus' },
+                    { emoji: '🚁', labelKey: 'item.helicopter' },
+                    { emoji: '🚂', labelKey: 'item.train' },
+                    { emoji: '🚲', labelKey: 'item.bike' },
+                    { emoji: '✈️', labelKey: 'item.plane' },
                 ]
             },
             food: {
-                name: 'Food',
+                nameKey: 'cat.food',
                 items: [
-                    { emoji: '🍕', label: 'Pizza' },
-                    { emoji: '🍔', label: 'Burger' },
-                    { emoji: '🌭', label: 'Hot Dog' },
-                    { emoji: '🍟', label: 'Fries' },
-                    { emoji: '🌮', label: 'Taco' },
-                    { emoji: '🍩', label: 'Donut' },
+                    { emoji: '🍕', labelKey: 'item.pizza' },
+                    { emoji: '🍔', labelKey: 'item.burger' },
+                    { emoji: '🌭', labelKey: 'item.hotdog' },
+                    { emoji: '🍟', labelKey: 'item.fries' },
+                    { emoji: '🌮', labelKey: 'item.taco' },
+                    { emoji: '🍩', labelKey: 'item.donut' },
                 ]
             },
             sports: {
-                name: 'Sports',
+                nameKey: 'cat.sports',
                 items: [
-                    { emoji: '⚽', label: 'Soccer' },
-                    { emoji: '🏀', label: 'Basketball' },
-                    { emoji: '🎾', label: 'Tennis' },
-                    { emoji: '⚾', label: 'Baseball' },
-                    { emoji: '🏈', label: 'Football' },
-                    { emoji: '🏐', label: 'Volleyball' },
+                    { emoji: '⚽', labelKey: 'item.soccer' },
+                    { emoji: '🏀', labelKey: 'item.basketball' },
+                    { emoji: '🎾', labelKey: 'item.tennis' },
+                    { emoji: '⚾', labelKey: 'item.baseball' },
+                    { emoji: '🏈', labelKey: 'item.football' },
+                    { emoji: '🏐', labelKey: 'item.volleyball' },
                 ]
             },
             weather: {
-                name: 'Weather',
+                nameKey: 'cat.weather',
                 items: [
-                    { emoji: '☀️', label: 'Sunny' },
-                    { emoji: '🌧️', label: 'Rainy' },
-                    { emoji: '❄️', label: 'Snowy' },
-                    { emoji: '⛈️', label: 'Stormy' },
-                    { emoji: '🌤️', label: 'Cloudy' },
-                    { emoji: '🌪️', label: 'Windy' },
+                    { emoji: '☀️', labelKey: 'item.sunny' },
+                    { emoji: '🌧️', labelKey: 'item.rainy' },
+                    { emoji: '❄️', labelKey: 'item.snowy' },
+                    { emoji: '⛈️', labelKey: 'item.stormy' },
+                    { emoji: '🌤️', labelKey: 'item.cloudy' },
+                    { emoji: '🌪️', labelKey: 'item.windy' },
                 ]
             },
             colors: {
-                name: 'Colors',
+                nameKey: 'cat.colors',
                 items: [
-                    { emoji: '🔴', label: 'Red' },
-                    { emoji: '🔵', label: 'Blue' },
-                    { emoji: '🟢', label: 'Green' },
-                    { emoji: '🟡', label: 'Yellow' },
-                    { emoji: '🟣', label: 'Purple' },
-                    { emoji: '🟠', label: 'Orange' },
+                    { emoji: '🔴', labelKey: 'item.red' },
+                    { emoji: '🔵', labelKey: 'item.blue' },
+                    { emoji: '🟢', labelKey: 'item.green' },
+                    { emoji: '🟡', labelKey: 'item.yellow' },
+                    { emoji: '🟣', labelKey: 'item.purple' },
+                    { emoji: '🟠', labelKey: 'item.orangeColor' },
                 ]
             },
             clothes: {
-                name: 'Clothes',
+                nameKey: 'cat.clothes',
                 items: [
-                    { emoji: '👕', label: 'Shirt' },
-                    { emoji: '👖', label: 'Pants' },
-                    { emoji: '👗', label: 'Dress' },
-                    { emoji: '🧥', label: 'Coat' },
-                    { emoji: '👟', label: 'Shoes' },
-                    { emoji: '🧢', label: 'Hat' },
+                    { emoji: '👕', labelKey: 'item.shirt' },
+                    { emoji: '👖', labelKey: 'item.pants' },
+                    { emoji: '👗', labelKey: 'item.dress' },
+                    { emoji: '🧥', labelKey: 'item.coat' },
+                    { emoji: '👟', labelKey: 'item.shoes' },
+                    { emoji: '🧢', labelKey: 'item.hat' },
                 ]
             },
             shapes: {
-                name: 'Shapes',
+                nameKey: 'cat.shapes',
                 items: [
-                    { emoji: '⬛', label: 'Square' },
-                    { emoji: '⚫', label: 'Circle' },
-                    { emoji: '🔺', label: 'Triangle' },
-                    { emoji: '💠', label: 'Diamond' },
-                    { emoji: '⭐', label: 'Star' },
-                    { emoji: '❤️', label: 'Heart' },
+                    { emoji: '⬛', labelKey: 'item.square' },
+                    { emoji: '⚫', labelKey: 'item.circle' },
+                    { emoji: '🔺', labelKey: 'item.triangle' },
+                    { emoji: '💠', labelKey: 'item.diamond' },
+                    { emoji: '⭐', labelKey: 'item.star' },
+                    { emoji: '❤️', labelKey: 'item.heart' },
                 ]
             },
             tools: {
-                name: 'Tools',
+                nameKey: 'cat.tools',
                 items: [
-                    { emoji: '🔨', label: 'Hammer' },
-                    { emoji: '🔧', label: 'Wrench' },
-                    { emoji: '🪛', label: 'Screwdriver' },
-                    { emoji: '✂️', label: 'Scissors' },
-                    { emoji: '📏', label: 'Ruler' },
-                    { emoji: '🔩', label: 'Bolt' },
+                    { emoji: '🔨', labelKey: 'item.hammer' },
+                    { emoji: '🔧', labelKey: 'item.wrench' },
+                    { emoji: '🪛', labelKey: 'item.screwdriver' },
+                    { emoji: '✂️', labelKey: 'item.scissors' },
+                    { emoji: '📏', labelKey: 'item.ruler' },
+                    { emoji: '🔩', labelKey: 'item.bolt' },
                 ]
             }
         };
+        
+        // Helper function to get translated text
+        function t(key, params) {
+            return typeof I18n !== 'undefined' ? I18n.t(key, params) : key;
+        }
+        
+        function getItemLabel(item) {
+            return t(item.labelKey);
+        }
+        
+        function getCategoryName(catKey) {
+            return t(categories[catKey].nameKey);
+        }
         
         let score = 0;
         let level = 1;
         let lives = 3;
         let oddItem = null;
         
-        let mainCategory = '';
+        let mainCategoryKey = '';
         let questionsAnswered = 0;
         let canAnswer = true;
         
@@ -289,7 +302,7 @@
                 oddCatKey = catKeys[Math.floor(Math.random() * catKeys.length)];
             } while (oddCatKey === mainCatKey);
             
-            mainCategory = categories[mainCatKey].name;
+            mainCategoryKey = mainCatKey;
             const mainItems = [...categories[mainCatKey].items];
             const oddItems = [...categories[oddCatKey].items];
             
@@ -311,7 +324,7 @@
                 card.className = 'item-card';
                 card.innerHTML = `
                     <span class="emoji">${item.emoji}</span>
-                    <span class="label">${item.label}</span>
+                    <span class="label">${getItemLabel(item)}</span>
                 `;
                 card.onclick = () => checkAnswer(card, item);
                 itemsGrid.appendChild(card);
@@ -325,9 +338,12 @@
             const cards = itemsGrid.querySelectorAll('.item-card');
             cards.forEach(c => c.style.pointerEvents = 'none');
             
+            const itemLabel = getItemLabel(item);
+            const categoryName = getCategoryName(mainCategoryKey);
+            
             if (item === oddItem) {
                 card.classList.add('correct');
-                categoryHint.textContent = `✅ Yes! ${item.label} is not a ${mainCategory.slice(0, -1)}!`;
+                categoryHint.textContent = t('oddOneOut.correct', { item: itemLabel, category: categoryName });
                 score += 10 * level;
                 questionsAnswered++;
                 GameUtils.playSound('correct');
@@ -349,7 +365,8 @@
                     }
                 });
                 
-                categoryHint.textContent = `❌ The others are ${mainCategory}. ${oddItem.label} doesn't belong!`;
+                const oddItemLabel = getItemLabel(oddItem);
+                categoryHint.textContent = t('oddOneOut.wrong', { category: categoryName, item: oddItemLabel });
                 lives--;
                 document.getElementById('lives').textContent = lives;
                 GameUtils.playSound('wrong');
@@ -405,9 +422,9 @@
             const bestScore = Math.max(score, highScore);
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('finalScoreText').textContent = t('oddOneOut.finalScore', { score: score });
+            document.getElementById('highScoreText').textContent = t('oddOneOut.highScoreValue', { score: bestScore, player: bestPlayer });
+            document.getElementById('playerDisplay').textContent = t('oddOneOut.playerGame', { name: playerName });
             document.getElementById('gameOver').style.display = 'block';
             loadHighScore();
         }

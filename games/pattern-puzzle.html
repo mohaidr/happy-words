@@ -235,8 +235,8 @@
     
     <div id="gameOver">
         <h2 id="gameOverTitle" data-i18n="patternPuzzle.result">Game Over!</h2>
-        <p>You reached Level <span id="finalLevel">0</span></p>
-        <p>Score: <span id="finalScore">0</span></p>
+        <p id="reachedLevelText"></p>
+        <p id="scoreText"></p>
         <p id="highScoreMsg"></p>
         <button onclick="startGame()" data-i18n="game.playAgain">Try Again</button>
     </div>
@@ -390,7 +390,8 @@
                 
                 level++;
                 document.getElementById('level').textContent = level;
-                document.getElementById('message').textContent = '✨ Perfect! Next level...';
+                const perfectText = typeof I18n !== 'undefined' ? I18n.t('patternPuzzle.perfect') : '✨ Perfect! Next level...';
+                document.getElementById('message').textContent = perfectText;
                 
                 if (level % 3 === 0) {
                     GameUtils.playSound('levelUp');
@@ -411,9 +412,21 @@
             const isNewHigh = saveHighScore(level - 1, score);
             loadHighScore();
             
-            document.getElementById('gameOverTitle').textContent = level > 5 ? '🎉 Amazing!' : '⭐ Good Try!';
-            document.getElementById('finalLevel').textContent = level - 1;
-            document.getElementById('finalScore').textContent = score;
+            const finalLevel = level - 1;
+            const titleText = finalLevel > 5 
+                ? (typeof I18n !== 'undefined' ? I18n.t('patternPuzzle.amazing') : '🎉 Amazing!')
+                : (typeof I18n !== 'undefined' ? I18n.t('patternPuzzle.goodTry') : '⭐ Good Try!');
+            document.getElementById('gameOverTitle').textContent = titleText;
+            
+            const reachedLevelText = typeof I18n !== 'undefined' 
+                ? I18n.t('patternPuzzle.reachedLevel', { level: finalLevel })
+                : `You reached Level ${finalLevel}`;
+            document.getElementById('reachedLevelText').textContent = reachedLevelText;
+            
+            const scoreText = typeof I18n !== 'undefined' 
+                ? I18n.t('patternPuzzle.scoreValue', { score: score })
+                : `Score: ${score}`;
+            document.getElementById('scoreText').textContent = scoreText;
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {

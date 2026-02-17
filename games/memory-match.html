@@ -167,7 +167,7 @@
     <div class="stats">
         <div><span data-i18n="game.moves">Moves</span>: <span id="moves">0</span></div>
         <div><span data-i18n="game.pairs">Pairs</span>: <span id="pairs">0</span>/<span id="totalPairs">8</span></div>
-        <div>⏱️ <span id="time">0</span>s</div>
+        <div>⏱️ <span id="time">0</span><span data-i18n="game.secondsShort">s</span></div>
     </div>
     
     <div class="level-select">
@@ -183,7 +183,6 @@
     <button id="startBtn" class="start-btn" style="display:none">Start Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best: -- moves</div>
-    <p class="info" style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Score is based on fewest moves</p>
     
     <div id="gameOver">
         <h2 data-i18n="memoryMatch.result">🎉 You Won!</h2>
@@ -240,10 +239,10 @@
                 const bestPlayer = GameUtils.getHighScorePlayerName(key);
                 const bestTime = localStorage.getItem(key + '_time') || '?';
                 const bestLabel = typeof I18n !== 'undefined' ? I18n.t('game.best') : 'Best';
-                const movesLabel = typeof I18n !== 'undefined' ? I18n.t('game.moves').toLowerCase() : 'moves';
-                const byLabel = typeof I18n !== 'undefined' ? I18n.t('game.by') : 'by';
-                document.getElementById('highScoreDisplay').innerHTML = 
-                    `🏆 ${bestLabel}: ${bestMoves} ${movesLabel} in ${bestTime}s ${byLabel} ${bestPlayer}`;
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('memoryMatch.highScore', { moves: bestMoves, time: bestTime, player: bestPlayer })
+                    : `${bestMoves} moves in ${bestTime}s by ${bestPlayer}`;
+                document.getElementById('highScoreDisplay').innerHTML = `🏆 ${bestLabel}: ${highScoreText}`;
             } else {
                 const bestLabel = typeof I18n !== 'undefined' ? I18n.t('game.best') : 'Best';
                 const movesLabel = typeof I18n !== 'undefined' ? I18n.t('game.moves').toLowerCase() : 'moves';
@@ -372,10 +371,13 @@
         }
         
         function getPreviewTime() {
-            // Preview time in milliseconds based on grade level
-            if (gradeLevel === 'kg') return 5000;      // 5 seconds for KG
-            if (gradeLevel === 'g1-3') return 3500;    // 3.5 seconds for grades 1-3
-            return 2500;                               // 2.5 seconds for grades 3-6
+            // Preview time in milliseconds based on difficulty and grade level
+            if (currentLevel === 'hard') return 10000;   // Hard: always 10 seconds
+            if (currentLevel === 'medium') return 6000;  // Medium: always 6 seconds
+            // Easy level - varies by grade:
+            if (gradeLevel === 'kg') return 10000;       // KG: 10 seconds
+            if (gradeLevel === 'g1-3') return 6000;      // Grades 1-3: 6 seconds
+            return 4000;                                 // Grades 3-6: 4 seconds
         }
         
         function startGame() {
@@ -398,7 +400,8 @@
             
             const previewTime = getPreviewTime();
             const memorizeText = typeof I18n !== 'undefined' ? I18n.t('memoryMatch.memorize') : 'Memorize the cards!';
-            document.getElementById('message').textContent = `${memorizeText} ${previewTime/1000}s...`;
+            const secondsShortLabel = typeof I18n !== 'undefined' ? I18n.t('game.secondsShort') : 's';
+            document.getElementById('message').textContent = `${memorizeText} ${previewTime/1000}${secondsShortLabel}...`;
             
             // Countdown and then hide cards
             let countdown = previewTime / 1000;
@@ -406,7 +409,8 @@
                 countdown--;
                 if (countdown > 0) {
                     const memorizeText = typeof I18n !== 'undefined' ? I18n.t('memoryMatch.memorize') : 'Memorize the cards!';
-                    document.getElementById('message').textContent = `${memorizeText} ${countdown}s...`;
+                    const secondsShortLabel = typeof I18n !== 'undefined' ? I18n.t('game.secondsShort') : 's';
+                    document.getElementById('message').textContent = `${memorizeText} ${countdown}${secondsShortLabel}...`;
                 }
             }, 1000);
             

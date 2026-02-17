@@ -190,7 +190,7 @@
     <div id="gameOver">
         <h2 data-i18n="sortingFun.result">🎉 Great Sorting!</h2>
         <p><span data-i18n="game.score">Score</span>: <span id="finalScore">0</span></p>
-        <p>Time: <span id="finalTime">0</span> seconds</p>
+        <p id="finalTimeText"></p>
         <p id="highScoreMsg"></p>
         <button onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
@@ -199,47 +199,52 @@
     <script>
         const GAME_KEY = 'sortingFun';
         
+        // Helper to get translation
+        function t(key, params) {
+            return typeof I18n !== 'undefined' ? I18n.t(key, params) : key;
+        }
+        
         const categories = [
             {
-                name: 'Animals vs Food',
+                nameKey: 'sortingFun.cat.animalsVsFood',
                 bins: [
-                    { label: 'Animals', icon: '🐾', items: ['🐶', '🐱', '🐰', '🐸', '🦋', '🐼'] },
-                    { label: 'Food', icon: '🍽️', items: ['🍎', '🍕', '🍔', '🍦', '🧁', '🍩'] }
+                    { labelKey: 'sortingFun.bin.animals', icon: '🐾', items: ['🐶', '🐱', '🐰', '🐸', '🦋', '🐼'] },
+                    { labelKey: 'sortingFun.bin.food', icon: '🍽️', items: ['🍎', '🍕', '🍔', '🍦', '🧁', '🍩'] }
                 ]
             },
             {
-                name: 'Land vs Water',
+                nameKey: 'sortingFun.cat.landVsWater',
                 bins: [
-                    { label: 'Land', icon: '🌲', items: ['🐕', '🐈', '🦁', '🐘', '🐿️', '🦔'] },
-                    { label: 'Water', icon: '🌊', items: ['🐠', '🐙', '🦈', '🐳', '🦀', '🐬'] }
+                    { labelKey: 'sortingFun.bin.land', icon: '🌲', items: ['🐕', '🐈', '🦁', '🐘', '🐿️', '🦔'] },
+                    { labelKey: 'sortingFun.bin.water', icon: '🌊', items: ['🐠', '🐙', '🦈', '🐳', '🦀', '🐬'] }
                 ]
             },
             {
-                name: 'Fruits vs Vegetables',
+                nameKey: 'sortingFun.cat.fruitsVsVegetables',
                 bins: [
-                    { label: 'Fruits', icon: '🍇', items: ['🍎', '🍌', '🍊', '🍓', '🍑', '🥝'] },
-                    { label: 'Vegetables', icon: '🥬', items: ['🥕', '🥦', '🌽', '🍆', '🥒', '🫑'] }
+                    { labelKey: 'sortingFun.bin.fruits', icon: '🍇', items: ['🍎', '🍌', '🍊', '🍓', '🍑', '🥝'] },
+                    { labelKey: 'sortingFun.bin.vegetables', icon: '🥬', items: ['🥕', '🥦', '🌽', '🍆', '🥒', '🫑'] }
                 ]
             },
             {
-                name: 'Hot vs Cold',
+                nameKey: 'sortingFun.cat.hotVsCold',
                 bins: [
-                    { label: 'Hot', icon: '🔥', items: ['☀️', '🌶️', '🍵', '🔥', '🌋', '♨️'] },
-                    { label: 'Cold', icon: '❄️', items: ['❄️', '⛄', '🧊', '🍦', '🥶', '🌨️'] }
+                    { labelKey: 'sortingFun.bin.cold', icon: '❄️', items: ['❄️', '⛄', '🧊', '🍦', '🥶', '🌨️'] },
+                    { labelKey: 'sortingFun.bin.hot', icon: '🔥', items: ['☀️', '🌶️', '🍵', '🔥', '🌋', '♨️'] }
                 ]
             },
             {
-                name: 'Sky vs Ground',
+                nameKey: 'sortingFun.cat.skyVsGround',
                 bins: [
-                    { label: 'Sky', icon: '☁️', items: ['✈️', '🦅', '☁️', '⭐', '🌙', '🎈'] },
-                    { label: 'Ground', icon: '🌍', items: ['🚗', '🏠', '🌳', '🐜', '🪨', '🌸'] }
+                    { labelKey: 'sortingFun.bin.sky', icon: '☁️', items: ['✈️', '🦅', '☁️', '⭐', '🌙', '🎈'] },
+                    { labelKey: 'sortingFun.bin.ground', icon: '🌍', items: ['🚗', '🏠', '🌳', '🐜', '🪨', '🌸'] }
                 ]
             },
             {
-                name: 'Day vs Night',
+                nameKey: 'sortingFun.cat.dayVsNight',
                 bins: [
-                    { label: 'Day', icon: '☀️', items: ['☀️', '🌤️', '☁️', '🦋', '🐝', '🌻'] },
-                    { label: 'Night', icon: '🌙', items: ['🌙', '⭐', '🦉', '🦇', '🌃', '🔦'] }
+                    { labelKey: 'sortingFun.bin.day', icon: '☀️', items: ['☀️', '🌤️', '☁️', '🦋', '🐝', '🌻'] },
+                    { labelKey: 'sortingFun.bin.night', icon: '🌙', items: ['🌙', '⭐', '🦉', '🦇', '🌃', '🔦'] }
                 ]
             }
         ];
@@ -307,7 +312,7 @@
             const availableCategories = gradeCategories.filter(c => c !== currentCategory);
             currentCategory = availableCategories[Math.floor(Math.random() * availableCategories.length)];
             
-            document.getElementById('categoryName').textContent = currentCategory.name;
+            document.getElementById('categoryName').textContent = t(currentCategory.nameKey);
             
             // Setup bins
             const binsContainer = document.getElementById('binsContainer');
@@ -319,7 +324,7 @@
                 bin.dataset.binIndex = index;
                 bin.innerHTML = `
                     <div class="bin-icon">${binData.icon}</div>
-                    <div class="bin-label">${binData.label}</div>
+                    <div class="bin-label">${t(binData.labelKey)}</div>
                     <div class="bin-items" id="binItems${index}"></div>
                 `;
                 
@@ -511,7 +516,7 @@
             loadHighScore();
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalTime').textContent = timeElapsed;
+            document.getElementById('finalTimeText').textContent = t('sortingFun.timeResult', { time: timeElapsed });
             
             const highMsg = document.getElementById('highScoreMsg');
             if (isNewHigh) {
