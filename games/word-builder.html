@@ -199,26 +199,27 @@
     <div class="letter-bank" id="letterBank"></div>
     
     <div class="controls">
-        <button class="btn btn-clear" id="clearBtn">Clear</button>
-        <button class="btn btn-check" id="checkBtn">Check ✓</button>
+        <button class="btn btn-clear" id="clearBtn" data-i18n="wordBuilder.clear">Clear</button>
+        <button class="btn btn-check" id="checkBtn" data-i18n="wordBuilder.check">Check ✓</button>
     </div>
     
     <p class="hint-text" data-i18n="wordBuilder.hint">Tap letters to spell the word! Spell 10 words to win!</p>
     <p class="hint-text" id="bestScoreDisplay">🏆 Best: --</p>
     
     <div id="gameOver" class="light-theme">
-        <h2 data-i18n="wordBuilder.result">🎉 Amazing!</h2>
+        <h2 id="resultTitle">🎉 Amazing!</h2>
         <p id="playerDisplay"></p>
-        <p>Final Score: <span id="finalScore">0</span></p>
-        <p>🏆 High Score: <span id="highScore">0</span></p>
-        <p>Words Spelled: <span id="wordsCount">0</span>/10</p>
+        <p><span data-i18n="game.finalScoreLabel">Final Score</span>: <span id="finalScore">0</span></p>
+        <p>🏆 <span data-i18n="game.best">High Score</span>: <span id="highScore">0</span></p>
+        <p><span data-i18n="wordBuilder.wordsSpelled">Words Spelled</span>: <span id="wordsCount">0</span>/10</p>
         <button class="btn btn-start" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
-        <a href="../index.html" class="home-link">← Back to Home</a>
+        <a href="../index.html" class="home-link" data-i18n="btn.back">← Back to Home</a>
     </div>
 
     <script src="../js/game-utils.js"></script>
     <script>
-        const words = [
+        // English words
+        const wordsEn = [
             // Level 1: 3-letter words
             { word: 'cat', emoji: '🐱' },
             { word: 'dog', emoji: '🐕' },
@@ -254,6 +255,51 @@
             { word: 'heart', emoji: '❤️' },
         ];
         
+        // Arabic words (كلمات عربية)
+        const wordsAr = [
+            // المستوى ١: كلمات من ٣ حروف
+            { word: 'قطة', emoji: '🐱' },
+            { word: 'كلب', emoji: '🐕' },
+            { word: 'شمس', emoji: '☀️' },
+            { word: 'باب', emoji: '🚪' },
+            { word: 'قمر', emoji: '🌙' },
+            { word: 'بيت', emoji: '🏠' },
+            { word: 'نجم', emoji: '⭐' },
+            { word: 'ماء', emoji: '💧' },
+            { word: 'ولد', emoji: '👦' },
+            { word: 'بنت', emoji: '👧' },
+            // المستوى ٢: كلمات من ٤ حروف
+            { word: 'سمكة', emoji: '🐟' },
+            { word: 'وردة', emoji: '🌹' },
+            { word: 'تفاحة', emoji: '🍎' },
+            { word: 'موزة', emoji: '🍌' },
+            { word: 'كتاب', emoji: '📖' },
+            { word: 'قلعة', emoji: '🏰' },
+            { word: 'طائر', emoji: '🐦' },
+            { word: 'شجرة', emoji: '🌳' },
+            { word: 'زهرة', emoji: '🌸' },
+            { word: 'بطة', emoji: '🦆' },
+            { word: 'أسد', emoji: '🦁' },
+            // المستوى ٣: كلمات من ٥+ حروف
+            { word: 'سيارة', emoji: '🚗' },
+            { word: 'فراشة', emoji: '🦋' },
+            { word: 'طائرة', emoji: '✈️' },
+            { word: 'مدرسة', emoji: '🏫' },
+            { word: 'حديقة', emoji: '🌷' },
+            { word: 'دراجة', emoji: '🚲' },
+            { word: 'عصفور', emoji: '🐦' },
+            { word: 'ساعة', emoji: '⏰' },
+            { word: 'كرسي', emoji: '🪑' },
+            { word: 'قطار', emoji: '🚂' },
+            { word: 'حصان', emoji: '🐴' },
+        ];
+        
+        // Get words based on current language
+        function getWords() {
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            return lang === 'ar' ? wordsAr : wordsEn;
+        }
+        
         let score = 0;
         let level = 1;
         let lives = 3;
@@ -278,19 +324,26 @@
         const gameOverEl = document.getElementById('gameOver');
         
         function getWordsByLevel(lvl) {
+            const words = getWords();
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            
+            // For Arabic, use different length thresholds
+            const shortLen = lang === 'ar' ? 3 : 3;
+            const medLen = lang === 'ar' ? 4 : 4;
+            
             // Adjust available word lengths based on grade
             if (gradeLevel === 'kg') {
-                // KG: Only 3-letter words
-                return words.filter(w => w.word.length === 3);
+                // KG: Only short words
+                return words.filter(w => w.word.length <= shortLen);
             } else if (gradeLevel === 'g1-3') {
-                // Grade 1-3: 3 and 4 letter words
-                if (lvl <= 3) return words.filter(w => w.word.length === 3);
-                return words.filter(w => w.word.length === 4);
+                // Grade 1-3: Short and medium words
+                if (lvl <= 3) return words.filter(w => w.word.length <= shortLen);
+                return words.filter(w => w.word.length <= medLen);
             } else {
                 // Grade 3-6: All words, progress faster
-                if (lvl <= 2) return words.filter(w => w.word.length === 3);
-                if (lvl <= 4) return words.filter(w => w.word.length === 4);
-                return words.filter(w => w.word.length === 5);
+                if (lvl <= 2) return words.filter(w => w.word.length <= shortLen);
+                if (lvl <= 4) return words.filter(w => w.word.length <= medLen);
+                return words;
             }
         }
         
@@ -323,12 +376,15 @@
             // Create letter bank (word letters + extra random letters)
             const letters = currentWord.word.split('');
             const extraCount = Math.min(4, 8 - letters.length);
-            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            const alphabet = lang === 'ar' 
+                ? 'أبتثجحخدذرزسشصضطظعغفقكلمنهوي'
+                : 'abcdefghijklmnopqrstuvwxyz';
             
             for (let i = 0; i < extraCount; i++) {
                 let randomLetter;
                 do {
-                    randomLetter = alphabet[Math.floor(Math.random() * 26)];
+                    randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
                 } while (letters.filter(l => l === randomLetter).length >= 2);
                 letters.push(randomLetter);
             }
@@ -450,7 +506,7 @@
         function showSuccess() {
             const msg = document.createElement('div');
             msg.className = 'success-msg';
-            msg.textContent = '⭐ Great! ⭐';
+            msg.textContent = typeof I18n !== 'undefined' ? I18n.t('wordBuilder.great') : '⭐ Great! ⭐';
             document.body.appendChild(msg);
             setTimeout(() => msg.remove(), 800);
         }
@@ -504,17 +560,35 @@
             
             const bestScore = Math.max(score, highScore);
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
             
-            // Update title based on win/lose
-            const titleEl = gameOverEl.querySelector('h2');
-            titleEl.textContent = won ? '🎉 Amazing!' : '😅 Good Try!';
+            // Update title based on win/lose with translation
+            const titleEl = document.getElementById('resultTitle');
+            if (won) {
+                titleEl.textContent = lang === 'ar' ? '🎉 رائع!' : '🎉 Amazing!';
+            } else {
+                titleEl.textContent = lang === 'ar' ? '😅 محاولة جيدة!' : '😅 Good Try!';
+            }
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            
+            // Format high score with translation
+            const byText = lang === 'ar' ? 'بواسطة' : 'by';
+            document.getElementById('highScore').textContent = `${bestScore} ${byText} ${bestPlayer}`;
+            
             document.getElementById('wordsCount').textContent = wordsCompleted;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            
+            // Format player display with translation
+            const gameText = lang === 'ar' ? `لعبة ${playerName}` : `${playerName}'s Game`;
+            document.getElementById('playerDisplay').textContent = gameText;
+            
             gameOverEl.style.display = 'block';
             loadHighScore();
+            
+            // Re-translate page elements
+            if (typeof I18n !== 'undefined') {
+                I18n.translatePage();
+            }
         }
         
         // Keyboard support

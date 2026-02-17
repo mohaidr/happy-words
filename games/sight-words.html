@@ -36,6 +36,7 @@
             height: 420px;
             margin-bottom: 15px;
             padding: 30px;
+            background-color: transparent;
 
         }
         
@@ -59,7 +60,7 @@
         
         .word-card.target,
         .word-card.distractor {
-            background: linear-gradient(145deg, #fff, #f0f0f0);
+            background: linear-gradient(145deg, #ffffff, #b6b6b6);
             color: #2d3436;
         }
         
@@ -157,8 +158,8 @@
 
     <script src="../js/game-utils.js"></script>
     <script>
-        // Common sight words for 2nd graders (Dolch + Fry words)
-        const sightWords = [
+        // English sight words (Dolch + Fry words)
+        const sightWordsEn = [
             // Pre-primer & Primer
             'the', 'and', 'a', 'to', 'is', 'you', 'it', 'in', 'was', 'he',
             'she', 'for', 'on', 'are', 'as', 'with', 'his', 'they', 'at', 'be',
@@ -171,6 +172,26 @@
             'see', 'no', 'way', 'could', 'my', 'than', 'first', 'been', 'call', 'who',
             'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may',
         ];
+        
+        // Arabic sight words (كلمات بصرية عربية)
+        const sightWordsAr = [
+            // الكلمات الأساسية
+            'هذا', 'هذه', 'أنا', 'أنت', 'هو', 'هي', 'نحن', 'هم', 'في', 'على',
+            'من', 'إلى', 'مع', 'عن', 'كان', 'كانت', 'هل', 'ما', 'ماذا', 'أين',
+            'متى', 'كيف', 'لماذا', 'نعم', 'لا', 'كل', 'بعض', 'كثير', 'قليل', 'واحد',
+            'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'يوم', 'ليلة', 'صباح', 'مساء', 'الآن', 'بعد',
+            // كلمات إضافية
+            'قال', 'ذهب', 'جاء', 'رأى', 'أكل', 'شرب', 'نام', 'لعب', 'قرأ', 'كتب',
+            'بيت', 'مدرسة', 'كتاب', 'قلم', 'باب', 'شمس', 'قمر', 'ماء', 'طعام', 'أم',
+            'أب', 'أخ', 'أخت', 'صديق', 'معلم', 'ولد', 'بنت', 'طفل', 'كبير', 'صغير',
+            'جميل', 'طيب', 'سعيد', 'حزين', 'جديد', 'قديم', 'أحب', 'أريد', 'يمكن', 'يجب',
+        ];
+        
+        // Get sight words based on current language
+        function getBaseSightWords() {
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            return lang === 'ar' ? sightWordsAr : sightWordsEn;
+        }
         
         let score = 0;
         let level = 1;
@@ -193,11 +214,12 @@
         
         // Grade-filtered sight words
         function getSightWords() {
+            const sightWords = getBaseSightWords();
             if (gradeLevel === 'kg') {
-                // KG: Only the most basic pre-primer words
+                // KG: Only the most basic words
                 return sightWords.slice(0, 20);
             } else if (gradeLevel === 'g1-3') {
-                // Grade 1-3: Pre-primer through primer
+                // Grade 1-3: Basic through intermediate
                 return sightWords.slice(0, 44);
             }
             // Grade 3-6: All words
@@ -234,7 +256,8 @@
             // Pick target word
             const availableWords = getSightWords();
             targetWord = availableWords[Math.floor(Math.random() * availableWords.length)];
-            targetWordEl.textContent = targetWord.toUpperCase();
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            targetWordEl.textContent = lang === 'ar' ? targetWord : targetWord.toUpperCase();
             
             // Determine count based on level
             targetCount = Math.min(3 + Math.floor(level / 2), 5);
@@ -271,7 +294,7 @@
             wordCards.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = `word-card ${item.isTarget ? 'target' : 'distractor'}`;
-                card.textContent = item.word.toUpperCase();
+                card.textContent = lang === 'ar' ? item.word : item.word.toUpperCase();
                 
                 const col = index % cols;
                 const row = Math.floor(index / cols);

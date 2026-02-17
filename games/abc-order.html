@@ -44,17 +44,18 @@
             width: 100%;
         }
         
-        .answer-slots {
+        .answer-slots 
+        {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
             min-height: 70px;
             padding: 15px;
-            background: rgba(255,255,255,0.2);
+            background: rgb(225 222 219);
             border-radius: 20px;
             width: 100%;
-            border: 3px dashed rgba(255,255,255,0.5);
+            border: 3px dashed rgb(12 12 12 / 50%);
         }
         
         .letter-tile {
@@ -80,7 +81,7 @@
             min-width: 55px;
             padding: 12px 18px;
             height: 48px;
-            background: rgba(255,255,255,0.3);
+            background: rgb(255, 255, 255);
             border-radius: 12px;
             border: 2px dashed rgba(255,255,255,0.5);
             display: flex;
@@ -160,7 +161,7 @@
         
         <div class="letters-pool" id="lettersPool"></div>
         
-        <button class="check-btn" id="checkBtn" onclick="checkAnswer()">Check Order ✓</button>
+        <button class="check-btn" id="checkBtn" onclick="checkAnswer()" data-i18n="abcOrder.checkOrder">✓ Check Order</button>
     </div>
     
     <div id="gameOver">
@@ -194,8 +195,9 @@
         const checkBtn = document.getElementById('checkBtn');
         const feedbackEl = document.getElementById('feedback');
         
-        // Simple words for different levels
-        const simpleWords = [
+        // English letters and words
+        const englishLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        const simpleWordsEn = [
             ['cat', 'dog', 'ant'],
             ['ball', 'cup', 'doll'],
             ['egg', 'fish', 'goat'],
@@ -208,19 +210,38 @@
             ['door', 'elephant', 'frog'],
         ];
         
+        // Arabic letters (الحروف العربية بالترتيب)
+        const arabicLetters = ['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'هـ', 'و', 'ي'];
+        const simpleWordsAr = [
+            ['أسد', 'باب', 'تفاحة'],
+            ['جمل', 'حصان', 'خروف'],
+            ['دب', 'ذئب', 'رجل'],
+            ['زرافة', 'سمك', 'شمس'],
+            ['صقر', 'ضفدع', 'طائر'],
+            ['عين', 'غزال', 'فيل'],
+            ['قطة', 'كلب', 'لعبة'],
+            ['موز', 'نجمة', 'هدية'],
+            ['ورد', 'يد', 'أرنب'],
+            ['بطة', 'ثعلب', 'جبل'],
+        ];
+        
         function getItems() {
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            const letters = lang === 'ar' ? arabicLetters : englishLetters;
+            const simpleWords = lang === 'ar' ? simpleWordsAr : simpleWordsEn;
+            
             if (gradeLevel === 'kg') {
                 // Just letters for KG
                 const count = 3 + Math.floor(level / 3);
-                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-                const start = Math.floor(Math.random() * (26 - count));
+                const maxStart = letters.length - count;
+                const start = Math.floor(Math.random() * Math.max(1, maxStart));
                 return letters.slice(start, start + Math.min(count, 5));
             } else if (gradeLevel === 'g1-3') {
                 // Mix of letters and simple words
                 if (level <= 3) {
                     const count = 3 + Math.floor(level / 2);
-                    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-                    const start = Math.floor(Math.random() * (26 - count));
+                    const maxStart = letters.length - count;
+                    const start = Math.floor(Math.random() * Math.max(1, maxStart));
                     return letters.slice(start, start + Math.min(count, 5));
                 } else {
                     return simpleWords[Math.floor(Math.random() * simpleWords.length)].slice(0, 3 + Math.floor(level / 3));
@@ -237,9 +258,21 @@
             userOrder = [];
             
             currentItems = getItems();
-            correctOrder = [...currentItems].sort((a, b) => 
-                a.toLowerCase().localeCompare(b.toLowerCase())
-            );
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            // Sort using appropriate locale
+            correctOrder = [...currentItems].sort((a, b) => {
+                if (lang === 'ar') {
+                    // For Arabic, use the arabicLetters array order for letters
+                    const aIdx = arabicLetters.indexOf(a);
+                    const bIdx = arabicLetters.indexOf(b);
+                    if (aIdx !== -1 && bIdx !== -1) {
+                        return aIdx - bIdx;
+                    }
+                    // For words, use Arabic locale
+                    return a.localeCompare(b, 'ar');
+                }
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
             
             // Shuffle for display
             const shuffled = [...currentItems].sort(() => Math.random() - 0.5);
@@ -339,7 +372,7 @@
             
             if (isCorrect) {
                 slotTiles.forEach(t => t.classList.add('correct'));
-                feedbackEl.textContent = '✅ Perfect ABC order!';
+                feedbackEl.textContent = typeof I18n !== 'undefined' ? I18n.t('abcOrder.perfect') : '✅ Perfect ABC order!';
                 score += 10 * level;
                 questionsAnswered++;
                 GameUtils.playSound('correct');
@@ -362,7 +395,8 @@
                     }
                 });
                 
-                feedbackEl.textContent = '❌ Try again! Correct: ' + correctOrder.join(' → ');
+                const tryAgainText = typeof I18n !== 'undefined' ? I18n.t('abcOrder.tryAgain') : '❌ Try again! Correct:';
+                feedbackEl.textContent = tryAgainText + ' ' + correctOrder.join(' → ');
                 lives--;
                 document.getElementById('lives').textContent = lives;
                 GameUtils.playSound('wrong');

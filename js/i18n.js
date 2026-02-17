@@ -450,19 +450,24 @@ const I18n = {
 
             // Rhyme Time Game
             "rhymeTime.title": "🎵 Rhyme Time",
-            "rhymeTime.instruction": "Find words that rhyme with {word}!",
+            "rhymeTime.instruction": "Find the word that rhymes with:",
             "rhymeTime.result": "🎵 Great Rhyming!",
 
             // ABC Order Game
             "abcOrder.title": "🔤 ABC Order",
             "abcOrder.instruction": "Put the letters in order!",
+            "abcOrder.checkOrder": "✓ Check Order",
             "abcOrder.result": "🔤 Great Ordering!",
+            "abcOrder.perfect": "✅ Perfect ABC order!",
+            "abcOrder.tryAgain": "❌ Try again! Correct:",
 
             // Word Builder Game
             "wordBuilder.title": "🧱 Word Builder",
             "wordBuilder.instruction": "Build the word!",
             "wordBuilder.hint": "Hint",
             "wordBuilder.result": "🧱 Great Building!",
+            "wordBuilder.great": "⭐ Great! ⭐",
+            "wordBuilder.wordsSpelled": "Words Spelled",
 
             // Opposite Match Game
             "oppositeMatch.title": "↔️ Opposite Match",
@@ -990,19 +995,24 @@ const I18n = {
 
             // Rhyme Time Game (لعبة القافية)
             "rhymeTime.title": "🎵 وقت القافية",
-            "rhymeTime.instruction": "ابحث عن كلمات تقافي {word}!",
+            "rhymeTime.instruction": "ابحث عن الكلمة التي تقافي:",
             "rhymeTime.result": "🎵 قافية رائعة!",
 
             // ABC Order Game (لعبة ترتيب الحروف)
             "abcOrder.title": "🔤 ترتيب الحروف",
             "abcOrder.instruction": "رتب الحروف بالترتيب!",
+            "abcOrder.checkOrder": "✓ تحقق من الترتيب",
             "abcOrder.result": "🔤 ترتيب رائع!",
+            "abcOrder.perfect": "✅ ترتيب مثالي!",
+            "abcOrder.tryAgain": "❌ حاول مرة أخرى! الترتيب الصحيح:",
 
             // Word Builder Game (لعبة بناء الكلمات)
             "wordBuilder.title": "🧱 بناء الكلمات",
             "wordBuilder.instruction": "ابنِ الكلمة!",
             "wordBuilder.hint": "تلميح",
             "wordBuilder.result": "🧱 بناء رائع!",
+            "wordBuilder.great": "⭐ رائع! ⭐",
+            "wordBuilder.wordsSpelled": "الكلمات",
 
             // Opposite Match Game (لعبة الأضداد)
             "oppositeMatch.title": "↔️ مطابقة الأضداد",
