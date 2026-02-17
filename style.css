@@ -417,6 +417,46 @@ footer {
     box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
 }
 
+/* Gender Selector */
+.gender-label {
+    display: block;
+    font-size: 1.3rem;
+    margin-top: 15px;
+    margin-bottom: 8px;
+}
+
+.gender-selector {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.gender-btn {
+    background: rgba(118, 75, 162, 0.1);
+    border: 2px solid #764ba2;
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 500;
+    color: #764ba2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gender-btn:hover {
+    background: rgba(118, 75, 162, 0.2);
+    transform: scale(1.05);
+}
+
+.gender-btn.active {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+}
+
 .hidden {
     display: none !important;
 }

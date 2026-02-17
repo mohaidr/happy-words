@@ -41,6 +41,12 @@
                 <label for="studentName" data-i18n="onboarding.askName">What's your name? 😊</label>
                 <input type="text" id="studentName" data-i18n-placeholder="onboarding.namePlaceholder" placeholder="Type your name here..." maxlength="20">
                 
+                <label class="gender-label" data-i18n="onboarding.askGender">Are you a boy or a girl? 👦👧</label>
+                <div class="gender-selector">
+                    <button class="gender-btn" data-gender="m" onclick="selectGender('m')" data-i18n="onboarding.boy">👦 Boy</button>
+                    <button class="gender-btn" data-gender="f" onclick="selectGender('f')" data-i18n="onboarding.girl">👧 Girl</button>
+                </div>
+                
                 <label for="gradeLevel" class="grade-label" data-i18n="onboarding.askGrade">What grade are you in? 📚</label>
                 <div class="grade-selector">
                     <button class="grade-btn active" data-grade="kg" onclick="selectGrade('kg')" data-i18n="onboarding.gradeKG">🌟 KG</button>

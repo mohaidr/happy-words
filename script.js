@@ -179,7 +179,8 @@ function getMessageText(message, messageIndex) {
     const key = msgKeys[messageIndex];
     // Use I18n translation if available, otherwise fall back to English word
     if (typeof I18n !== 'undefined' && I18n.translations && I18n.translations[key]) {
-        return I18n.t(key, { name: studentName });
+        // Use tGender for gender-aware Arabic translations
+        return I18n.tGender(key, { name: studentName });
     }
     return message.word.replace('{name}', studentName);
 }
@@ -366,6 +367,15 @@ function selectGrade(grade) {
     });
 }
 
+let currentGender = localStorage.getItem('happyWordsGender') || 'm';
+
+function selectGender(gender) {
+    currentGender = gender;
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.gender === gender);
+    });
+}
+
 function startApp() {
     const nameInput = document.getElementById('studentName');
     const nameContainer = document.getElementById('nameContainer');
@@ -380,6 +390,7 @@ function startApp() {
     // Save player name for games to use
     localStorage.setItem('happyWordsPlayerName', studentName);
     localStorage.setItem('happyWordsGradeLevel', currentGrade);
+    localStorage.setItem('happyWordsGender', currentGender);
 
     // Hide name input, show the main app
     nameContainer.classList.add('hidden');
@@ -849,6 +860,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user already has a name saved - auto-login
     const savedName = localStorage.getItem('happyWordsPlayerName');
     const savedGrade = localStorage.getItem('happyWordsGradeLevel');
+    const savedGender = localStorage.getItem('happyWordsGender');
+    
+    // Initialize gender button state
+    if (savedGender) {
+        currentGender = savedGender;
+        document.querySelectorAll('.gender-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.gender === savedGender);
+        });
+    } else {
+        // Default to male if no saved gender
+        document.querySelectorAll('.gender-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.gender === 'm');
+        });
+    }
     
     if (savedName) {
         // Pre-fill the name input

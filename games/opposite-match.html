@@ -127,9 +127,9 @@
     <div id="gameOver">
         <h2 data-i18n="oppositeMatch.result">🎉 Great Job!</h2>
         <p id="playerDisplay"></p>
-        <p>Final Score: <span id="finalScore">0</span></p>
-        <p>🏆 High Score: <span id="highScore">0</span></p>
-        <p>Best Streak: <span id="bestStreak">0</span></p>
+        <p><span data-i18n="game.finalScoreLabel">Final Score</span>: <span id="finalScore">0</span></p>
+        <p>🏆 <span data-i18n="game.highScore">High Score</span>: <span id="highScore">0</span></p>
+        <p><span data-i18n="game.bestStreak">Best Streak</span>: <span id="bestStreak">0</span></p>
         <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
         <a href="../index.html" class="home-link">← Back to Home</a>
     </div>
@@ -304,7 +304,8 @@
                 if (streak >= 3) {
                     streakBonus.classList.add('hot');
                 }
-                streakBonus.textContent = `🔥 Streak: ${streak}`;
+                const streakLabel = typeof I18n !== 'undefined' ? I18n.t('game.streak') : 'Streak';
+                streakBonus.textContent = `🔥 ${streakLabel}: ${streak}`;
                 
                 if (streak > bestStreak) bestStreak = streak;
                 
@@ -327,7 +328,8 @@
                 
                 streak = 0;
                 streakBonus.classList.remove('hot');
-                streakBonus.textContent = `🔥 Streak: 0`;
+                const streakLabel = typeof I18n !== 'undefined' ? I18n.t('game.streak') : 'Streak';
+                streakBonus.textContent = `🔥 ${streakLabel}: 0`;
                 
                 lives--;
                 document.getElementById('lives').textContent = lives;
@@ -360,7 +362,8 @@
             document.getElementById('score').textContent = score;
             document.getElementById('level').textContent = level;
             document.getElementById('lives').textContent = lives;
-            streakBonus.textContent = '🔥 Streak: 0';
+            const streakLabelInit = typeof I18n !== 'undefined' ? I18n.t('game.streak') : 'Streak';
+            streakBonus.textContent = `🔥 ${streakLabelInit}: 0`;
             streakBonus.classList.remove('hot');
             document.getElementById('gameOver').style.display = 'none';
             
