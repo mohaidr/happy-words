@@ -188,7 +188,7 @@
     
     <div class="stats">
         <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
-        <div>📝 <span id="progress">1</span>/10</div>
+        <div>📝 <span id="progress">1</span>/15</div>
         <div>❤️ <span id="lives">3</span></div>
     </div>
     
@@ -203,7 +203,7 @@
         <button class="btn btn-check" id="checkBtn" data-i18n="wordBuilder.check">Check ✓</button>
     </div>
     
-    <p class="hint-text" data-i18n="wordBuilder.hint">Tap letters to spell the word! Spell 10 words to win!</p>
+    <p class="hint-text" data-i18n="wordBuilder.hint">Tap letters to spell the word! Spell 15 words to win!</p>
     <p class="hint-text" id="bestScoreDisplay">🏆 Best: --</p>
     
     <div id="gameOver" class="light-theme">
@@ -211,16 +211,16 @@
         <p id="playerDisplay"></p>
         <p><span data-i18n="game.finalScoreLabel">Final Score</span>: <span id="finalScore">0</span></p>
         <p>🏆 <span data-i18n="game.best">High Score</span>: <span id="highScore">0</span></p>
-        <p><span data-i18n="wordBuilder.wordsSpelled">Words Spelled</span>: <span id="wordsCount">0</span>/10</p>
+        <p><span data-i18n="wordBuilder.wordsSpelled">Words Spelled</span>: <span id="wordsCount">0</span>/15</p>
         <button class="btn btn-start" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
         <a href="../index.html" class="home-link" data-i18n="btn.back">← Back to Home</a>
     </div>
 
     <script src="../js/game-utils.js"></script>
     <script>
-        // English words
+        // English words - 100 words
         const wordsEn = [
-            // Level 1: 3-letter words
+            // Level 1: 3-letter words (35 words)
             { word: 'cat', emoji: '🐱' },
             { word: 'dog', emoji: '🐕' },
             { word: 'sun', emoji: '☀️' },
@@ -231,7 +231,32 @@
             { word: 'car', emoji: '🚗' },
             { word: 'egg', emoji: '🥚' },
             { word: 'ant', emoji: '🐜' },
-            // Level 2: 4-letter words
+            { word: 'bee', emoji: '🐝' },
+            { word: 'cow', emoji: '🐄' },
+            { word: 'pig', emoji: '🐷' },
+            { word: 'owl', emoji: '🦉' },
+            { word: 'bat', emoji: '🦇' },
+            { word: 'fox', emoji: '🦊' },
+            { word: 'box', emoji: '📦' },
+            { word: 'key', emoji: '🔑' },
+            { word: 'pen', emoji: '🖊️' },
+            { word: 'eye', emoji: '👁️' },
+            { word: 'ear', emoji: '👂' },
+            { word: 'leg', emoji: '🦵' },
+            { word: 'ice', emoji: '🧊' },
+            { word: 'pie', emoji: '🥧' },
+            { word: 'jar', emoji: '🫙' },
+            { word: 'nut', emoji: '🥜' },
+            { word: 'boy', emoji: '👦' },
+            { word: 'mom', emoji: '👩' },
+            { word: 'dad', emoji: '👨' },
+            { word: 'toy', emoji: '🧸' },
+            { word: 'bug', emoji: '🐞' },
+            { word: 'hen', emoji: '🐔' },
+            { word: 'map', emoji: '🗺️' },
+            { word: 'net', emoji: '🥅' },
+            { word: 'pot', emoji: '🍲' },
+            // Level 2: 4-letter words (35 words)
             { word: 'fish', emoji: '🐟' },
             { word: 'bird', emoji: '🐦' },
             { word: 'tree', emoji: '🌳' },
@@ -242,7 +267,32 @@
             { word: 'frog', emoji: '🐸' },
             { word: 'duck', emoji: '🦆' },
             { word: 'lion', emoji: '🦁' },
-            // Level 3: 5-letter words
+            { word: 'bear', emoji: '🐻' },
+            { word: 'deer', emoji: '🦌' },
+            { word: 'goat', emoji: '🐐' },
+            { word: 'lamb', emoji: '🐑' },
+            { word: 'crab', emoji: '🦀' },
+            { word: 'snail', emoji: '🐌' },
+            { word: 'ball', emoji: '⚽' },
+            { word: 'bell', emoji: '🔔' },
+            { word: 'gift', emoji: '🎁' },
+            { word: 'kite', emoji: '🪁' },
+            { word: 'boat', emoji: '⛵' },
+            { word: 'ship', emoji: '🚢' },
+            { word: 'bike', emoji: '🚲' },
+            { word: 'door', emoji: '🚪' },
+            { word: 'lamp', emoji: '💡' },
+            { word: 'milk', emoji: '🥛' },
+            { word: 'corn', emoji: '🌽' },
+            { word: 'pear', emoji: '🍐' },
+            { word: 'sock', emoji: '🧦' },
+            { word: 'rain', emoji: '🌧️' },
+            { word: 'snow', emoji: '❄️' },
+            { word: 'fire', emoji: '🔥' },
+            { word: 'leaf', emoji: '🍃' },
+            { word: 'rose', emoji: '🌹' },
+            { word: 'hand', emoji: '✋' },
+            // Level 3: 5+ letter words (30 words)
             { word: 'apple', emoji: '🍎' },
             { word: 'house', emoji: '🏠' },
             { word: 'train', emoji: '🚂' },
@@ -253,11 +303,32 @@
             { word: 'beach', emoji: '🏖️' },
             { word: 'robot', emoji: '🤖' },
             { word: 'heart', emoji: '❤️' },
+            { word: 'tiger', emoji: '🐯' },
+            { word: 'zebra', emoji: '🦓' },
+            { word: 'whale', emoji: '🐋' },
+            { word: 'shark', emoji: '🦈' },
+            { word: 'snake', emoji: '🐍' },
+            { word: 'turtle', emoji: '🐢' },
+            { word: 'rabbit', emoji: '🐰' },
+            { word: 'monkey', emoji: '🐵' },
+            { word: 'giraffe', emoji: '🦒' },
+            { word: 'dolphin', emoji: '🐬' },
+            { word: 'orange', emoji: '🍊' },
+            { word: 'banana', emoji: '🍌' },
+            { word: 'grapes', emoji: '🍇' },
+            { word: 'carrot', emoji: '🥕' },
+            { word: 'tomato', emoji: '🍅' },
+            { word: 'cheese', emoji: '🧀' },
+            { word: 'bread', emoji: '🍞' },
+            { word: 'phone', emoji: '📱' },
+            { word: 'camera', emoji: '📷' },
+            { word: 'school', emoji: '🏫' },
+            { word: 'clock', emoji: '⏰' },
         ];
         
-        // Arabic words (كلمات عربية)
+        // Arabic words (كلمات عربية) - 100 كلمة
         const wordsAr = [
-            // المستوى ١: كلمات من ٣ حروف
+            // المستوى ١: كلمات من ٣ حروف (35 كلمة)
             { word: 'قطة', emoji: '🐱' },
             { word: 'كلب', emoji: '🐕' },
             { word: 'شمس', emoji: '☀️' },
@@ -268,7 +339,32 @@
             { word: 'ماء', emoji: '💧' },
             { word: 'ولد', emoji: '👦' },
             { word: 'بنت', emoji: '👧' },
-            // المستوى ٢: كلمات من ٤ حروف
+            { word: 'أم', emoji: '👩' },
+            { word: 'أب', emoji: '👨' },
+            { word: 'يد', emoji: '✋' },
+            { word: 'عين', emoji: '👁️' },
+            { word: 'أنف', emoji: '👃' },
+            { word: 'فم', emoji: '👄' },
+            { word: 'أذن', emoji: '👂' },
+            { word: 'قدم', emoji: '🦶' },
+            { word: 'خبز', emoji: '🍞' },
+            { word: 'جبن', emoji: '🧀' },
+            { word: 'بيض', emoji: '🥚' },
+            { word: 'حب', emoji: '❤️' },
+            { word: 'نار', emoji: '🔥' },
+            { word: 'ثلج', emoji: '❄️' },
+            { word: 'مطر', emoji: '🌧️' },
+            { word: 'برق', emoji: '⚡' },
+            { word: 'بحر', emoji: '🌊' },
+            { word: 'جبل', emoji: '⛰️' },
+            { word: 'نهر', emoji: '🏞️' },
+            { word: 'دبدوب', emoji: '🧸' },
+            { word: 'قبعة', emoji: '🧢' },
+            { word: 'جد', emoji: '👴' },
+            { word: 'جدة', emoji: '👵' },
+            { word: 'طفل', emoji: '👶' },
+            { word: 'كرة', emoji: '⚽' },
+            // المستوى ٢: كلمات من ٤ حروف (35 كلمة)
             { word: 'سمكة', emoji: '🐟' },
             { word: 'وردة', emoji: '🌹' },
             { word: 'تفاحة', emoji: '🍎' },
@@ -280,18 +376,60 @@
             { word: 'زهرة', emoji: '🌸' },
             { word: 'بطة', emoji: '🦆' },
             { word: 'أسد', emoji: '🦁' },
-            // المستوى ٣: كلمات من ٥+ حروف
+            { word: 'فيل', emoji: '🐘' },
+            { word: 'نمر', emoji: '🐯' },
+            { word: 'دب', emoji: '🐻' },
+            { word: 'أرنب', emoji: '🐰' },
+            { word: 'قرد', emoji: '🐵' },
+            { word: 'ثعلب', emoji: '🦊' },
+            { word: 'بقرة', emoji: '🐄' },
+            { word: 'خروف', emoji: '🐑' },
+            { word: 'دجاجة', emoji: '🐔' },
+            { word: 'ديك', emoji: '🐓' },
+            { word: 'حمامة', emoji: '🕊️' },
+            { word: 'نحلة', emoji: '🐝' },
+            { word: 'عنب', emoji: '🍇' },
+            { word: 'برتقالة', emoji: '🍊' },
+            { word: 'ليمون', emoji: '🍋' },
+            { word: 'فراولة', emoji: '🍓' },
+            { word: 'بطيخ', emoji: '🍉' },
+            { word: 'جزرة', emoji: '🥕' },
+            { word: 'طماطم', emoji: '🍅' },
+            { word: 'خيار', emoji: '🥒' },
+            { word: 'بطاطا', emoji: '🥔' },
+            { word: 'ذرة', emoji: '🌽' },
+            { word: 'قلم', emoji: '✏️' },
+            // المستوى ٣: كلمات من ٥+ حروف (30 كلمة)
             { word: 'سيارة', emoji: '🚗' },
             { word: 'فراشة', emoji: '🦋' },
             { word: 'طائرة', emoji: '✈️' },
             { word: 'مدرسة', emoji: '🏫' },
             { word: 'حديقة', emoji: '🌷' },
             { word: 'دراجة', emoji: '🚲' },
-            { word: 'عصفور', emoji: '🐦' },
+            { word: 'عصفور', emoji: '🐤' },
             { word: 'ساعة', emoji: '⏰' },
             { word: 'كرسي', emoji: '🪑' },
             { word: 'قطار', emoji: '🚂' },
             { word: 'حصان', emoji: '🐴' },
+            { word: 'زرافة', emoji: '🦒' },
+            { word: 'تمساح', emoji: '🐊' },
+            { word: 'سلحفاة', emoji: '🐢' },
+            { word: 'دلفين', emoji: '🐬' },
+            { word: 'حوت', emoji: '🐋' },
+            { word: 'أخطبوط', emoji: '🐙' },
+            { word: 'عنكبوت', emoji: '🕷️' },
+            { word: 'سحابة', emoji: '☁️' },
+            { word: 'نافذة', emoji: '🪟' },
+            { word: 'مظلة', emoji: '☂️' },
+            { word: 'هاتف', emoji: '📱' },
+            { word: 'تلفاز', emoji: '📺' },
+            { word: 'كاميرا', emoji: '📷' },
+            { word: 'حاسوب', emoji: '💻' },
+            { word: 'جرس', emoji: '🔔' },
+            { word: 'شمعة', emoji: '🕯️' },
+            { word: 'مصباح', emoji: '💡' },
+            { word: 'مفتاح', emoji: '🔑' },
+            { word: 'نظارة', emoji: '👓' },
         ];
         
         // Get words based on current language
@@ -356,7 +494,12 @@
             }
             
             const pool = available.length > 0 ? available : getWordsByLevel(level);
-            currentWord = pool[Math.floor(Math.random() * pool.length)];
+            // Shuffle pool using Fisher-Yates algorithm for true randomness
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            currentWord = pool[0];
             usedWords.push(currentWord.word);
             currentGuess = [];
             
@@ -465,7 +608,7 @@
                 wordsCompleted++;
                 
                 scoreEl.textContent = score;
-                progressEl.textContent = Math.min(wordsCompleted + 1, 10);
+                progressEl.textContent = Math.min(wordsCompleted + 1, 15);
                 
                 // Play correct sound
                 GameUtils.playSound('correct');
@@ -479,7 +622,7 @@
                 }
                 
                 setTimeout(() => {
-                    if (wordsCompleted >= 10) {
+                    if (wordsCompleted >= 15) {
                         endGame(true);
                     } else {
                         loadNewWord();

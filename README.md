@@ -63,7 +63,7 @@ netlify deploy --prod
 Add more happy messages by editing the `happyMessages` array in `script.js`:
 
 ```javascript
-{ emoji: "�", word: "Your custom message here!" }
+{ emoji: "⭐", word: "Your custom message here!" }
 ```
 
 Made with 💖 for awesome kids!

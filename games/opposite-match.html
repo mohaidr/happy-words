@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../css/games.css">
     <style>
         body {
-            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            background: linear-gradient(135deg, #667eea, #764ba2);
         }
         
         .game-area {
@@ -21,25 +21,29 @@
             gap: 20px;
             max-width: 400px;
             margin: 0 auto;
-            padding: 30px;
+            padding: 20px;
+            background-color: rgb(255 255 255 / 50%);
+            
         }
         
         .word-prompt {
-            background: linear-gradient(145deg, #fff, #f0f0f0);
-            padding: 25px 50px;
+            background: linear-gradient(145deg, #fdcb6e, #f39c12);
+            padding: 25px 60px;
             border-radius: 20px;
-            font-size: 36px;
+            font-size: 42px;
             font-weight: bold;
             color: #2d3436;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            min-width: 150px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            min-width: 180px;
             text-align: center;
             display: inline-block;
+            border: 4px solid rgba(255,255,255,0.3);
         }
         
         .question-text {
             font-size: 20px;
-            opacity: 0.9;
+            opacity: 0.95;
+            margin-bottom: 5px;
         }
         
         .answer-grid {
@@ -47,58 +51,71 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             width: 100%;
+            max-width: 350px;
         }
         
         .answer-btn {
-            padding: 20px;
-            font-size: 22px;
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 600;
+            padding: 22px 15px;
+            font-size: 26px;
+            font-family: inherit;
+            font-weight: 700;
             border: none;
             border-radius: 18px;
-            background: linear-gradient(145deg, #fff, #e0e0e0);
-            color: #2d3436;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            min-height: 80px;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            min-height: 85px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
         
+        .answer-btn:nth-child(1) { background: linear-gradient(145deg, #74b9ff, #0984e3); }
+        .answer-btn:nth-child(2) { background: linear-gradient(145deg, #00b894, #00cec9); }
+        .answer-btn:nth-child(3) { background: linear-gradient(145deg, #fd79a8, #e84393); }
+        .answer-btn:nth-child(4) { background: linear-gradient(145deg, #a29bfe, #6c5ce7); }
+        
         .answer-btn:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .answer-btn:active {
+            transform: scale(0.98);
         }
         
         .answer-btn.correct {
-            background: linear-gradient(145deg, #00b894, #00cec9);
-            color: white;
-            animation: pulse 0.5s ease;
+            background: linear-gradient(145deg, #00b894, #00cec9) !important;
+            animation: correctPop 0.4s ease;
         }
         
         .answer-btn.wrong {
-            background: linear-gradient(145deg, #d63031, #e74c3c);
-            color: white;
-            animation: shake 0.3s ease;
+            background: linear-gradient(145deg, #d63031, #e74c3c) !important;
+            animation: shake 0.4s ease;
+        }
+        
+        @keyframes correctPop {
+            50% { transform: scale(1.15); }
         }
         
         .streak-bonus {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 16px;
+            background: rgba(255,255,255,0.25);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
         }
         
         .streak-bonus.hot {
-            background: rgba(255,107,107,0.3);
-            animation: glow 1s ease infinite;
+            background: linear-gradient(145deg, #ff6b6b, #ee5a24);
+            animation: pulse 1s ease infinite;
         }
         
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255,107,107,0.5); }
-            50% { box-shadow: 0 0 20px rgba(255,107,107,0.8); }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
-        #gameOver h2 { color: #a29bfe; }
+        #gameOver h2 { color: #6c5ce7; }
     </style>
 </head>
 <body>
@@ -119,7 +136,7 @@
         
         <p class="question-text" data-i18n="oppositeMatch.instruction">What is the OPPOSITE of...</p>
         
-        <div class="word-prompt" id="wordPrompt">HOT</div>
+        <div class="word-prompt" id="wordPrompt"></div>
         
         <div class="answer-grid" id="answerGrid"></div>
     </div>
@@ -140,7 +157,7 @@
     <script>
         const GAME_KEY = 'oppositeMatch';
         
-        // English opposite pairs by difficulty
+        // English opposite pairs by difficulty (kid-friendly)
         const oppositesEn = {
             easy: [
                 ['hot', 'cold'], ['big', 'small'], ['up', 'down'],
@@ -159,100 +176,88 @@
                 ['before', 'after'], ['above', 'below'], ['buy', 'sell'],
                 ['ask', 'answer'], ['many', 'few'], ['more', 'less'],
                 ['same', 'different'], ['early', 'late'], ['start', 'finish'],
-                ['lost', 'found'], ['hide', 'seek'], ['nice', 'mean'],
-                ['sink', 'float'], ['thin', 'fat'], ['warm', 'cool'],
+                ['lost', 'found'], ['hide', 'seek'], ['nice', 'unkind'],
+                ['sink', 'float'], ['thin', 'thick'], ['warm', 'cool'],
             ],
             medium: [
-                ['brave', 'scared'], ['kind', 'mean'], ['strong', 'weak'],
-                ['sweet', 'sour'], ['rich', 'poor'], ['thick', 'thin'],
+                ['brave', 'scared'], ['kind', 'unkind'], ['strong', 'weak'],
+                ['sweet', 'sour'], ['thick', 'thin'], ['laugh', 'cry'],
                 ['heavy', 'light'], ['rough', 'smooth'], ['sharp', 'dull'],
                 ['deep', 'shallow'], ['wide', 'narrow'], ['loose', 'tight'],
                 ['wild', 'tame'], ['asleep', 'awake'], ['begin', 'end'],
-                ['love', 'hate'], ['laugh', 'cry'], ['win', 'lose'],
-                ['remember', 'forget'], ['true', 'false'], ['give', 'take'],
-                ['friend', 'enemy'], ['peace', 'war'], ['safe', 'dangerous'],
-                ['quiet', 'noisy'], ['bright', 'dim'], ['wise', 'foolish'],
-                ['clever', 'dumb'], ['honest', 'dishonest'], ['calm', 'angry'],
-                ['tidy', 'messy'], ['lazy', 'busy'], ['proud', 'ashamed'],
-                ['fancy', 'plain'], ['fresh', 'stale'], ['ripe', 'unripe'],
-                ['whole', 'broken'], ['real', 'fake'], ['common', 'rare'],
-                ['cheap', 'expensive'], ['easy', 'hard'], ['simple', 'complex'],
-                ['boring', 'fun'], ['gentle', 'rough'], ['major', 'minor'],
-                ['public', 'private'], ['normal', 'weird'], ['silent', 'loud'],
-                ['polite', 'rude'], ['lucky', 'unlucky'], ['careful', 'careless'],
-                ['useful', 'useless'], ['helpful', 'harmful'], ['possible', 'impossible'],
-                ['visible', 'invisible'], ['legal', 'illegal'], ['active', 'inactive'],
+                ['noisy', 'quiet'], ['win', 'lose'], ['give', 'take'],
+                ['remember', 'forget'], ['true', 'false'], ['calm', 'upset'],
+                ['bright', 'dim'], ['wise', 'silly'], ['tidy', 'messy'],
+                ['lazy', 'busy'], ['proud', 'shy'], ['plain', 'fancy'],
+                ['fresh', 'stale'], ['ripe', 'unripe'], ['whole', 'broken'],
+                ['real', 'fake'], ['common', 'rare'], ['cheap', 'expensive'],
+                ['easy', 'hard'], ['simple', 'complex'], ['boring', 'fun'],
+                ['gentle', 'rough'], ['major', 'minor'], ['public', 'private'],
+                ['normal', 'unusual'], ['silent', 'loud'], ['polite', 'rude'],
+                ['lucky', 'unlucky'], ['careful', 'careless'], ['useful', 'useless'],
+                ['possible', 'impossible'], ['visible', 'invisible'], ['active', 'inactive'],
+                ['indoor', 'outdoor'], ['sunny', 'cloudy'], ['empty', 'crowded'],
             ],
             hard: [
-                ['ancient', 'modern'], ['arrive', 'depart'], ['attack', 'defend'],
-                ['boring', 'exciting'], ['capture', 'release'], ['certain', 'doubtful'],
-                ['combine', 'separate'], ['create', 'destroy'], ['expand', 'shrink'],
-                ['generous', 'selfish'], ['innocent', 'guilty'], ['maximum', 'minimum'],
-                ['permanent', 'temporary'], ['positive', 'negative'], ['polite', 'rude'],
-                ['success', 'failure'], ['accept', 'reject'], ['include', 'exclude'],
-                ['artificial', 'natural'], ['amateur', 'professional'], ['abstract', 'concrete'],
-                ['voluntary', 'mandatory'], ['frequent', 'rare'], ['gradual', 'sudden'],
-                ['humble', 'arrogant'], ['abundant', 'scarce'], ['flexible', 'rigid'],
-                ['transparent', 'opaque'], ['superior', 'inferior'], ['external', 'internal'],
-                ['vertical', 'horizontal'], ['majority', 'minority'], ['offensive', 'defensive'],
-                ['optimistic', 'pessimistic'], ['domestic', 'foreign'], ['urban', 'rural'],
-                ['courage', 'cowardice'], ['victory', 'defeat'], ['increase', 'decrease'],
-                ['complex', 'simple'], ['familiar', 'strange'], ['freedom', 'captivity'],
-                ['harmony', 'conflict'], ['ignorance', 'knowledge'], ['celebrate', 'mourn'],
-                ['confident', 'insecure'], ['advance', 'retreat'], ['approve', 'disapprove'],
-                ['benefit', 'harm'], ['construct', 'demolish'], ['encourage', 'discourage'],
-                ['entrance', 'exit'], ['genuine', 'counterfeit'], ['logical', 'illogical'],
-                ['precious', 'worthless'], ['reward', 'punish'], ['voluntary', 'compulsory'],
+                ['ancient', 'modern'], ['arrive', 'depart'], ['boring', 'exciting'],
+                ['certain', 'doubtful'], ['combine', 'separate'], ['expand', 'shrink'],
+                ['generous', 'selfish'], ['maximum', 'minimum'], ['permanent', 'temporary'],
+                ['positive', 'negative'], ['success', 'failure'], ['accept', 'reject'],
+                ['include', 'exclude'], ['artificial', 'natural'], ['amateur', 'professional'],
+                ['abstract', 'concrete'], ['voluntary', 'required'], ['frequent', 'rare'],
+                ['gradual', 'sudden'], ['humble', 'proud'], ['abundant', 'scarce'],
+                ['flexible', 'rigid'], ['transparent', 'opaque'], ['external', 'internal'],
+                ['vertical', 'horizontal'], ['majority', 'minority'], ['optimistic', 'pessimistic'],
+                ['increase', 'decrease'], ['complex', 'simple'], ['familiar', 'strange'],
+                ['confident', 'nervous'], ['approve', 'disapprove'], ['encourage', 'discourage'],
+                ['entrance', 'exit'], ['genuine', 'fake'], ['logical', 'illogical'],
+                ['precious', 'worthless'], ['ordinary', 'extraordinary'], ['patient', 'impatient'],
+                ['organized', 'disorganized'], ['popular', 'unpopular'], ['regular', 'irregular'],
+                ['specific', 'general'], ['temporary', 'permanent'], ['willing', 'unwilling'],
             ]
         };
         
-        // Arabic opposite pairs (الأضداد)
+        // Arabic opposite pairs (الأضداد) - kid-friendly from curated list
         const oppositesAr = {
             easy: [
-                ['حار', 'بارد'], ['كبير', 'صغير'], ['فوق', 'تحت'],
-                ['سعيد', 'حزين'], ['سريع', 'بطيء'], ['نهار', 'ليل'],
-                ['قديم', 'جديد'], ['مفتوح', 'مغلق'], ['داخل', 'خارج'],
-                ['نعم', 'لا'], ['قف', 'امشِ'], ['ولد', 'بنت'],
-                ['طويل', 'قصير'], ['مبلل', 'جاف'], ['ممتلئ', 'فارغ'],
-                ['فاتح', 'غامق'], ['ناعم', 'خشن'], ['نظيف', 'وسخ'],
-                ['عالي', 'منخفض'], ['دفع', 'سحب'], ['أعلى', 'أسفل'],
-                ['أبيض', 'أسود'], ['جيد', 'سيء'], ['يمين', 'يسار'],
-                ['هنا', 'هناك'], ['تعال', 'اذهب'], ['اجلس', 'قف'],
-                ['نام', 'استيقظ'], ['أمام', 'خلف'], ['قريب', 'بعيد'],
-                ['أول', 'آخر'], ['شمس', 'قمر'], ['صيف', 'شتاء'],
-                ['بداية', 'نهاية'], ['كثير', 'قليل'], ['أكثر', 'أقل'],
-                ['مبكر', 'متأخر'], ['ضائع', 'موجود'], ['رفيع', 'سمين'],
+                ['كبير', 'صغير'], ['طويل', 'قصير'], ['قوي', 'ضعيف'],
+                ['سريع', 'بطيء'], ['واسع', 'ضيق'], ['ثقيل', 'خفيف'],
+                ['قديم', 'جديد'], ['صعب', 'سهل'], ['كثير', 'قليل'],
+                ['بعيد', 'قريب'], ['نظيف', 'متسخ'], ['سعيد', 'حزين'],
+                ['نشيط', 'كسلان'], ['هادئ', 'مزعج'], ['نهار', 'ليل'],
+                ['صباح', 'مساء'], ['بداية', 'نهاية'], ['أول', 'آخر'],
+                ['قبل', 'بعد'], ['فوق', 'تحت'], ['أمام', 'خلف'],
+                ['يمين', 'يسار'], ['داخل', 'خارج'], ['هنا', 'هناك'],
+                ['شمس', 'قمر'], ['نور', 'ظلام'], ['حر', 'برد'],
+                ['رطب', 'جاف'], ['ذهب', 'جاء'], ['دخل', 'خرج'],
+                ['صعد', 'نزل'], ['وقف', 'جلس'], ['نام', 'استيقظ'],
+                ['فتح', 'أغلق'], ['أعطى', 'أخذ'], ['ضحك', 'بكى'],
+                ['نسي', 'تذكر'], ['شبعان', 'جائع'], ['مبكر', 'متأخر'],
             ],
             medium: [
-                ['شجاع', 'خائف'], ['لطيف', 'قاسي'], ['قوي', 'ضعيف'],
-                ['حلو', 'حامض'], ['غني', 'فقير'], ['سميك', 'رفيع'],
-                ['ثقيل', 'خفيف'], ['خشن', 'ناعم'], ['حاد', 'باهت'],
-                ['عميق', 'ضحل'], ['واسع', 'ضيق'], ['فضفاض', 'ضيق'],
-                ['بري', 'أليف'], ['نائم', 'مستيقظ'], ['يبدأ', 'ينتهي'],
-                ['حب', 'كره'], ['ضحك', 'بكاء'], ['فوز', 'خسارة'],
-                ['تذكر', 'نسي'], ['صحيح', 'خطأ'], ['أعطى', 'أخذ'],
-                ['صديق', 'عدو'], ['سلام', 'حرب'], ['آمن', 'خطير'],
-                ['هادئ', 'صاخب'], ['ساطع', 'خافت'], ['حكيم', 'أحمق'],
-                ['صادق', 'كاذب'], ['هادئ', 'غاضب'], ['مرتب', 'فوضوي'],
-                ['كسول', 'نشيط'], ['فخور', 'خجول'], ['طازج', 'فاسد'],
-                ['كامل', 'مكسور'], ['حقيقي', 'مزيف'], ['رخيص', 'غالي'],
-                ['سهل', 'صعب'], ['بسيط', 'معقد'], ['ممل', 'ممتع'],
-                ['مؤدب', 'وقح'], ['محظوظ', 'سيء الحظ'], ['حذر', 'متهور'],
+                ['جميل', 'قبيح'], ['سمين', 'نحيف'], ['مرتفع', 'منخفض'],
+                ['شجاع', 'خائف'], ['كريم', 'بخيل'], ['متواضع', 'متكبر'],
+                ['لطيف', 'فظ'], ['متفائل', 'متشائم'], ['صبور', 'جزوع'],
+                ['شروق', 'غروب'], ['ماضي', 'مستقبل'], ['شرق', 'غرب'],
+                ['شمال', 'جنوب'], ['سماء', 'أرض'], ['بحر', 'بر'],
+                ['جبل', 'وادي'], ['عذب', 'مالح'], ['صافي', 'عكر'],
+                ['يابس', 'طري'], ['باع', 'اشترى'], ['ربح', 'خسر'],
+                ['نجح', 'رسب'], ['ظاهر', 'خفي'], ['عام', 'خاص'],
+                ['مفيد', 'غير مفيد'], ['ثابت', 'متغير'], ['ممكن', 'مستحيل'],
+                ['ريان', 'عطشان'], ['مستقيم', 'منحني'], ['بسيط', 'مركب'],
+                ['واقعي', 'خيالي'], ['صادق', 'غير صادق'], ['زرع', 'حصد'],
             ],
             hard: [
-                ['قديم', 'حديث'], ['وصل', 'غادر'], ['هجوم', 'دفاع'],
-                ['ممل', 'مثير'], ['أسر', 'أطلق'], ['متأكد', 'شاك'],
-                ['دمج', 'فصل'], ['خلق', 'دمر'], ['توسع', 'تقلص'],
-                ['كريم', 'أناني'], ['بريء', 'مذنب'], ['أقصى', 'أدنى'],
+                ['معلوم', 'مجهول'], ['واحد', 'متعدد'], ['مادي', 'معنوي'],
+                ['كلي', 'جزئي'], ['صحة', 'مرض'], ['علم', 'جهل'],
+                ['وجود', 'عدم'], ['سلس', 'معقد'], ['ظاهر', 'باطن'],
                 ['دائم', 'مؤقت'], ['إيجابي', 'سلبي'], ['نجاح', 'فشل'],
-                ['قبول', 'رفض'], ['تضمين', 'استبعاد'], ['صناعي', 'طبيعي'],
-                ['هاوي', 'محترف'], ['متكرر', 'نادر'], ['تدريجي', 'مفاجئ'],
-                ['متواضع', 'متكبر'], ['وفير', 'شحيح'], ['مرن', 'صلب'],
-                ['شفاف', 'معتم'], ['أعلى', 'أدنى'], ['خارجي', 'داخلي'],
-                ['عمودي', 'أفقي'], ['أغلبية', 'أقلية'], ['تفاؤل', 'تشاؤم'],
-                ['محلي', 'أجنبي'], ['حضري', 'ريفي'], ['شجاعة', 'جبن'],
-                ['انتصار', 'هزيمة'], ['زيادة', 'نقصان'], ['معقد', 'بسيط'],
-                ['مألوف', 'غريب'], ['حرية', 'أسر'], ['تشجيع', 'إحباط'],
+                ['قبول', 'رفض'], ['صناعي', 'طبيعي'], ['هاوي', 'محترف'],
+                ['متكرر', 'نادر'], ['تدريجي', 'مفاجئ'], ['وفير', 'شحيح'],
+                ['مرن', 'صلب'], ['شفاف', 'معتم'], ['خارجي', 'داخلي'],
+                ['عمودي', 'أفقي'], ['أغلبية', 'أقلية'], ['زيادة', 'نقصان'],
+                ['مألوف', 'غريب'], ['واثق', 'متردد'], ['تشجيع', 'إحباط'],
+                ['مدخل', 'مخرج'], ['أصلي', 'مقلد'], ['منطقي', 'غير منطقي'],
             ]
         };
         
@@ -275,6 +280,8 @@
         let highScore = GameUtils.getHighScore(GAME_KEY);
         let playerName = GameUtils.getPlayerName();
         let gradeLevel = GameUtils.getGradeLevel();
+        let shuffledPairs = []; // Pre-shuffled pairs for the game
+        let pairIndex = 0;
         
         const wordPrompt = document.getElementById('wordPrompt');
         const answerGrid = document.getElementById('answerGrid');
@@ -286,25 +293,49 @@
             return level <= 2 ? 'easy' : level <= 5 ? 'medium' : 'hard';
         }
         
-        function getUnusedPair() {
-            const difficulty = getDifficulty();
+        // Fisher-Yates shuffle
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Initialize shuffled pairs at game start
+        function initShuffledPairs() {
             const opposites = getOpposites();
-            const pool = opposites[difficulty].filter(p => 
-                !usedPairs.some(u => u[0] === p[0])
-            );
+            // Combine all difficulties and shuffle
+            let allPairs = [];
             
-            if (pool.length === 0) {
-                usedPairs = [];
-                return opposites[difficulty][Math.floor(Math.random() * opposites[difficulty].length)];
+            // Add pairs based on grade level
+            if (gradeLevel === 'kg') {
+                allPairs = [...opposites.easy];
+            } else if (gradeLevel === 'g1-3') {
+                allPairs = [...opposites.easy, ...opposites.medium];
+            } else {
+                allPairs = [...opposites.easy, ...opposites.medium, ...opposites.hard];
             }
             
-            return pool[Math.floor(Math.random() * pool.length)];
+            // Shuffle thoroughly
+            shuffledPairs = shuffleArray(allPairs);
+            pairIndex = 0;
+        }
+        
+        function getNextPair() {
+            // If we've used all pairs, reshuffle
+            if (pairIndex >= shuffledPairs.length) {
+                shuffledPairs = shuffleArray(shuffledPairs);
+                pairIndex = 0;
+            }
+            return shuffledPairs[pairIndex++];
         }
         
         function generateQuestion() {
             canAnswer = true;
             
-            currentPair = getUnusedPair();
+            currentPair = getNextPair();
             usedPairs.push(currentPair);
             
             // Randomly choose which word to show
@@ -316,11 +347,10 @@
             const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
             wordPrompt.textContent = lang === 'ar' ? promptWord : promptWord.toUpperCase();
             
-            // Generate wrong answers from other pairs
-            const difficulty = getDifficulty();
+            // Generate wrong answers from ALL pairs (more variety)
             const opposites = getOpposites();
+            const allWords = [...opposites.easy, ...opposites.medium, ...opposites.hard].flat();
             const wrongAnswers = [];
-            const allWords = opposites[difficulty].flat();
             
             while (wrongAnswers.length < 3) {
                 const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
@@ -415,9 +445,10 @@
             bestStreak = 0;
             usedPairs = [];
             
-            playerName = GameUtils.getPlayerName();
-            gradeLevel = GameUtils.getGradeLevel();
             highScore = GameUtils.getHighScore(GAME_KEY);
+            
+            // Shuffle all pairs at game start for better randomization
+            initShuffledPairs();
             
             document.getElementById('score').textContent = score;
             document.getElementById('level').textContent = level;
@@ -446,7 +477,13 @@
         
         // Initialize
         GameUtils.initSoundToggle();
-        setTimeout(() => startGame(), 500);
+        
+        // Auto-start game after DOM and i18n are ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(() => startGame(), 100));
+        } else {
+            setTimeout(() => startGame(), 100);
+        }
     </script>
     <script>
         // Add language toggle button

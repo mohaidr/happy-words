@@ -60,8 +60,8 @@
         
         .word-card.target,
         .word-card.distractor {
-            background: linear-gradient(145deg, #ffffff, #b6b6b6);
-            color: #2d3436;
+            background: #2f97f159;
+            color: #ffffff;
         }
         
         .word-card.correct {
@@ -403,18 +403,28 @@
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            
+            // Use translated "by" text for high score
+            const byText = typeof I18n !== 'undefined' ? I18n.t('game.by') : 'by';
+            document.getElementById('highScore').textContent = `${bestScore} ${byText} ${bestPlayer}`;
             document.getElementById('wordsFound').textContent = totalWordsFound;
             document.getElementById('finalLevel').textContent = level;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            
+            // Use translated player game text
+            const playerGameText = typeof I18n !== 'undefined' ? I18n.t('game.playerGame', {name: playerName}) : playerName + "'s Game";
+            document.getElementById('playerDisplay').textContent = playerGameText;
             gameOverEl.style.display = 'block';
         }
 
         // Initialize sound toggle
         GameUtils.initSoundToggle();
         
-        // Auto-start game on load
-        setTimeout(() => startGame(), 500);
+        // Auto-start game after DOM and i18n are ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(() => startGame(), 100));
+        } else {
+            setTimeout(() => startGame(), 100);
+        }
     </script>
     <script>
         // Add language toggle button

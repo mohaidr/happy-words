@@ -311,6 +311,9 @@ const I18n = {
             "game.youWon": "🎉 You Won!",
             "game.greatJob": "🎉 Great Job!",
             "game.finalScore": "Final Score",
+            "game.highScore": "High Score",
+            "game.backHome": "← Back to Home",
+            "game.playerGame": "{name}'s Game",
             "game.info.fewestMoves": "Score is based on fewest moves",
 
             // Level names
@@ -447,6 +450,7 @@ const I18n = {
             "sightWords.title": "📖 Sight Words",
             "sightWords.instruction": "Find the word: {word}",
             "sightWords.result": "📖 Great Reading!",
+            "sightWords.wordsFound": "Words Found",
 
             // Rhyme Time Game
             "rhymeTime.title": "🎵 Rhyme Time",
@@ -856,6 +860,9 @@ const I18n = {
             "game.youWon": "🎉 فزت!",
             "game.greatJob": "🎉 أحسنت!",
             "game.finalScore": "النتيجة النهائية",
+            "game.highScore": "أعلى نتيجة",
+            "game.backHome": "العودة للرئيسية →",
+            "game.playerGame": "لعبة {name}",
             "game.info.fewestMoves": "النتيجة بناءً على أقل عدد حركات",
 
             // Level names (مستويات)
@@ -992,6 +999,7 @@ const I18n = {
             "sightWords.title": "📖 كلمات بصرية",
             "sightWords.instruction": "ابحث عن الكلمة: {word}",
             "sightWords.result": "📖 قراءة رائعة!",
+            "sightWords.wordsFound": "الكلمات الموجودة",
 
             // Rhyme Time Game (لعبة القافية)
             "rhymeTime.title": "🎵 وقت القافية",

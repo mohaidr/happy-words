@@ -142,13 +142,13 @@
     
     <p class="instruction" data-i18n="rhymeTime.instruction">Find the word that rhymes with:</p>
     
-    <div class="main-word" id="mainWord">CAT</div>
+    <div class="main-word" id="mainWord"></div>
     
     <div class="choices" id="choices">
-        <button class="choice" onclick="checkAnswer(0)">HAT</button>
-        <button class="choice" onclick="checkAnswer(1)">DOG</button>
-        <button class="choice" onclick="checkAnswer(2)">SUN</button>
-        <button class="choice" onclick="checkAnswer(3)">CUP</button>
+        <button class="choice" onclick="checkAnswer(0)"></button>
+        <button class="choice" onclick="checkAnswer(1)"></button>
+        <button class="choice" onclick="checkAnswer(2)"></button>
+        <button class="choice" onclick="checkAnswer(3)"></button>
     </div>
     
     <p class="hint-text" data-i18n="rhymeTime.hint">Words that rhyme sound alike at the end!</p>
@@ -503,8 +503,12 @@
         // Initialize sound toggle
         GameUtils.initSoundToggle();
         
-        // Auto-start game on load
-        setTimeout(() => startGame(), 500);
+        // Auto-start game after DOM and i18n are ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(() => startGame(), 100));
+        } else {
+            setTimeout(() => startGame(), 100);
+        }
     </script>
     <script>
         // Add language toggle button
