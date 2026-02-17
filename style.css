@@ -54,19 +54,19 @@ header h1 {
 
 /* Global Sound Toggle */
 .global-sound-toggle {
-    position: absolute;
+    position: fixed;
     top: 15px;
     right: 15px;
     background: rgba(255, 255, 255, 0.3);
     border: none;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 100;
+    z-index: 1000;
 }
 
 .global-sound-toggle:hover {
@@ -1278,9 +1278,10 @@ body.rtl .lang-toggle {
 /* Adjust sound toggle position for language toggle */
 .global-sound-toggle {
     right: 15px;
+    left: auto;
 }
 
 body.rtl .global-sound-toggle {
     right: auto;
-    left: 60px;
+    left: 15px;
 }
