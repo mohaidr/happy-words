@@ -7,7 +7,7 @@
 body {
     font-family: 'Fredoka', Arial, sans-serif;
     min-height: 100vh;
-    background: linear-gradient(160deg, #f8f9fc 0%, #eef2f7 40%, #f3f0f7 70%, #f0f4f8 100%);
+    background: linear-gradient(160deg, #4fa3d1 0%, #3b82c4 40%, #5a9fd4 70%, #68b8e8 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -28,9 +28,9 @@ body::before {
     pointer-events: none;
     z-index: 0;
     background-image: 
-        radial-gradient(circle, rgba(148, 163, 184, 0.2) 2px, transparent 2px),
-        radial-gradient(circle, rgba(167, 139, 250, 0.12) 2px, transparent 2px),
-        radial-gradient(circle, rgba(129, 140, 160, 0.1) 1.5px, transparent 1.5px);
+        radial-gradient(circle, rgba(255, 255, 255, 0.3) 2px, transparent 2px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.2) 2px, transparent 2px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.15) 1.5px, transparent 1.5px);
     background-size: 80px 80px, 100px 100px, 120px 120px;
     animation: gentleRain 15s linear infinite;
 }
@@ -56,7 +56,8 @@ body::before {
 
 header h1 {
     font-size: 2.5rem;
-    color: #6366f1;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     margin-bottom: 8px;
     letter-spacing: 1px;
 }
@@ -68,7 +69,7 @@ header h1 {
 
 .subtitle {
     font-size: 1.1rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 15px;
 }
 
@@ -316,7 +317,7 @@ header h1 {
 
 footer {
     margin-top: 24px;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.85);
     font-size: 0.9rem;
 }
 
@@ -326,7 +327,7 @@ footer {
     border-radius: 24px;
     padding: 32px 28px;
     margin: 16px 0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -470,7 +471,7 @@ footer {
     font-size: 0.95rem;
     font-family: 'Fredoka', sans-serif;
     font-weight: 500;
-    color: #64748b;
+    color: #ffffff;
     cursor: pointer;
     margin-top: 16px;
     transition: all 0.2s ease;
@@ -986,8 +987,9 @@ footer {
 .games-section {
     margin-top: 20px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.85);
     border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .games-title {
@@ -997,7 +999,7 @@ footer {
 }
 
 .games-subtitle {
-    color: #94a3b8;
+    color: #64748b;
     font-size: 0.9rem;
     margin-bottom: 16px;
 }
