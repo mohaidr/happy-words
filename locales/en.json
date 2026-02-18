@@ -112,5 +112,24 @@
   
   "level.easy": "Easy",
   "level.medium": "Medium",
-  "level.hard": "Hard"
+  "level.hard": "Hard",
+  
+  "storyGame.title": "Story Time",
+  "storyGame.selectStory": "Choose a story to read!",
+  "storyGame.readCarefully": "📚 Read the story carefully!",
+  "storyGame.imReady": "✓ I'm Ready!",
+  "storyGame.backToStories": "← Back",
+  "storyGame.nextStory": "📖 Next Story",
+  "storyGame.chooseAnother": "Choose Another",
+  "storyGame.storiesCompleted": "Stories",
+  "storyGame.correctAnswers": "Correct Answers",
+  "storyGame.reviewAnswers": "📝 Review Your Answers",
+  "storyGame.yourAnswer": "Your answer",
+  "storyGame.correctAnswer": "Correct",
+  "storyGame.timeLeft": "{time} seconds left",
+  "storyGame.greatJob": "Great Job!",
+  "storyGame.goodJob": "Good Job!",
+  "storyGame.perfect": "Perfect! 🌟",
+  "storyGame.keepTrying": "Keep Trying!",
+  "storyGame.instruction": "Read stories and answer questions!"
 }

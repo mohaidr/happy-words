@@ -112,5 +112,24 @@
   
   "level.easy": "سهل",
   "level.medium": "متوسط",
-  "level.hard": "صعب"
+  "level.hard": "صعب",
+  
+  "storyGame.title": "وقت القصة",
+  "storyGame.selectStory": "اختر قصة لتقرأها!",
+  "storyGame.readCarefully": "📚 اقرأ القصة بعناية!",
+  "storyGame.imReady": "✓ أنا جاهز!",
+  "storyGame.backToStories": "العودة →",
+  "storyGame.nextStory": "📖 القصة التالية",
+  "storyGame.chooseAnother": "اختر قصة أخرى",
+  "storyGame.storiesCompleted": "القصص",
+  "storyGame.correctAnswers": "الإجابات الصحيحة",
+  "storyGame.reviewAnswers": "📝 راجع إجاباتك",
+  "storyGame.yourAnswer": "إجابتك",
+  "storyGame.correctAnswer": "الصحيح",
+  "storyGame.timeLeft": "{time} ثانية متبقية",
+  "storyGame.greatJob": "أحسنت!",
+  "storyGame.goodJob": "جيد!",
+  "storyGame.perfect": "ممتاز! 🌟",
+  "storyGame.keepTrying": "استمر في المحاولة!",
+  "storyGame.instruction": "اقرأ القصص وأجب على الأسئلة!"
 }

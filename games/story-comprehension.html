@@ -427,6 +427,7 @@
             </div>
             <div class="btn-row">
                 <button class="start-btn" id="readyBtn" data-i18n="storyGame.imReady">✓ I'm Ready!</button>
+                <button class="back-btn" id="backFromStoryBtn" data-i18n="storyGame.backToStories">← Back</button>
             </div>
         </div>
         
@@ -469,6 +470,225 @@
     <script>
         const GAME_KEY = 'storyComprehension';
         
+        // Color dictionary for dynamic color replacement
+        const COLORS = {
+            red: { en: 'red', ar: 'أحمر', arFem: 'حمراء' },
+            blue: { en: 'blue', ar: 'أزرق', arFem: 'زرقاء' },
+            green: { en: 'green', ar: 'أخضر', arFem: 'خضراء' },
+            yellow: { en: 'yellow', ar: 'أصفر', arFem: 'صفراء' },
+            white: { en: 'white', ar: 'أبيض', arFem: 'بيضاء' },
+            black: { en: 'black', ar: 'أسود', arFem: 'سوداء' },
+            brown: { en: 'brown', ar: 'بني', arFem: 'بنية' },
+            pink: { en: 'pink', ar: 'وردي', arFem: 'وردية' },
+            orange: { en: 'orange', ar: 'برتقالي', arFem: 'برتقالية' },
+            purple: { en: 'purple', ar: 'بنفسجي', arFem: 'بنفسجية' },
+            gray: { en: 'gray', ar: 'رمادي', arFem: 'رمادية' }
+        };
+        
+        const COLOR_KEYS = Object.keys(COLORS);
+        
+        // Semantic color groups - what colors make sense for different objects
+        const SEMANTIC_COLORS = {
+            // Nature
+            mountain: ['brown', 'gray', 'white', 'green'],  // Real mountain colors
+            water: ['blue', 'white'],  // Waterfall, river, lake
+            sky: ['blue', 'gray', 'white'],
+            grass: ['green'],
+            
+            // Animals
+            rabbit: ['white', 'brown', 'gray'],
+            fish: ['orange', 'blue', 'yellow', 'red', 'green', 'purple'],
+            bird: ['blue', 'red', 'yellow', 'green', 'brown', 'orange'],
+            
+            // Clothing & accessories
+            coat: ['red', 'blue', 'green', 'black', 'brown', 'gray', 'purple', 'pink'],
+            umbrella: ['red', 'blue', 'green', 'yellow', 'purple', 'black', 'pink', 'orange'],
+            
+            // Objects - most man-made items can be any color
+            tent: ['red', 'blue', 'green', 'yellow', 'orange'],
+            backpack: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange', 'black'],
+            lunchbox: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange'],
+            bike: ['red', 'blue', 'green', 'yellow', 'black', 'purple', 'orange', 'pink'],
+            watch: ['red', 'blue', 'green', 'yellow', 'black', 'purple', 'orange', 'pink', 'white'],
+            card: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange', 'white'],
+            balloon: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange'],
+            wool: ['blue', 'pink', 'yellow', 'red', 'green', 'white', 'purple', 'orange']
+        };
+        
+        // Number dictionary for dynamic number replacement
+        // Arabic numbers 3-9: use arMasc with masculine nouns, arFem with feminine nouns
+        // Note: Number 2 uses dual form (المثنى) in Arabic, not counted here
+        const NUMBERS = {
+            3: { en: 'three', arMasc: 'ثلاثة', arFem: 'ثلاث', value: 3 },
+            4: { en: 'four', arMasc: 'أربعة', arFem: 'أربع', value: 4 },
+            5: { en: 'five', arMasc: 'خمسة', arFem: 'خمس', value: 5 },
+            6: { en: 'six', arMasc: 'ستة', arFem: 'ست', value: 6 },
+            7: { en: 'seven', arMasc: 'سبعة', arFem: 'سبع', value: 7 },
+            8: { en: 'eight', arMasc: 'ثمانية', arFem: 'ثماني', value: 8 },
+            9: { en: 'nine', arMasc: 'تسعة', arFem: 'تسع', value: 9 }
+        };
+        
+        const NUMBER_KEYS = Object.keys(NUMBERS).map(Number);
+        
+        // Semantic number groups - what numbers make sense for different objects
+        // Using only 3-9 for proper Arabic grammar (2 uses dual form المثنى)
+        const SEMANTIC_NUMBERS = {
+            mountains: [3, 4, 5],              // 3-5 mountains in a drawing
+            eggs: [3, 4, 5, 6],                // Reasonable for recipes
+            apples: [3, 4, 5, 6, 7],           // Picking fruit
+            spoons: [3, 4],                    // Recipe measurements
+            minutes: [5, 7, 8, 9],             // Baking time (realistic minutes)
+            books: [3, 4, 5],                  // Borrowing books
+            friends: [3, 4, 5],                // Playing with friends
+            gifts: [3, 4, 5, 6, 7, 8]          // Birthday gifts
+        };
+        
+        // Ordinal numbers dictionary (for positions like "third seat")
+        // Using 3-7 for Arabic grammar compatibility
+        const ORDINALS = {
+            3: { en: 'third', arMasc: 'الثالث', arFem: 'الثالثة', value: 3 },
+            4: { en: 'fourth', arMasc: 'الرابع', arFem: 'الرابعة', value: 4 },
+            5: { en: 'fifth', arMasc: 'الخامس', arFem: 'الخامسة', value: 5 },
+            6: { en: 'sixth', arMasc: 'السادس', arFem: 'السادسة', value: 6 },
+            7: { en: 'seventh', arMasc: 'السابع', arFem: 'السابعة', value: 7 }
+        };
+        
+        const ORDINAL_KEYS = Object.keys(ORDINALS).map(Number);
+        
+        // Semantic ordinal groups
+        const SEMANTIC_ORDINALS = {
+            seats: [3, 4, 5, 6, 7]             // Bus/class seat positions
+        };
+        
+        // Get random ordinal from allowed set
+        function getRandomOrdinal(exclude = [], allowedOrdinals = null) {
+            let available = allowedOrdinals || ORDINAL_KEYS;
+            available = available.filter(n => !exclude.includes(n));
+            const shuffled = [...available].sort(() => Math.random() - 0.5);
+            return shuffled[0];
+        }
+        
+        // Generate ordinal options for a question (correct + 3 wrong)
+        function generateOrdinalOptions(correctOrd, useFeminine = false, semanticType = null) {
+            let allowedOrdinals = semanticType ? SEMANTIC_ORDINALS[semanticType] : ORDINAL_KEYS;
+            
+            let wrongOrdinals = allowedOrdinals
+                .filter(n => n !== correctOrd)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const allOrdinals = [correctOrd, ...wrongOrdinals].sort((a, b) => a - b);
+            const correctIndex = allOrdinals.indexOf(correctOrd);
+            
+            return {
+                options: {
+                    en: allOrdinals.map(n => ORDINALS[n].en.charAt(0).toUpperCase() + ORDINALS[n].en.slice(1)),
+                    ar: allOrdinals.map(n => useFeminine ? ORDINALS[n].arFem : ORDINALS[n].arMasc)
+                },
+                correct: correctIndex
+            };
+        }
+        
+        // Apply ordinals to text
+        function applyOrdinals(text, ordinalMap, lang) {
+            let result = text;
+            for (const [placeholder, ordKey] of Object.entries(ordinalMap)) {
+                const ord = ORDINALS[ordKey];
+                if (!ord) continue;
+                result = result.replace(new RegExp(`{${placeholder}}`, 'g'), lang === 'ar' ? ord.arMasc : ord.en);
+                result = result.replace(new RegExp(`{${placeholder}_fem}`, 'g'), ord.arFem);
+                result = result.replace(new RegExp(`{${placeholder}_masc}`, 'g'), ord.arMasc);
+            }
+            return result;
+        }
+        
+        // Get random numbers from allowed set
+        function getRandomNumber(exclude = [], allowedNumbers = null) {
+            let available = allowedNumbers || NUMBER_KEYS;
+            available = available.filter(n => !exclude.includes(n));
+            const shuffled = [...available].sort(() => Math.random() - 0.5);
+            return shuffled[0];
+        }
+        
+        // Generate number options for a question (correct + 3 wrong)
+        function generateNumberOptions(correctNum, useFeminine = false, semanticType = null) {
+            const correctValue = NUMBERS[correctNum].value;
+            let allowedNumbers = semanticType ? SEMANTIC_NUMBERS[semanticType] : NUMBER_KEYS;
+            
+            // Get 3 wrong numbers, preferring nearby values
+            let wrongNumbers = allowedNumbers
+                .filter(n => n !== correctNum)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const allNumbers = [correctNum, ...wrongNumbers].sort((a, b) => a - b);
+            const correctIndex = allNumbers.indexOf(correctNum);
+            
+            return {
+                options: {
+                    en: allNumbers.map(n => NUMBERS[n].en.charAt(0).toUpperCase() + NUMBERS[n].en.slice(1)),
+                    ar: allNumbers.map(n => useFeminine ? NUMBERS[n].arFem : NUMBERS[n].arMasc)
+                },
+                correct: correctIndex
+            };
+        }
+        
+        // Apply numbers to text
+        function applyNumbers(text, numberMap, lang) {
+            let result = text;
+            for (const [placeholder, numKey] of Object.entries(numberMap)) {
+                const num = NUMBERS[numKey];
+                if (!num) continue;
+                result = result.replace(new RegExp(`{${placeholder}}`, 'g'), lang === 'ar' ? num.arMasc : num.en);
+                result = result.replace(new RegExp(`{${placeholder}_fem}`, 'g'), num.arFem);
+                result = result.replace(new RegExp(`{${placeholder}_masc}`, 'g'), num.arMasc);
+            }
+            return result;
+        }
+        
+        // Get random colors excluding specified ones, optionally from a specific group
+        function getRandomColors(count, exclude = [], allowedColors = null) {
+            let available = allowedColors || COLOR_KEYS;
+            available = available.filter(c => !exclude.includes(c));
+            const shuffled = [...available].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, count);
+        }
+        
+        // Get a single random color from allowed set
+        function getRandomColor(exclude = [], allowedColors = null) {
+            return getRandomColors(1, exclude, allowedColors)[0];
+        }
+        
+        // Generate color options for a question (correct + 3 wrong)
+        // semanticType limits wrong options to semantically appropriate colors
+        function generateColorOptions(correctColor, useFeminine = false, semanticType = null) {
+            const allowedColors = semanticType ? SEMANTIC_COLORS[semanticType] : COLOR_KEYS;
+            const wrongColors = getRandomColors(3, [correctColor], allowedColors);
+            const allColors = [correctColor, ...wrongColors].sort(() => Math.random() - 0.5);
+            const correctIndex = allColors.indexOf(correctColor);
+            
+            return {
+                options: {
+                    en: allColors.map(c => COLORS[c].en.charAt(0).toUpperCase() + COLORS[c].en.slice(1)),
+                    ar: allColors.map(c => useFeminine ? COLORS[c].arFem : COLORS[c].ar)
+                },
+                correct: correctIndex
+            };
+        }
+        
+        // Apply colors to text
+        function applyColors(text, colorMap, lang, useFeminineAr = false) {
+            let result = text;
+            for (const [placeholder, colorKey] of Object.entries(colorMap)) {
+                const color = COLORS[colorKey];
+                const colorText = lang === 'ar' ? (useFeminineAr ? color.arFem : color.ar) : color.en;
+                result = result.replace(new RegExp(`{${placeholder}}`, 'g'), colorText);
+                result = result.replace(new RegExp(`{${placeholder}_fem}`, 'g'), color.arFem || color.ar);
+                result = result.replace(new RegExp(`{${placeholder}_masc}`, 'g'), color.ar);
+            }
+            return result;
+        }
+        
         // Stories data with both Arabic and English
         const stories = [
             {
@@ -478,29 +698,31 @@
                     en: 'The Creative Artist',
                     ar: 'الرسام المبدع'
                 },
+                colorSlots: [
+                    { name: 'mountainColor', type: 'mountain' },
+                    { name: 'waterfallColor', type: 'water' },
+                    { name: 'tentColor', type: 'tent' }
+                ],
+                numberSlots: [
+                    { name: 'mountainCount', type: 'mountains' }
+                ],
                 text: {
-                    en: 'Layla drew a large picture. She drew three brown mountains and a blue waterfall flowing from the middle mountain. She placed a small yellow tent under the tree, then she drew a single bird flying in the clear sky.',
-                    ar: 'رسمت ليلى لوحة كبيرة. رسمت ثلاثة جبال بنية، وشلالاً أزرق ينزل من الجبل الأوسط. وضعت خيمة صفراء صغيرة تحت الشجرة، ثم رسمت عصفوراً وحيداً يطير في السماء الصافية.'
+                    en: 'Layla drew a large picture. She drew {mountainCount} {mountainColor} mountains and a {waterfallColor} waterfall flowing from the middle mountain. She placed a small {tentColor} tent under the tree, then she drew a single bird flying in the clear sky.',
+                    ar: 'رسمت ليلى لوحة كبيرة. رسمت {mountainCount_masc} جبال {mountainColor_fem}، وشلالاً {waterfallColor_masc} ينزل من الجبل الأوسط. وضعت خيمة {tentColor_fem} صغيرة تحت الشجرة، ثم رسمت عصفوراً وحيداً يطير في السماء الصافية.'
                 },
                 questions: [
                     {
                         text: { en: 'How many mountains did Layla draw?', ar: 'كم جبلًا رسمت ليلى؟' },
-                        options: {
-                            en: ['Two', 'Three', 'Four', 'Five'],
-                            ar: ['اثنان', 'ثلاثة', 'أربعة', 'خمسة']
-                        },
-                        correct: 1
+                        numberQuestion: 'mountainCount',
+                        numberFeminine: false
                     },
                     {
-                        text: { en: 'From which mountain was the waterfall flowing?', ar: 'من أي جبل كان ينزل الشلال؟' },
-                        options: {
-                            en: ['The first mountain', 'The middle mountain', 'The last mountain', 'All mountains'],
-                            ar: ['الجبل الأول', 'الجبل الأوسط', 'الجبل الأخير', 'كل الجبال']
-                        },
-                        correct: 1
+                        text: { en: 'What color was the waterfall?', ar: 'ما لون الشلال؟' },
+                        colorQuestion: 'waterfallColor',
+                        colorFeminine: false
                     },
                     {
-                        text: { en: 'Where did she place the yellow tent?', ar: 'أين وضعت الخيمة الصفراء؟' },
+                        text: { en: 'Where did she place the {tentColor} tent?', ar: 'أين وضعت الخيمة {tentColor_fem}؟' },
                         options: {
                             en: ['On the mountain', 'Under the tree', 'By the waterfall', 'In the sky'],
                             ar: ['على الجبل', 'تحت الشجرة', 'بجانب الشلال', 'في السماء']
@@ -524,18 +746,18 @@
                     en: 'The Busy Kitchen',
                     ar: 'المطبخ المزدحم'
                 },
+                numberSlots: [
+                    { name: 'eggCount', type: 'eggs' }
+                ],
                 text: {
-                    en: 'Grandmother was preparing an Eid cake. She put four eggs in the large bowl, then added a cup of sugar and a spoonful of vanilla. Grandmother forgot to put the butter on the table, so she asked her grandson, Khaled, to get it from the fridge.',
-                    ar: 'كانت الجدة تحضر كعكة العيد. وضعت أربع بيضات في الوعاء الكبير، ثم أضافت كوباً من السكر وملعقة من الفانيليا. نسيت الجدة وضع الزبدة على الطاولة، فطلبت من حفيدها خالد أن يحضرها من الثلاجة.'
+                    en: 'Grandmother was preparing an Eid cake. She put {eggCount} eggs in the large bowl, then added a cup of sugar and a spoonful of vanilla. Grandmother forgot to put the butter on the table, so she asked her grandson, Khaled, to get it from the fridge.',
+                    ar: 'كانت الجدة تحضر كعكة العيد. وضعت {eggCount_fem} بيضات في الوعاء الكبير، ثم أضافت كوباً من السكر وملعقة من الفانيليا. نسيت الجدة وضع الزبدة على الطاولة، فطلبت من حفيدها خالد أن يحضرها من الثلاجة.'
                 },
                 questions: [
                     {
                         text: { en: 'How many eggs did Grandmother put in the bowl?', ar: 'كم بيضة وضعت الجدة في الوعاء؟' },
-                        options: {
-                            en: ['Two eggs', 'Three eggs', 'Four eggs', 'Five eggs'],
-                            ar: ['بيضتان', 'ثلاث بيضات', 'أربع بيضات', 'خمس بيضات']
-                        },
-                        correct: 2
+                        numberQuestion: 'eggCount',
+                        numberFeminine: true
                     },
                     {
                         text: { en: 'What did Grandmother add along with the sugar?', ar: 'ماذا أضافت الجدة مع السكر؟' },
@@ -570,9 +792,12 @@
                     en: 'The Library Adventure',
                     ar: 'مغامرة المكتبة'
                 },
+                colorSlots: [
+                    { name: 'cardColor', type: 'card' }
+                ],
                 text: {
-                    en: 'Amin went to the public library on Tuesday. He borrowed a book about dinosaurs and a short story about space. He put the two books in his backpack, but he lost his red card near the science bookshelf. The security guard found it and gave it back to him at the door.',
-                    ar: 'ذهب أمين إلى المكتبة العامة يوم الثلاثاء. استعار كتاباً عن الديناصورات وقصة قصيرة عن الفضاء. وضع الكتابين في ظهره، لكنه أضاع بطاقته الحمراء عند رف الكتب العلمية. وجدها الحارس وأعادها له عند الباب.'
+                    en: 'Amin went to the public library on Tuesday. He borrowed a book about dinosaurs and a short story about space. He put the two books in his backpack, but he lost his {cardColor} card near the science bookshelf. The security guard found it and gave it back to him at the door.',
+                    ar: 'ذهب أمين إلى المكتبة العامة يوم الثلاثاء. استعار كتاباً عن الديناصورات وقصة قصيرة عن الفضاء. وضع الكتابين في ظهره، لكنه أضاع بطاقته {cardColor_fem} عند رف الكتب العلمية. وجدها الحارس وأعادها له عند الباب.'
                 },
                 questions: [
                     {
@@ -593,11 +818,8 @@
                     },
                     {
                         text: { en: 'What color was the card that Amin lost?', ar: 'ما لون البطاقة التي أضاعها أمين؟' },
-                        options: {
-                            en: ['Blue', 'Green', 'Red', 'Yellow'],
-                            ar: ['أزرق', 'أخضر', 'أحمر', 'أصفر']
-                        },
-                        correct: 2
+                        colorQuestion: 'cardColor',
+                        colorFeminine: true
                     },
                     {
                         text: { en: 'Who found the card and returned it to him?', ar: 'من الذي وجد البطاقة وأعادها له؟' },
@@ -616,21 +838,22 @@
                     en: 'The Rainy Day',
                     ar: 'اليوم الماطر'
                 },
+                colorSlots: [
+                    { name: 'coatColor', type: 'coat' },
+                    { name: 'umbrellaColor', type: 'umbrella' }
+                ],
                 text: {
-                    en: 'It started to rain heavily. Majed put on his green coat and black rubber boots. He carried a large blue umbrella, but the strong wind flipped it inside out. Majed ran quickly and hid under the bus stop shelter until the rain stopped.',
-                    ar: 'بدأ المطر يسقط بغزارة. لبس ماجد معطفه الأخضر وحذاءه المطاطي الأسود. حمل مظلة زرقاء كبيرة، لكن الهواء القوي قلب المظلة. ركض ماجد بسرعة واختبأ تحت مظلة الحافلة حتى توقف المطر.'
+                    en: 'It started to rain heavily. Majed put on his {coatColor} coat and black rubber boots. He carried a large {umbrellaColor} umbrella, but the strong wind flipped it inside out. Majed ran quickly and hid under the bus stop shelter until the rain stopped.',
+                    ar: 'بدأ المطر يسقط بغزارة. لبس ماجد معطفه ال{coatColor_masc} وحذاءه المطاطي الأسود. حمل مظلة {umbrellaColor_fem} كبيرة، لكن الهواء القوي قلب المظلة. ركض ماجد بسرعة واختبأ تحت مظلة الحافلة حتى توقف المطر.'
                 },
                 questions: [
                     {
                         text: { en: 'What color was the coat Majed wore?', ar: 'ما لون المعطف الذي لبسه ماجد؟' },
-                        options: {
-                            en: ['Blue', 'Red', 'Green', 'Black'],
-                            ar: ['أزرق', 'أحمر', 'أخضر', 'أسود']
-                        },
-                        correct: 2
+                        colorQuestion: 'coatColor',
+                        colorFeminine: false
                     },
                     {
-                        text: { en: 'What happened to the blue umbrella?', ar: 'ماذا حدث للمظلة الزرقاء؟' },
+                        text: { en: 'What happened to the {umbrellaColor} umbrella?', ar: 'ماذا حدث للمظلة {umbrellaColor_fem}؟' },
                         options: {
                             en: ['It broke', 'The wind flipped it', 'He lost it', 'It flew away'],
                             ar: ['انكسرت', 'قلبها الهواء', 'أضاعها', 'طارت بعيداً']
@@ -662,18 +885,18 @@
                     en: 'The Fruit Garden',
                     ar: 'بستان الفواكه'
                 },
+                numberSlots: [
+                    { name: 'appleCount', type: 'apples' }
+                ],
                 text: {
-                    en: 'In the orchard, Maryam picked five apples and put them in a wooden basket. She saw a small ladybug walking on a green leaf. Maryam called her brother Zaid to show him, but the ladybug flew away and hid behind a pear.',
-                    ar: 'في البستان، قطفت مريم خمس ثمرات من التفاح ووضعتها في سلة خشبية. رأت حشرة دعسوقة صغيرة تمشي على ورقة شجر خضراء. نادت مريم أخيها زيد ليريها، لكن الدعسوقة طارت واختبأت خلف ثمرة كمثرى.'
+                    en: 'In the orchard, Maryam picked {appleCount} apples and put them in a wooden basket. She saw a small ladybug walking on a green leaf. Maryam called her brother Zaid to show him, but the ladybug flew away and hid behind a pear.',
+                    ar: 'في البستان، قطفت مريم {appleCount_fem} تفاحات ووضعتها في سلة خشبية. رأت حشرة دعسوقة صغيرة تمشي على ورقة شجر خضراء. نادت مريم أخيها زيد لتريه، لكن الدعسوقة طارت واختبأت خلف ثمرة كمثرى.'
                 },
                 questions: [
                     {
                         text: { en: 'How many apples did Maryam pick?', ar: 'كم تفاحة قطفت مريم؟' },
-                        options: {
-                            en: ['Three', 'Four', 'Five', 'Six'],
-                            ar: ['ثلاث', 'أربع', 'خمس', 'ست']
-                        },
-                        correct: 2
+                        numberQuestion: 'appleCount',
+                        numberFeminine: true
                     },
                     {
                         text: { en: 'What was the ladybug doing when Maryam saw it?', ar: 'ماذا كانت تفعل الدعسوقة عندما رأتها مريم؟' },
@@ -708,26 +931,27 @@
                     en: 'The School Bus',
                     ar: 'حافلة المدرسة'
                 },
+                colorSlots: [
+                    { name: 'backpackColor', type: 'backpack' },
+                    { name: 'lunchboxColor', type: 'lunchbox' }
+                ],
+                ordinalSlots: [
+                    { name: 'seatNumber', type: 'seats' }
+                ],
                 text: {
-                    en: 'Adam got on the yellow bus and sat in the third seat. He was carrying a blue backpack with a green lunchbox inside. Adam forgot his umbrella under the seat when he got off, so the driver, Saeed, ran after him to return it.',
-                    ar: 'ركب آدم الحافلة الصفراء وجلس في المقعد الثالث. كان يحمل حقيبة زرقاء وبداخلها علبة طعام خضراء. نسي آدم مظلته تحت الكرسي عندما نزل، فركض السائق سعيد خلفه ليعيدها له.'
+                    en: 'Adam got on the yellow bus and sat in the {seatNumber} seat. He was carrying a {backpackColor} backpack with a {lunchboxColor} lunchbox inside. Adam forgot his umbrella under the seat when he got off, so the driver, Saeed, ran after him to return it.',
+                    ar: 'ركب آدم الحافلة الصفراء وجلس في المقعد {seatNumber_masc}. كان يحمل حقيبة {backpackColor_fem} وبداخلها علبة طعام {lunchboxColor_fem}. نسي آدم مظلته تحت الكرسي عندما نزل، فركض السائق سعيد خلفه ليعيدها له.'
                 },
                 questions: [
                     {
                         text: { en: 'Which seat did Adam sit in?', ar: 'في أي مقعد جلس آدم؟' },
-                        options: {
-                            en: ['First seat', 'Second seat', 'Third seat', 'Fourth seat'],
-                            ar: ['المقعد الأول', 'المقعد الثاني', 'المقعد الثالث', 'المقعد الرابع']
-                        },
-                        correct: 2
+                        ordinalQuestion: 'seatNumber',
+                        ordinalFeminine: false
                     },
                     {
                         text: { en: 'What color was the lunchbox in his bag?', ar: 'ما لون علبة الطعام التي كانت في حقيبته؟' },
-                        options: {
-                            en: ['Blue', 'Yellow', 'Green', 'Red'],
-                            ar: ['أزرق', 'أصفر', 'أخضر', 'أحمر']
-                        },
-                        correct: 2
+                        colorQuestion: 'lunchboxColor',
+                        colorFeminine: true
                     },
                     {
                         text: { en: 'What did Adam forget under the seat?', ar: 'ماذا نسي آدم تحت الكرسي؟' },
@@ -754,18 +978,19 @@
                     en: 'The Little Baker',
                     ar: 'الخباز الصغير'
                 },
+                numberSlots: [
+                    { name: 'spoonCount', type: 'spoons' },
+                    { name: 'minuteCount', type: 'minutes' }
+                ],
                 text: {
-                    en: 'Yassin decided to make chocolate cookies. He put three spoons of sugar and two cups of flour into a large bowl. He added dark chocolate chips at the end. He baked the cookies for ten minutes, then took them out to cool on the window.',
-                    ar: 'قرر ياسين صنع بسكويت الشوكولاتة. وضع ثلاث ملاعق من السكر وكوبين من الدقيق في وعاء كبير. أضاف حبيبات الشوكولاتة الداكنة في النهاية. خبز البسكويت لمدة عشر دقائق، ثم أخرجه ليبرد على النافذة.'
+                    en: 'Yassin decided to make chocolate cookies. He put {spoonCount} spoons of sugar and two cups of flour into a large bowl. He added dark chocolate chips at the end. He baked the cookies for {minuteCount} minutes, then took them out to cool on the window.',
+                    ar: 'قرر ياسين صنع بسكويت الشوكولاتة. وضع {spoonCount_fem} ملاعق من السكر وكوبين من الدقيق في وعاء كبير. أضاف حبيبات الشوكولاتة الداكنة في النهاية. خبز البسكويت لمدة {minuteCount_fem} دقائق، ثم أخرجه ليبرد على النافذة.'
                 },
                 questions: [
                     {
                         text: { en: 'How many spoons of sugar did Yassin put in?', ar: 'كم ملعقة سكر وضع ياسين؟' },
-                        options: {
-                            en: ['Two spoons', 'Three spoons', 'Four spoons', 'Five spoons'],
-                            ar: ['ملعقتان', 'ثلاث ملاعق', 'أربع ملاعق', 'خمس ملاعق']
-                        },
-                        correct: 1
+                        numberQuestion: 'spoonCount',
+                        numberFeminine: true
                     },
                     {
                         text: { en: 'What did Yassin add at the very end?', ar: 'ماذا أضاف ياسين في النهاية؟' },
@@ -777,11 +1002,8 @@
                     },
                     {
                         text: { en: 'How many minutes did it take to bake the cookies?', ar: 'كم دقيقة استغرق خبز البسكويت؟' },
-                        options: {
-                            en: ['Five minutes', 'Ten minutes', 'Fifteen minutes', 'Twenty minutes'],
-                            ar: ['خمس دقائق', 'عشر دقائق', 'خمس عشرة دقيقة', 'عشرين دقيقة']
-                        },
-                        correct: 1
+                        numberQuestion: 'minuteCount',
+                        numberFeminine: true
                     },
                     {
                         text: { en: 'Where did he put the cookies to cool down?', ar: 'أين وضع البسكويت ليبرد؟' },
@@ -800,9 +1022,12 @@
                     en: 'The Lost Kitten',
                     ar: 'القطة الضائعة'
                 },
+                colorSlots: [
+                    { name: 'woolColor', type: 'wool' }
+                ],
                 text: {
-                    en: 'Sama looked for her kitten "Mishmish" everywhere. She looked behind the sofa but didn\'t find her, then she looked inside the wooden box and found only a red wool ball. Finally, she heard a sound from the kitchen, and found the kitten sleeping on top of the fridge.',
-                    ar: 'بحثت سما عن قطتها "مشمش" في كل مكان. نظرت خلف الأريكة ولم تجدها، ثم نظرت داخل الصندوق الخشبي ووجدت فقط كرة صوف حمراء. أخيراً، سمعت صوتاً من المطبخ، ووجدت القطة نائمة فوق الثلاجة.'
+                    en: 'Sama looked for her kitten "Mishmish" everywhere. She looked behind the sofa but didn\'t find her, then she looked inside the wooden box and found only a {woolColor} wool ball. Finally, she heard a sound from the kitchen, and found the kitten sleeping on top of the fridge.',
+                    ar: 'بحثت سما عن قطتها "مشمش" في كل مكان. نظرت خلف الأريكة ولم تجدها، ثم نظرت داخل الصندوق الخشبي ووجدت فقط كرة صوف {woolColor_fem}. أخيراً، سمعت صوتاً من المطبخ، ووجدت القطة نائمة فوق الثلاجة.'
                 },
                 questions: [
                     {
@@ -816,8 +1041,8 @@
                     {
                         text: { en: 'What did Sama find inside the wooden box?', ar: 'ماذا وجدت سما داخل الصندوق الخشبي؟' },
                         options: {
-                            en: ['The kitten', 'A red wool ball', 'A toy', 'Nothing'],
-                            ar: ['القطة', 'كرة صوف حمراء', 'لعبة', 'لا شيء']
+                            en: ['The kitten', 'A {woolColor} wool ball', 'A toy', 'Nothing'],
+                            ar: ['القطة', 'كرة صوف {woolColor_fem}', 'لعبة', 'لا شيء']
                         },
                         correct: 1
                     },
@@ -848,7 +1073,7 @@
                 },
                 text: {
                     en: 'Karim went out to the garden after the rain. He saw a small snail crawling on the stone garden wall. There were four butterflies flying around a sunflower. Karim picked a wide leaf to cover the snail from the water drops falling from the tree.',
-                    ar: 'خرج كريم إلى الحديقة بعد المطر. رأى حلزوناً صغيراً يزحف على سور الحديقة الحجري. كانت هناك أربع فراشات تطير حول زهرة عباد الشمس. قطف كريم ورقة شجر عريضة ليغطي بها الحلزون من قطرات الماء المتساقطة من الشجرة.'
+                    ar: 'خرج كريم إلى الحديقة بعد المطر. رأى حلزوناً صغيراً يزحف على سور الحديقة الحجري. كانت هناك أربع فراشات تطير حول زهرة دوار الشمس. قطف كريم ورقة شجر عريضة ليغطي بها الحلزون من قطرات الماء المتساقطة من الشجرة.'
                 },
                 questions: [
                     {
@@ -871,7 +1096,7 @@
                         text: { en: 'Which flower were the butterflies flying around?', ar: 'حول أي زهرة كانت الفراشات تطير؟' },
                         options: {
                             en: ['Rose', 'Tulip', 'Sunflower', 'Daisy'],
-                            ar: ['وردة', 'توليب', 'عباد الشمس', 'أقحوان']
+                            ar: ['وردة', 'توليب', 'دوار الشمس', 'أقحوان']
                         },
                         correct: 2
                     },
@@ -892,24 +1117,28 @@
                     en: 'The Birthday Present',
                     ar: 'هدية عيد الميلاد'
                 },
+                colorSlots: [
+                    { name: 'bikeColor', type: 'bike' },
+                    { name: 'watchColor', type: 'watch' }
+                ],
+                numberSlots: [
+                    { name: 'giftCount', type: 'gifts' }
+                ],
                 text: {
-                    en: 'On her birthday, Layan received three wrapped gifts. The large gift was a pink bicycle, and the medium gift was a coloring set. As for the small gift given to her by her brother Omar, it was a white wristwatch.',
-                    ar: 'في عيد ميلادها، حصلت ليان على ثلاث هدايا مغلفة. الهدية الكبيرة كانت دراجة وردية، والهدية المتوسطة كانت مجموعة تلوين. أما الهدية الصغيرة التي أعطاها لها أخوها عمر، فكانت عبارة عن ساعة يد بيضاء.'
+                    en: 'On her birthday, Layan received {giftCount} wrapped gifts. The large gift was a {bikeColor} bicycle, and the medium gift was a coloring set. As for the small gift given to her by her brother Omar, it was a {watchColor} wristwatch.',
+                    ar: 'في عيد ميلادها، حصلت ليان على {giftCount_fem} هدايا مغلفة. الهدية الكبيرة كانت دراجة {bikeColor_fem}، والهدية المتوسطة كانت مجموعة تلوين. أما الهدية الصغيرة التي أعطاها لها أخوها عمر، فكانت عبارة عن ساعة يد {watchColor_fem}.'
                 },
                 questions: [
                     {
                         text: { en: 'How many gifts did Layan receive?', ar: 'كم عدد الهدايا التي حصلت عليها ليان؟' },
-                        options: {
-                            en: ['Two', 'Three', 'Four', 'Five'],
-                            ar: ['اثنتان', 'ثلاث', 'أربع', 'خمس']
-                        },
-                        correct: 1
+                        numberQuestion: 'giftCount',
+                        numberFeminine: true
                     },
                     {
                         text: { en: 'What was the large gift?', ar: 'ماذا كانت الهدية الكبيرة؟' },
                         options: {
-                            en: ['A doll', 'A pink bicycle', 'A coloring set', 'A wristwatch'],
-                            ar: ['دمية', 'دراجة وردية', 'مجموعة تلوين', 'ساعة يد']
+                            en: ['A doll', 'A {bikeColor} bicycle', 'A coloring set', 'A wristwatch'],
+                            ar: ['دمية', 'دراجة {bikeColor_fem}', 'مجموعة تلوين', 'ساعة يد']
                         },
                         correct: 1
                     },
@@ -923,11 +1152,8 @@
                     },
                     {
                         text: { en: 'What color was the wristwatch she got?', ar: 'ما لون ساعة اليد التي حصلت عليها؟' },
-                        options: {
-                            en: ['Pink', 'Blue', 'White', 'Gold'],
-                            ar: ['وردي', 'أزرق', 'أبيض', 'ذهبي']
-                        },
-                        correct: 2
+                        colorQuestion: 'watchColor',
+                        colorFeminine: true
                     }
                 ]
             }
@@ -942,18 +1168,18 @@
                     en: 'The Hungry Rabbit',
                     ar: 'الأرنب الجائع'
                 },
+                colorSlots: [
+                    { name: 'rabbitColor', type: 'rabbit' }
+                ],
                 text: {
-                    en: 'The white rabbit saw a big carrot under the tree. The rabbit ate the carrot and then drank some cold water. The rabbit slept in his small house.',
-                    ar: 'رأى الأرنب الأبيض جزرة كبيرة تحت الشجرة. أكل الأرنب الجزرة ثم شرب ماءً بارداً. نام الأرنب في بيته الصغير.'
+                    en: 'The {rabbitColor} rabbit saw a big carrot under the tree. The rabbit ate the carrot and then drank some cold water. The rabbit slept in his small house.',
+                    ar: 'رأى الأرنب ال{rabbitColor_masc} جزرة كبيرة تحت الشجرة. أكل الأرنب الجزرة ثم شرب ماءً بارداً. نام الأرنب في بيته الصغير.'
                 },
                 questions: [
                     {
                         text: { en: 'What color is the rabbit?', ar: 'ما لون الأرنب؟' },
-                        options: {
-                            en: ['Brown', 'White', 'Black', 'Gray'],
-                            ar: ['بني', 'أبيض', 'أسود', 'رمادي']
-                        },
-                        correct: 1
+                        colorQuestion: 'rabbitColor',
+                        colorFeminine: false
                     },
                     {
                         text: { en: 'What did the rabbit find under the tree?', ar: 'ماذا وجد الأرنب تحت الشجرة؟' },
@@ -985,21 +1211,21 @@
                 id: 'kg_balloon',
                 icon: '🎈',
                 title: {
-                    en: 'The Red Balloon',
-                    ar: 'البالون الأحمر'
+                    en: 'The Colorful Balloon',
+                    ar: 'البالون الملون'
                 },
+                colorSlots: [
+                    { name: 'balloonColor', type: 'balloon' }
+                ],
                 text: {
-                    en: 'Bassem bought a red balloon. The balloon flew high in the air. Dad caught the balloon and gave it to Bassem. Bassem laughed and said, "Thank you."',
-                    ar: 'اشترى باسم بالوناً أحمر. طار البالون عالياً في الهواء. أمسك الأب بالبالون وأعطاه لباسم. ضحك باسم وقال: شكراً.'
+                    en: 'Bassem bought a {balloonColor} balloon. The balloon flew high in the air. Dad caught the balloon and gave it to Bassem. Bassem laughed and said, "Thank you."',
+                    ar: 'اشترت لين بالوناً {balloonColor_masc}. طار البالون عالياً في الهواء. أمسك الأب بالبالون وأعطاه لباسم. ضحك باسم وقال: شكراً.'
                 },
                 questions: [
                     {
                         text: { en: 'What color was the balloon?', ar: 'ما لون البالون؟' },
-                        options: {
-                            en: ['Blue', 'Red', 'Yellow', 'Green'],
-                            ar: ['أزرق', 'أحمر', 'أصفر', 'أخضر']
-                        },
-                        correct: 1
+                        colorQuestion: 'balloonColor',
+                        colorFeminine: false
                     },
                     {
                         text: { en: 'Where did the balloon fly?', ar: 'أين طار البالون؟' },
@@ -1034,18 +1260,19 @@
                     en: 'Fish in the Water',
                     ar: 'السمكة في الماء'
                 },
+                colorSlots: [
+                    { name: 'fish1Color', type: 'fish' },
+                    { name: 'fish2Color', type: 'fish' }
+                ],
                 text: {
-                    en: 'In the sea, there is a small yellow fish. The fish swims next to a big rock. The fish saw her friend, the blue fish, and they played together in the sand.',
-                    ar: 'في البحر سمكة صفراء صغيرة. تسبح السمكة بجانب صخرة كبيرة. رأت السمكة صديقتها السمكة الزرقاء ولعبتا معاً في الرمل.'
+                    en: 'In the sea, there is a small {fish1Color} fish. The fish swims next to a big rock. The fish saw her friend, the {fish2Color} fish, and they played together in the sand.',
+                    ar: 'في البحر سمكة {fish1Color_fem} صغيرة. تسبح السمكة بجانب صخرة كبيرة. رأت السمكة صديقتها السمكة {fish2Color_fem} ولعبتا معاً في الرمل.'
                 },
                 questions: [
                     {
                         text: { en: 'What color is the small fish?', ar: 'ما لون السمكة الصغيرة؟' },
-                        options: {
-                            en: ['Red', 'Blue', 'Yellow', 'Green'],
-                            ar: ['أحمر', 'أزرق', 'أصفر', 'أخضر']
-                        },
-                        correct: 2
+                        colorQuestion: 'fish1Color',
+                        colorFeminine: true
                     },
                     {
                         text: { en: 'Where was the fish swimming?', ar: 'أين كانت تسبح السمكة؟' },
@@ -1056,12 +1283,9 @@
                         correct: 1
                     },
                     {
-                        text: { en: 'Who did the fish see in the water?', ar: 'من رأت السمكة في الماء؟' },
-                        options: {
-                            en: ['A red fish', 'A blue fish', 'A green fish', 'A big fish'],
-                            ar: ['سمكة حمراء', 'سمكة زرقاء', 'سمكة خضراء', 'سمكة كبيرة']
-                        },
-                        correct: 1
+                        text: { en: 'What color was the friend fish?', ar: 'ما لون السمكة الصديقة؟' },
+                        colorQuestion: 'fish2Color',
+                        colorFeminine: true
                     },
                     {
                         text: { en: 'Where did the two fish play together?', ar: 'أين لعبت السمكتان معاً؟' },
@@ -1210,9 +1434,152 @@
             });
         }
         
+        // Current story color assignments
+        let currentColorMap = {};
+        let currentColorTypes = {};  // Store semantic types for color questions
+        
+        // Current story number assignments
+        let currentNumberMap = {};
+        let currentNumberTypes = {};  // Store semantic types for number questions
+        
+        // Current story ordinal assignments
+        let currentOrdinalMap = {};
+        let currentOrdinalTypes = {};  // Store semantic types for ordinal questions
+        
+        // Process a story with random colors, numbers, and ordinals
+        function processStoryWithColors(story) {
+            // Deep clone the story first
+            const processed = JSON.parse(JSON.stringify(story));
+            
+            // Reset maps
+            currentColorMap = {};
+            currentColorTypes = {};
+            currentNumberMap = {};
+            currentNumberTypes = {};
+            currentOrdinalMap = {};
+            currentOrdinalTypes = {};
+            
+            // Process color slots if any
+            if (story.colorSlots && story.colorSlots.length > 0) {
+                const usedColors = [];
+                
+                story.colorSlots.forEach(slot => {
+                    const slotName = typeof slot === 'string' ? slot : slot.name;
+                    const slotType = typeof slot === 'string' ? null : slot.type;
+                    const allowedColors = slotType ? SEMANTIC_COLORS[slotType] : null;
+                    
+                    const color = getRandomColor(usedColors, allowedColors);
+                    currentColorMap[slotName] = color;
+                    currentColorTypes[slotName] = slotType;
+                    usedColors.push(color);
+                });
+            }
+            
+            // Process number slots if any
+            if (story.numberSlots && story.numberSlots.length > 0) {
+                const usedNumbers = [];
+                
+                story.numberSlots.forEach(slot => {
+                    const slotName = slot.name;
+                    const slotType = slot.type;
+                    const allowedNumbers = slotType ? SEMANTIC_NUMBERS[slotType] : null;
+                    
+                    const num = getRandomNumber(usedNumbers, allowedNumbers);
+                    currentNumberMap[slotName] = num;
+                    currentNumberTypes[slotName] = slotType;
+                    usedNumbers.push(num);
+                });
+            }
+            
+            // Process ordinal slots if any
+            if (story.ordinalSlots && story.ordinalSlots.length > 0) {
+                const usedOrdinals = [];
+                
+                story.ordinalSlots.forEach(slot => {
+                    const slotName = slot.name;
+                    const slotType = slot.type;
+                    const allowedOrdinals = slotType ? SEMANTIC_ORDINALS[slotType] : null;
+                    
+                    const ord = getRandomOrdinal(usedOrdinals, allowedOrdinals);
+                    currentOrdinalMap[slotName] = ord;
+                    currentOrdinalTypes[slotName] = slotType;
+                    usedOrdinals.push(ord);
+                });
+            }
+            
+            // Apply colors, numbers, and ordinals to story text
+            processed.text.en = applyColors(processed.text.en, currentColorMap, 'en');
+            processed.text.ar = applyColors(processed.text.ar, currentColorMap, 'ar');
+            processed.text.en = applyNumbers(processed.text.en, currentNumberMap, 'en');
+            processed.text.ar = applyNumbers(processed.text.ar, currentNumberMap, 'ar');
+            processed.text.en = applyOrdinals(processed.text.en, currentOrdinalMap, 'en');
+            processed.text.ar = applyOrdinals(processed.text.ar, currentOrdinalMap, 'ar');
+            
+            // Process questions
+            processed.questions = processed.questions.map(q => {
+                const question = { ...q };
+                
+                // Apply colors, numbers, and ordinals to question text if it has placeholders
+                if (question.text) {
+                    let enText = applyColors(question.text.en, currentColorMap, 'en');
+                    let arText = applyColors(question.text.ar, currentColorMap, 'ar');
+                    enText = applyNumbers(enText, currentNumberMap, 'en');
+                    arText = applyNumbers(arText, currentNumberMap, 'ar');
+                    enText = applyOrdinals(enText, currentOrdinalMap, 'en');
+                    arText = applyOrdinals(arText, currentOrdinalMap, 'ar');
+                    question.text = { en: enText, ar: arText };
+                }
+                
+                // If this is a color question, generate options dynamically
+                if (question.colorQuestion) {
+                    const correctColor = currentColorMap[question.colorQuestion];
+                    const semanticType = currentColorTypes[question.colorQuestion];
+                    const colorResult = generateColorOptions(correctColor, question.colorFeminine, semanticType);
+                    question.options = colorResult.options;
+                    question.correct = colorResult.correct;
+                }
+                // If this is a number question, generate options dynamically
+                else if (question.numberQuestion) {
+                    const correctNumber = currentNumberMap[question.numberQuestion];
+                    const semanticType = currentNumberTypes[question.numberQuestion];
+                    const numResult = generateNumberOptions(correctNumber, question.numberFeminine, semanticType);
+                    question.options = numResult.options;
+                    question.correct = numResult.correct;
+                }
+                // If this is an ordinal question, generate options dynamically
+                else if (question.ordinalQuestion) {
+                    const correctOrdinal = currentOrdinalMap[question.ordinalQuestion];
+                    const semanticType = currentOrdinalTypes[question.ordinalQuestion];
+                    const ordResult = generateOrdinalOptions(correctOrdinal, question.ordinalFeminine, semanticType);
+                    question.options = ordResult.options;
+                    question.correct = ordResult.correct;
+                }
+                // Apply colors, numbers, and ordinals to regular options if they have placeholders
+                else if (question.options) {
+                    question.options = {
+                        en: question.options.en.map(opt => {
+                            let result = applyColors(opt, currentColorMap, 'en');
+                            result = applyNumbers(result, currentNumberMap, 'en');
+                            return applyOrdinals(result, currentOrdinalMap, 'en');
+                        }),
+                        ar: question.options.ar.map(opt => {
+                            let result = applyColors(opt, currentColorMap, 'ar');
+                            result = applyNumbers(result, currentNumberMap, 'ar');
+                            return applyOrdinals(result, currentOrdinalMap, 'ar');
+                        })
+                    };
+                }
+                
+                return question;
+            });
+            
+            return processed;
+        }
+        
         // Select a story
         function selectStory(story) {
-            currentStory = story;
+            // Process story with random colors
+            currentStory = processStoryWithColors(story);
             currentQuestionIndex = 0;
             storyCorrectAnswers = 0;
             userAnswers = [];
@@ -1259,6 +1626,12 @@
             clearInterval(readingTimer);
             showScreen('questionScreen');
             displayQuestion();
+        };
+        
+        // Back from story button clicked
+        document.getElementById('backFromStoryBtn').onclick = () => {
+            clearInterval(readingTimer);
+            showScreen('storySelectScreen');
         };
         
         // Display current question

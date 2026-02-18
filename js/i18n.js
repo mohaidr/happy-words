@@ -734,7 +734,8 @@ const I18n = {
             "storyGame.perfect": "Perfect! 🌟",
             "storyGame.greatJob": "Great Job!",
             "storyGame.goodJob": "Good Job!",
-            "storyGame.keepTrying": "Keep Trying!"
+            "storyGame.keepTrying": "Keep Trying!",
+            "storyGame.backToStories": "← Back"
         },
         ar: {
             "app.title": "كلمات سعيدة للأطفال! 🌟",
@@ -1454,7 +1455,8 @@ const I18n = {
             "storyGame.perfect": "ممتاز! 🌟",
             "storyGame.greatJob": "أحسنت!",
             "storyGame.goodJob": "جيد!",
-            "storyGame.keepTrying": "استمر بالمحاولة!"
+            "storyGame.keepTrying": "استمر بالمحاولة!",
+            "storyGame.backToStories": "العودة →"
         }
     },
 

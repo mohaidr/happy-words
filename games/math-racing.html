@@ -323,6 +323,13 @@
                 buttons[index].classList.add('wrong-flash');
                 GameUtils.playSound('wrong');
                 setTimeout(() => buttons[index].classList.remove('wrong-flash'), 300);
+                
+                // Reduce lives on wrong answer
+                lives--;
+                livesEl.textContent = lives;
+                if (lives <= 0) {
+                    endGame();
+                }
             }
         }
         
@@ -395,7 +402,7 @@
             obstacles.forEach(o => o.el.remove());
             obstacles = [];
             score = 0;
-            lives = GameUtils.getMaxLives({kg: 5, 'g1-3': 4, default: 3});
+            lives = GameUtils.getMaxLives({kg: 10, 'g1-3': 8, default: 6});
             speed = 2;
             
             gameWidth = gameArea.offsetWidth;
@@ -447,8 +454,19 @@
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            
+            // Use localized format for high score
+            const highScoreText = typeof I18n !== 'undefined' 
+                ? `${bestScore} ${I18n.t('game.by')} ${bestPlayer}`
+                : `${bestScore} by ${bestPlayer}`;
+            document.getElementById('highScore').textContent = highScoreText;
+            
+            // Use localized player game text
+            const playerGameText = typeof I18n !== 'undefined' 
+                ? I18n.t('game.playerGame', { name: playerName })
+                : `${playerName}'s Game`;
+            document.getElementById('playerDisplay').textContent = playerGameText;
+            
             gameOverEl.style.display = 'block';
             loadHighScore();
         }
