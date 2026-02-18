@@ -168,7 +168,7 @@
     <script>
         const GAME_KEY = 'emojiFeelings';
         
-        // Feelings with emojis and i18n keys
+        // 30 unique feelings with kid-friendly emojis
         const feelings = [
             { emoji: '😊', key: 'happy' },
             { emoji: '😢', key: 'sad' },
@@ -177,19 +177,29 @@
             { emoji: '😲', key: 'surprised' },
             { emoji: '😴', key: 'tired' },
             { emoji: '🤔', key: 'confused' },
-            { emoji: '😍', key: 'excited' },
+            { emoji: '🤩', key: 'excited' },
             { emoji: '😌', key: 'calm' },
-            { emoji: '🥺', key: 'worried' },
+            { emoji: '😟', key: 'worried' },
             { emoji: '😤', key: 'frustrated' },
             { emoji: '🤗', key: 'loving' },
             { emoji: '😎', key: 'proud' },
             { emoji: '😳', key: 'embarrassed' },
-            { emoji: '🤢', key: 'sick' },
+            { emoji: '🤒', key: 'sick' },
             { emoji: '😒', key: 'bored' },
             { emoji: '🥰', key: 'grateful' },
-            { emoji: '😤', key: 'annoyed' },
+            { emoji: '😑', key: 'annoyed' },
             { emoji: '😔', key: 'lonely' },
-            { emoji: '🤩', key: 'amazed' },
+            { emoji: '😮', key: 'amazed' },
+            { emoji: '🥳', key: 'playful' },
+            { emoji: '😇', key: 'kind' },
+            { emoji: '🤭', key: 'silly' },
+            { emoji: '😋', key: 'hungry' },
+            { emoji: '🥱', key: 'sleepy' },
+            { emoji: '🤓', key: 'curious' },
+            { emoji: '🙂', key: 'content' },
+            { emoji: '😅', key: 'relieved' },
+            { emoji: '🤫', key: 'shy' },
+            { emoji: '💪', key: 'strong' },
         ];
         
         function getFeelingWord(feeling) {
@@ -208,7 +218,7 @@
         
         let score = 0;
         let level = 1;
-        let lives = 3;
+        let lives = 5;
         let currentFeeling = null;
         
         let usedFeelings = [];
@@ -217,36 +227,29 @@
         
         let highScore = GameUtils.getHighScore(GAME_KEY);
         let playerName = GameUtils.getPlayerName();
-        let gradeLevel = GameUtils.getGradeLevel();
         
         const feelingWord = document.getElementById('feelingWord');
         const feelingTip = document.getElementById('feelingTip');
         const emojiGrid = document.getElementById('emojiGrid');
         
         function getChoiceCount() {
-            if (gradeLevel === 'kg') return 4;
-            return 4 + Math.min(Math.floor(level / 3), 2);
-        }
-        
-        function getAvailableFeelings() {
-            // For younger kids, use simpler feelings
-            if (gradeLevel === 'kg') {
-                return feelings.slice(0, 10);
-            }
-            if (gradeLevel === 'g1-3') {
-                return feelings.slice(0, 15);
-            }
-            return feelings;
+            // Always show 4 emoji choices
+            return 4;
         }
         
         function generateQuestion() {
             canAnswer = true;
             
-            const available = getAvailableFeelings().filter(f => !usedFeelings.includes(f.key));
-            if (available.length < 4) usedFeelings = [];
+            // Get feelings not yet used
+            const available = feelings.filter(f => !usedFeelings.includes(f.key));
             
-            const pool = available.length >= 4 ? available : getAvailableFeelings();
-            const shuffled = [...pool].sort(() => Math.random() - 0.5);
+            // If all feelings used, end game!
+            if (available.length < 4) {
+                endGame();
+                return;
+            }
+            
+            const shuffled = [...available].sort(() => Math.random() - 0.5);
             
             currentFeeling = shuffled[0];
             usedFeelings.push(currentFeeling.key);
@@ -323,14 +326,10 @@
             score = 0;
             level = 1;
             usedFeelings = [];
-            
-            playerName = GameUtils.getPlayerName();
-            gradeLevel = GameUtils.getGradeLevel();
-            lives = GameUtils.getMaxLives({kg: 8, 'g1-3': 5, default: 3});
+            lives = 5;
             questionsAnswered = 0;
             
             playerName = GameUtils.getPlayerName();
-            gradeLevel = GameUtils.getGradeLevel();
             highScore = GameUtils.getHighScore(GAME_KEY);
             
             document.getElementById('score').textContent = score;
