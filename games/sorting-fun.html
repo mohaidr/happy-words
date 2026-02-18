@@ -175,7 +175,7 @@
         <div>⏱️ <span id="time">0</span>s</div>
     </div>
     
-    <div class="category-name" id="categoryName">Sort the items!</div>
+    <div class="category-name" id="categoryName"></div>
     
     <div class="bins-container" id="binsContainer"></div>
     
@@ -205,6 +205,7 @@
         }
         
         const categories = [
+            // Easy categories (KG friendly)
             {
                 nameKey: 'sortingFun.cat.animalsVsFood',
                 bins: [
@@ -220,12 +221,27 @@
                 ]
             },
             {
+                nameKey: 'sortingFun.cat.bigVsSmall',
+                bins: [
+                    { labelKey: 'sortingFun.bin.big', icon: '🐘', items: ['🐘', '🦒', '🐋', '🏠', '🚌', '🌳'] },
+                    { labelKey: 'sortingFun.bin.small', icon: '🐜', items: ['🐜', '🐝', '🦗', '🍓', '🔑', '💎'] }
+                ]
+            },
+            {
+                nameKey: 'sortingFun.cat.clothesVsToys',
+                bins: [
+                    { labelKey: 'sortingFun.bin.clothes', icon: '👕', items: ['👕', '👖', '🧢', '👟', '🧤', '🧣'] },
+                    { labelKey: 'sortingFun.bin.toys', icon: '🧸', items: ['🧸', '🎮', '🪀', '🎯', '🪁', '🎲'] }
+                ]
+            },
+            {
                 nameKey: 'sortingFun.cat.fruitsVsVegetables',
                 bins: [
                     { labelKey: 'sortingFun.bin.fruits', icon: '🍇', items: ['🍎', '🍌', '🍊', '🍓', '🍑', '🥝'] },
                     { labelKey: 'sortingFun.bin.vegetables', icon: '🥬', items: ['🥕', '🥦', '🌽', '🍆', '🥒', '🫑'] }
                 ]
             },
+            // Medium categories (Grades 1-3)
             {
                 nameKey: 'sortingFun.cat.hotVsCold',
                 bins: [
@@ -246,10 +262,61 @@
                     { labelKey: 'sortingFun.bin.day', icon: '☀️', items: ['☀️', '🌤️', '☁️', '🦋', '🐝', '🌻'] },
                     { labelKey: 'sortingFun.bin.night', icon: '🌙', items: ['🌙', '⭐', '🦉', '🦇', '🌃', '🔦'] }
                 ]
+            },
+            {
+                nameKey: 'sortingFun.cat.sweetVsSour',
+                bins: [
+                    { labelKey: 'sortingFun.bin.sweet', icon: '🍬', items: ['🍬', '🍭', '🍪', '🎂', '🍫', '🍯'] },
+                    { labelKey: 'sortingFun.bin.sour', icon: '🍋', items: ['🍋', '🥒', '🍏', '🥝', '🍊', '🫒'] }
+                ]
+            },
+            {
+                nameKey: 'sortingFun.cat.fastVsSlow',
+                bins: [
+                    { labelKey: 'sortingFun.bin.fast', icon: '🚀', items: ['🚀', '✈️', '🏎️', '⚡', '🐆', '🦅'] },
+                    { labelKey: 'sortingFun.bin.slow', icon: '🐢', items: ['🐢', '🐌', '🦥', '🐛', '🚶', '🐘'] }
+                ]
+            },
+            // Harder categories (Grades 3-6)
+            {
+                nameKey: 'sortingFun.cat.indoorVsOutdoor',
+                bins: [
+                    { labelKey: 'sortingFun.bin.indoor', icon: '🏠', items: ['🛋️', '🛏️', '📺', '🚿', '🍳', '💡'] },
+                    { labelKey: 'sortingFun.bin.outdoor', icon: '🌳', items: ['🌳', '🌻', '⛺', '🏕️', '🎡', '🏖️'] }
+                ]
+            },
+            {
+                nameKey: 'sortingFun.cat.summerVsWinter',
+                bins: [
+                    { labelKey: 'sortingFun.bin.summer', icon: '🌞', items: ['🌞', '🏖️', '🍦', '🩱', '🕶️', '⛱️'] },
+                    { labelKey: 'sortingFun.bin.winter', icon: '⛄', items: ['⛄', '🧣', '🎿', '☃️', '🧤', '🛷'] }
+                ]
+            },
+            {
+                nameKey: 'sortingFun.cat.schoolVsHome',
+                bins: [
+                    { labelKey: 'sortingFun.bin.school', icon: '🏫', items: ['📚', '✏️', '📐', '🎒', '📝', '🖍️'] },
+                    { labelKey: 'sortingFun.bin.home', icon: '🏠', items: ['🛏️', '🍳', '📺', '🛋️', '🧸', '🚿'] }
+                ]
+            },
+            {
+                nameKey: 'sortingFun.cat.healthyVsJunk',
+                bins: [
+                    { labelKey: 'sortingFun.bin.healthy', icon: '🥗', items: ['🥗', '🥕', '🍎', '🥦', '🍌', '💪'] },
+                    { labelKey: 'sortingFun.bin.junk', icon: '🍔', items: ['🍔', '🍟', '🍕', '🍩', '🍫', '🥤'] }
+                ]
+            },
+            {
+                nameKey: 'sortingFun.cat.softVsHard',
+                bins: [
+                    { labelKey: 'sortingFun.bin.soft', icon: '🧸', items: ['🧸', '☁️', '🛏️', '🧁', '🐑', '🎀'] },
+                    { labelKey: 'sortingFun.bin.hard', icon: '🪨', items: ['🪨', '💎', '🧱', '🔩', '🏠', '🦴'] }
+                ]
             }
         ];
         
         let currentCategory = null;
+        let usedCategories = [];
         let score = 0;
         let round = 1;
         let totalRounds = 5;
@@ -261,16 +328,8 @@
         const playerName = GameUtils.getPlayerName();
         const gradeLevel = GameUtils.getGradeLevel();
         
-        // Get categories based on grade level
+        // Get all categories for all levels
         function getCategories() {
-            if (gradeLevel === 'kg') {
-                // KG: Only the simplest, most obvious categories
-                return categories.slice(0, 2); // Animals vs Food, Land vs Water
-            } else if (gradeLevel === 'g1-3') {
-                // Grade 1-3: More categories
-                return categories.slice(0, 4);
-            }
-            // Grade 3-6: All categories
             return categories;
         }
         
@@ -307,10 +366,11 @@
         }
         
         function setupRound() {
-            // Pick random category based on grade
+            // Pick random category based on grade, excluding already used ones
             const gradeCategories = getCategories();
-            const availableCategories = gradeCategories.filter(c => c !== currentCategory);
+            const availableCategories = gradeCategories.filter(c => !usedCategories.includes(c));
             currentCategory = availableCategories[Math.floor(Math.random() * availableCategories.length)];
+            usedCategories.push(currentCategory);
             
             document.getElementById('categoryName').textContent = t(currentCategory.nameKey);
             
@@ -498,6 +558,7 @@
             score = 0;
             round = 1;
             currentCategory = null;
+            usedCategories = [];
             
             document.getElementById('score').textContent = '0';
             document.getElementById('round').textContent = '1';
@@ -537,8 +598,12 @@
         // Initialize sound toggle
         GameUtils.initSoundToggle();
         
-        // Auto-start game on load
-        setTimeout(() => startGame(), 500);
+        // Auto-start game on load after translations are ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => setTimeout(() => startGame(), 100));
+        } else {
+            setTimeout(() => startGame(), 100);
+        }
     </script>
     <script>
         // Add language toggle button
