@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Analytics -->
+    <script src="../js/analytics.js"></script>
+    <script src="../js/i18n.js"></script>
+    <title>📖 Story Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Story Selection */
+        .story-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .story-card {
+            background: linear-gradient(145deg, #fff, #f8f8f8);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+        }
+        
+        .story-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .story-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(145deg, #e8e4ff, #f0edff);
+        }
+        
+        .story-card.completed {
+            border-color: #10b981;
+        }
+        
+        .story-card .story-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        
+        .story-card .story-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .story-card .story-score {
+            font-size: 12px;
+            color: #10b981;
+            margin-top: 4px;
+        }
+        
+        /* Story Display */
+        .story-section {
+            background: linear-gradient(145deg, #fff, #f8f8f8);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        .story-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #e2e8f0;
+        }
+        
+        .story-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4a5568;
+        }
+        
+        .story-icon-large {
+            font-size: 36px;
+        }
+        
+        .story-text {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #2d3748;
+            text-align: justify;
+        }
+        
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        
+        .timer-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .read-instruction {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            color: #92400e;
+            margin-bottom: 16px;
+        }
+        
+        /* Questions Section */
+        .question-section {
+            background: linear-gradient(145deg, #fff, #f8f8f8);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        .question-progress {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .question-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .question-dot.current {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+        
+        .question-dot.answered {
+            background: #10b981;
+        }
+        
+        .question-dot.wrong {
+            background: #ef4444;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer-option {
+            background: linear-gradient(135deg, #f0f4ff, #e8edff);
+            border: 3px solid #c7d2fe;
+            border-radius: 14px;
+            padding: 14px 20px;
+            font-size: 16px;
+            color: #4338ca;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .answer-option:hover {
+            background: linear-gradient(135deg, #e0e7ff, #d0d9ff);
+            transform: translateX(4px);
+        }
+        
+        .answer-option.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #667eea;
+            color: white;
+        }
+        
+        .answer-option.correct {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+            color: white;
+            animation: pulse 0.5s ease;
+        }
+        
+        .answer-option.wrong {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-color: #ef4444;
+            color: white;
+            animation: shake 0.3s ease;
+        }
+        
+        .answer-option.show-correct {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+            color: white;
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: linear-gradient(145deg, #fff, #f8f8f8);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .results-emoji {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .results-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 24px;
+            color: white;
+        }
+        
+        .score-number {
+            font-size: 48px;
+            font-weight: 700;
+        }
+        
+        .score-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .review-section {
+            margin-top: 24px;
+        }
+        
+        .review-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .review-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e2e8f0;
+        }
+        
+        .review-item.correct {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .review-item.wrong {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .review-question {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+        
+        .review-answer {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .review-answer .icon {
+            font-size: 16px;
+        }
+        
+        .review-answer.user-answer {
+            color: #718096;
+        }
+        
+        .review-answer.correct-answer {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 500px) {
+            .story-select {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .story-text {
+                font-size: 16px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>
+        <a href="category-reading.html" class="category-btn" data-i18n="nav.reading">📚 Reading</a>
+        <h1>📖 <span data-i18n="storyGame.title">Story Time</span></h1>
+    </div>
+    
+    <div class="stats">
+        <div><span data-i18n="game.score">Score</span>: <span id="totalScore">0</span></div>
+        <div>📚 <span data-i18n="storyGame.storiesCompleted">Stories</span>: <span id="storiesCompleted">0</span>/<span id="totalStories">10</span></div>
+    </div>
+    
+    <div class="game-container">
+        <!-- Story Selection Screen -->
+        <div id="storySelectScreen">
+            <p class="info" style="color: white; margin-bottom: 15px;" data-i18n="storyGame.selectStory">Choose a story to read!</p>
+            <div class="story-select" id="storySelect"></div>
+        </div>
+        
+        <!-- Story Reading Screen -->
+        <div id="storyScreen" class="hidden">
+            <div class="story-section">
+                <div class="read-instruction" data-i18n="storyGame.readCarefully">📚 Read the story carefully!</div>
+                <div class="story-header">
+                    <span class="story-name" id="storyName"></span>
+                    <span class="story-icon-large" id="storyIconLarge"></span>
+                </div>
+                <div class="story-text" id="storyText"></div>
+                <div class="timer-bar">
+                    <div class="timer-progress" id="timerProgress"></div>
+                </div>
+                <div class="timer-text" id="timerText"></div>
+            </div>
+            <div class="btn-row">
+                <button class="start-btn" id="readyBtn" data-i18n="storyGame.imReady">✓ I'm Ready!</button>
+            </div>
+        </div>
+        
+        <!-- Questions Screen -->
+        <div id="questionScreen" class="hidden">
+            <div class="question-section">
+                <div class="question-progress" id="questionProgress"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="answer-options" id="answerOptions"></div>
+            </div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden">
+            <div class="results-section">
+                <div class="results-header">
+                    <div class="results-emoji" id="resultsEmoji">🎉</div>
+                    <div class="results-title" id="resultsTitle" data-i18n="storyGame.greatJob">Great Job!</div>
+                </div>
+                <div class="score-display">
+                    <div class="score-number" id="scoreNumber">0/4</div>
+                    <div class="score-label" data-i18n="storyGame.correctAnswers">Correct Answers</div>
+                </div>
+                <div class="review-section">
+                    <div class="review-title" data-i18n="storyGame.reviewAnswers">📝 Review Your Answers</div>
+                    <div id="reviewList"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="start-btn" id="nextStoryBtn" data-i18n="storyGame.nextStory">📖 Next Story</button>
+                    <button class="back-btn" id="backToSelectBtn" data-i18n="storyGame.chooseAnother">Choose Another</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <p class="info" data-i18n="storyGame.instruction">Read stories and answer questions!</p>
+    <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
+
+    <script src="../js/game-utils.js"></script>
+    <script>
+        const GAME_KEY = 'storyComprehension';
+        
+        // Stories data with both Arabic and English
+        const stories = [
+            {
+                id: 'artist',
+                icon: '🎨',
+                title: {
+                    en: 'The Creative Artist',
+                    ar: 'الرسام المبدع'
+                },
+                text: {
+                    en: 'Layla drew a large picture. She drew three brown mountains and a blue waterfall flowing from the middle mountain. She placed a small yellow tent under the tree, then she drew a single bird flying in the clear sky.',
+                    ar: 'رسمت ليلى لوحة كبيرة. رسمت ثلاثة جبال بنية، وشلالاً أزرق ينزل من الجبل الأوسط. وضعت خيمة صفراء صغيرة تحت الشجرة، ثم رسمت عصفوراً وحيداً يطير في السماء الصافية.'
+                },
+                questions: [
+                    {
+                        text: { en: 'How many mountains did Layla draw?', ar: 'كم جبلًا رسمت ليلى؟' },
+                        options: {
+                            en: ['Two', 'Three', 'Four', 'Five'],
+                            ar: ['اثنان', 'ثلاثة', 'أربعة', 'خمسة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'From which mountain was the waterfall flowing?', ar: 'من أي جبل كان ينزل الشلال؟' },
+                        options: {
+                            en: ['The first mountain', 'The middle mountain', 'The last mountain', 'All mountains'],
+                            ar: ['الجبل الأول', 'الجبل الأوسط', 'الجبل الأخير', 'كل الجبال']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Where did she place the yellow tent?', ar: 'أين وضعت الخيمة الصفراء؟' },
+                        options: {
+                            en: ['On the mountain', 'Under the tree', 'By the waterfall', 'In the sky'],
+                            ar: ['على الجبل', 'تحت الشجرة', 'بجانب الشلال', 'في السماء']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What was the bird doing in the drawing?', ar: 'ماذا كان يفعل العصفور في الرسمة؟' },
+                        options: {
+                            en: ['Sitting on a tree', 'Flying in the sky', 'Swimming in water', 'Standing on mountain'],
+                            ar: ['يجلس على الشجرة', 'يطير في السماء', 'يسبح في الماء', 'يقف على الجبل']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'kitchen',
+                icon: '🍰',
+                title: {
+                    en: 'The Busy Kitchen',
+                    ar: 'المطبخ المزدحم'
+                },
+                text: {
+                    en: 'Grandmother was preparing an Eid cake. She put four eggs in the large bowl, then added a cup of sugar and a spoonful of vanilla. Grandmother forgot to put the butter on the table, so she asked her grandson, Khaled, to get it from the fridge.',
+                    ar: 'كانت الجدة تحضر كعكة العيد. وضعت أربع بيضات في الوعاء الكبير، ثم أضافت كوباً من السكر وملعقة من الفانيليا. نسيت الجدة وضع الزبدة على الطاولة، فطلبت من حفيدها خالد أن يحضرها من الثلاجة.'
+                },
+                questions: [
+                    {
+                        text: { en: 'How many eggs did Grandmother put in the bowl?', ar: 'كم بيضة وضعت الجدة في الوعاء؟' },
+                        options: {
+                            en: ['Two eggs', 'Three eggs', 'Four eggs', 'Five eggs'],
+                            ar: ['بيضتان', 'ثلاث بيضات', 'أربع بيضات', 'خمس بيضات']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What did Grandmother add along with the sugar?', ar: 'ماذا أضافت الجدة مع السكر؟' },
+                        options: {
+                            en: ['Milk', 'Vanilla', 'Chocolate', 'Honey'],
+                            ar: ['الحليب', 'الفانيليا', 'الشوكولاتة', 'العسل']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What item did Grandmother forget on the table?', ar: 'ما هو الشيء الذي نسيته الجدة على الطاولة؟' },
+                        options: {
+                            en: ['Sugar', 'Eggs', 'Butter', 'Flour'],
+                            ar: ['السكر', 'البيض', 'الزبدة', 'الدقيق']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What is the name of the grandson who helped her?', ar: 'ما اسم الحفيد الذي ساعد الجدة؟' },
+                        options: {
+                            en: ['Ahmed', 'Khaled', 'Omar', 'Ali'],
+                            ar: ['أحمد', 'خالد', 'عمر', 'علي']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'library',
+                icon: '📚',
+                title: {
+                    en: 'The Library Adventure',
+                    ar: 'مغامرة المكتبة'
+                },
+                text: {
+                    en: 'Amin went to the public library on Tuesday. He borrowed a book about dinosaurs and a short story about space. He put the two books in his backpack, but he lost his red card near the science bookshelf. The security guard found it and gave it back to him at the door.',
+                    ar: 'ذهب أمين إلى المكتبة العامة يوم الثلاثاء. استعار كتاباً عن الديناصورات وقصة قصيرة عن الفضاء. وضع الكتابين في ظهره، لكنه أضاع بطاقته الحمراء عند رف الكتب العلمية. وجدها الحارس وأعادها له عند الباب.'
+                },
+                questions: [
+                    {
+                        text: { en: 'On which day did Amin go to the library?', ar: 'في أي يوم ذهب أمين إلى المكتبة؟' },
+                        options: {
+                            en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+                            ar: ['الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What was the book Amin borrowed about?', ar: 'عن ماذا يتحدث الكتاب الذي استعاره أمين؟' },
+                        options: {
+                            en: ['Animals', 'Dinosaurs', 'Cars', 'Plants'],
+                            ar: ['الحيوانات', 'الديناصورات', 'السيارات', 'النباتات']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What color was the card that Amin lost?', ar: 'ما لون البطاقة التي أضاعها أمين؟' },
+                        options: {
+                            en: ['Blue', 'Green', 'Red', 'Yellow'],
+                            ar: ['أزرق', 'أخضر', 'أحمر', 'أصفر']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Who found the card and returned it to him?', ar: 'من الذي وجد البطاقة وأعادها له؟' },
+                        options: {
+                            en: ['A student', 'The security guard', 'The librarian', 'His friend'],
+                            ar: ['طالب', 'الحارس', 'أمين المكتبة', 'صديقه']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'rainy',
+                icon: '🌧️',
+                title: {
+                    en: 'The Rainy Day',
+                    ar: 'اليوم الماطر'
+                },
+                text: {
+                    en: 'It started to rain heavily. Majed put on his green coat and black rubber boots. He carried a large blue umbrella, but the strong wind flipped it inside out. Majed ran quickly and hid under the bus stop shelter until the rain stopped.',
+                    ar: 'بدأ المطر يسقط بغزارة. لبس ماجد معطفه الأخضر وحذاءه المطاطي الأسود. حمل مظلة زرقاء كبيرة، لكن الهواء القوي قلب المظلة. ركض ماجد بسرعة واختبأ تحت مظلة الحافلة حتى توقف المطر.'
+                },
+                questions: [
+                    {
+                        text: { en: 'What color was the coat Majed wore?', ar: 'ما لون المعطف الذي لبسه ماجد؟' },
+                        options: {
+                            en: ['Blue', 'Red', 'Green', 'Black'],
+                            ar: ['أزرق', 'أحمر', 'أخضر', 'أسود']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What happened to the blue umbrella?', ar: 'ماذا حدث للمظلة الزرقاء؟' },
+                        options: {
+                            en: ['It broke', 'The wind flipped it', 'He lost it', 'It flew away'],
+                            ar: ['انكسرت', 'قلبها الهواء', 'أضاعها', 'طارت بعيداً']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Where did Majed hide from the rain?', ar: 'أين اختبأ ماجد من المطر؟' },
+                        options: {
+                            en: ['Under a tree', 'Under the bus stop shelter', 'Inside a shop', 'At home'],
+                            ar: ['تحت شجرة', 'تحت مظلة الحافلة', 'داخل متجر', 'في البيت']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'When did Majed leave his hiding spot?', ar: 'متى خرج ماجد من مخبئه؟' },
+                        options: {
+                            en: ['When his mom called', 'When the bus came', 'When the rain stopped', 'When he got bored'],
+                            ar: ['عندما نادته أمه', 'عندما جاءت الحافلة', 'عندما توقف المطر', 'عندما شعر بالملل']
+                        },
+                        correct: 2
+                    }
+                ]
+            },
+            {
+                id: 'garden',
+                icon: '🍎',
+                title: {
+                    en: 'The Fruit Garden',
+                    ar: 'بستان الفواكه'
+                },
+                text: {
+                    en: 'In the orchard, Maryam picked five apples and put them in a wooden basket. She saw a small ladybug walking on a green leaf. Maryam called her brother Zaid to show him, but the ladybug flew away and hid behind a pear.',
+                    ar: 'في البستان، قطفت مريم خمس ثمرات من التفاح ووضعتها في سلة خشبية. رأت حشرة دعسوقة صغيرة تمشي على ورقة شجر خضراء. نادت مريم أخيها زيد ليريها، لكن الدعسوقة طارت واختبأت خلف ثمرة كمثرى.'
+                },
+                questions: [
+                    {
+                        text: { en: 'How many apples did Maryam pick?', ar: 'كم تفاحة قطفت مريم؟' },
+                        options: {
+                            en: ['Three', 'Four', 'Five', 'Six'],
+                            ar: ['ثلاث', 'أربع', 'خمس', 'ست']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What was the ladybug doing when Maryam saw it?', ar: 'ماذا كانت تفعل الدعسوقة عندما رأتها مريم؟' },
+                        options: {
+                            en: ['Flying', 'Walking on a leaf', 'Sleeping', 'Eating'],
+                            ar: ['تطير', 'تمشي على ورقة', 'نائمة', 'تأكل']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Who is the person Maryam called?', ar: 'من هو الشخص الذي نادته مريم؟' },
+                        options: {
+                            en: ['Her mother', 'Her sister', 'Her brother Zaid', 'Her father'],
+                            ar: ['أمها', 'أختها', 'أخوها زيد', 'أبوها']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Where did the ladybug hide at the end?', ar: 'أين اختبأت الدعسوقة في النهاية؟' },
+                        options: {
+                            en: ['Behind an apple', 'Behind a pear', 'Under a leaf', 'On a flower'],
+                            ar: ['خلف تفاحة', 'خلف كمثرى', 'تحت ورقة', 'على زهرة']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'schoolbus',
+                icon: '🚌',
+                title: {
+                    en: 'The School Bus',
+                    ar: 'حافلة المدرسة'
+                },
+                text: {
+                    en: 'Adam got on the yellow bus and sat in the third seat. He was carrying a blue backpack with a green lunchbox inside. Adam forgot his umbrella under the seat when he got off, so the driver, Saeed, ran after him to return it.',
+                    ar: 'ركب آدم الحافلة الصفراء وجلس في المقعد الثالث. كان يحمل حقيبة زرقاء وبداخلها علبة طعام خضراء. نسي آدم مظلته تحت الكرسي عندما نزل، فركض السائق سعيد خلفه ليعيدها له.'
+                },
+                questions: [
+                    {
+                        text: { en: 'Which seat did Adam sit in?', ar: 'في أي مقعد جلس آدم؟' },
+                        options: {
+                            en: ['First seat', 'Second seat', 'Third seat', 'Fourth seat'],
+                            ar: ['المقعد الأول', 'المقعد الثاني', 'المقعد الثالث', 'المقعد الرابع']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What color was the lunchbox in his bag?', ar: 'ما لون علبة الطعام التي كانت في حقيبته؟' },
+                        options: {
+                            en: ['Blue', 'Yellow', 'Green', 'Red'],
+                            ar: ['أزرق', 'أصفر', 'أخضر', 'أحمر']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What did Adam forget under the seat?', ar: 'ماذا نسي آدم تحت الكرسي؟' },
+                        options: {
+                            en: ['His backpack', 'His lunchbox', 'His umbrella', 'His book'],
+                            ar: ['حقيبته', 'علبة طعامه', 'مظلته', 'كتابه']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: "What is the bus driver's name?", ar: 'ما اسم سائق الحافلة؟' },
+                        options: {
+                            en: ['Adam', 'Saeed', 'Omar', 'Ali'],
+                            ar: ['آدم', 'سعيد', 'عمر', 'علي']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'baker',
+                icon: '🍪',
+                title: {
+                    en: 'The Little Baker',
+                    ar: 'الخباز الصغير'
+                },
+                text: {
+                    en: 'Yassin decided to make chocolate cookies. He put three spoons of sugar and two cups of flour into a large bowl. He added dark chocolate chips at the end. He baked the cookies for ten minutes, then took them out to cool on the window.',
+                    ar: 'قرر ياسين صنع بسكويت الشوكولاتة. وضع ثلاث ملاعق من السكر وكوبين من الدقيق في وعاء كبير. أضاف حبيبات الشوكولاتة الداكنة في النهاية. خبز البسكويت لمدة عشر دقائق، ثم أخرجه ليبرد على النافذة.'
+                },
+                questions: [
+                    {
+                        text: { en: 'How many spoons of sugar did Yassin put in?', ar: 'كم ملعقة سكر وضع ياسين؟' },
+                        options: {
+                            en: ['Two spoons', 'Three spoons', 'Four spoons', 'Five spoons'],
+                            ar: ['ملعقتان', 'ثلاث ملاعق', 'أربع ملاعق', 'خمس ملاعق']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did Yassin add at the very end?', ar: 'ماذا أضاف ياسين في النهاية؟' },
+                        options: {
+                            en: ['Sugar', 'Flour', 'Dark chocolate chips', 'Milk'],
+                            ar: ['السكر', 'الدقيق', 'حبيبات الشوكولاتة الداكنة', 'الحليب']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'How many minutes did it take to bake the cookies?', ar: 'كم دقيقة استغرق خبز البسكويت؟' },
+                        options: {
+                            en: ['Five minutes', 'Ten minutes', 'Fifteen minutes', 'Twenty minutes'],
+                            ar: ['خمس دقائق', 'عشر دقائق', 'خمس عشرة دقيقة', 'عشرين دقيقة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Where did he put the cookies to cool down?', ar: 'أين وضع البسكويت ليبرد؟' },
+                        options: {
+                            en: ['On the table', 'On the window', 'In the fridge', 'On the floor'],
+                            ar: ['على الطاولة', 'على النافذة', 'في الثلاجة', 'على الأرض']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'kitten',
+                icon: '🐱',
+                title: {
+                    en: 'The Lost Kitten',
+                    ar: 'القطة الضائعة'
+                },
+                text: {
+                    en: 'Sama looked for her kitten "Mishmish" everywhere. She looked behind the sofa but didn\'t find her, then she looked inside the wooden box and found only a red wool ball. Finally, she heard a sound from the kitchen, and found the kitten sleeping on top of the fridge.',
+                    ar: 'بحثت سما عن قطتها "مشمش" في كل مكان. نظرت خلف الأريكة ولم تجدها، ثم نظرت داخل الصندوق الخشبي ووجدت فقط كرة صوف حمراء. أخيراً، سمعت صوتاً من المطبخ، ووجدت القطة نائمة فوق الثلاجة.'
+                },
+                questions: [
+                    {
+                        text: { en: 'What is the name of the kitten Sama was looking for?', ar: 'ما اسم القطة التي كانت تبحث عنها سما؟' },
+                        options: {
+                            en: ['Fluffy', 'Mishmish', 'Kitty', 'Coco'],
+                            ar: ['فلافي', 'مشمش', 'كيتي', 'كوكو']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did Sama find inside the wooden box?', ar: 'ماذا وجدت سما داخل الصندوق الخشبي؟' },
+                        options: {
+                            en: ['The kitten', 'A red wool ball', 'A toy', 'Nothing'],
+                            ar: ['القطة', 'كرة صوف حمراء', 'لعبة', 'لا شيء']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Which room did Sama hear a sound from?', ar: 'من أي غرفة سمعت سما صوتاً؟' },
+                        options: {
+                            en: ['Bedroom', 'Bathroom', 'Kitchen', 'Living room'],
+                            ar: ['غرفة النوم', 'الحمام', 'المطبخ', 'غرفة المعيشة']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Where was the kitten sleeping at the end?', ar: 'أين كانت القطة نائمة في النهاية؟' },
+                        options: {
+                            en: ['On the sofa', 'In the box', 'On top of the fridge', 'Under the bed'],
+                            ar: ['على الأريكة', 'في الصندوق', 'فوق الثلاجة', 'تحت السرير']
+                        },
+                        correct: 2
+                    }
+                ]
+            },
+            {
+                id: 'rainygarden',
+                icon: '🌧️',
+                title: {
+                    en: 'The Rainy Garden',
+                    ar: 'حديقة المطر'
+                },
+                text: {
+                    en: 'Karim went out to the garden after the rain. He saw a small snail crawling on the stone garden wall. There were four butterflies flying around a sunflower. Karim picked a wide leaf to cover the snail from the water drops falling from the tree.',
+                    ar: 'خرج كريم إلى الحديقة بعد المطر. رأى حلزوناً صغيراً يزحف على سور الحديقة الحجري. كانت هناك أربع فراشات تطير حول زهرة عباد الشمس. قطف كريم ورقة شجر عريضة ليغطي بها الحلزون من قطرات الماء المتساقطة من الشجرة.'
+                },
+                questions: [
+                    {
+                        text: { en: 'Where was the snail crawling?', ar: 'أين كان يزحف الحلزون؟' },
+                        options: {
+                            en: ['On a flower', 'On the stone wall', 'On a leaf', 'On the ground'],
+                            ar: ['على زهرة', 'على السور الحجري', 'على ورقة', 'على الأرض']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'How many butterflies did Karim see?', ar: 'كم عدد الفراشات التي رآها كريم؟' },
+                        options: {
+                            en: ['Two', 'Three', 'Four', 'Five'],
+                            ar: ['اثنتان', 'ثلاث', 'أربع', 'خمس']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Which flower were the butterflies flying around?', ar: 'حول أي زهرة كانت الفراشات تطير؟' },
+                        options: {
+                            en: ['Rose', 'Tulip', 'Sunflower', 'Daisy'],
+                            ar: ['وردة', 'توليب', 'عباد الشمس', 'أقحوان']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Why did Karim pick the wide leaf?', ar: 'لماذا قطف كريم ورقة الشجر العريضة؟' },
+                        options: {
+                            en: ['To play with it', 'To cover the snail from water', 'To give to his mom', 'To collect it'],
+                            ar: ['ليلعب بها', 'ليغطي الحلزون من الماء', 'ليعطيها لأمه', 'ليجمعها']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'birthday',
+                icon: '🎁',
+                title: {
+                    en: 'The Birthday Present',
+                    ar: 'هدية عيد الميلاد'
+                },
+                text: {
+                    en: 'On her birthday, Layan received three wrapped gifts. The large gift was a pink bicycle, and the medium gift was a coloring set. As for the small gift given to her by her brother Omar, it was a white wristwatch.',
+                    ar: 'في عيد ميلادها، حصلت ليان على ثلاث هدايا مغلفة. الهدية الكبيرة كانت دراجة وردية، والهدية المتوسطة كانت مجموعة تلوين. أما الهدية الصغيرة التي أعطاها لها أخوها عمر، فكانت عبارة عن ساعة يد بيضاء.'
+                },
+                questions: [
+                    {
+                        text: { en: 'How many gifts did Layan receive?', ar: 'كم عدد الهدايا التي حصلت عليها ليان؟' },
+                        options: {
+                            en: ['Two', 'Three', 'Four', 'Five'],
+                            ar: ['اثنتان', 'ثلاث', 'أربع', 'خمس']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What was the large gift?', ar: 'ماذا كانت الهدية الكبيرة؟' },
+                        options: {
+                            en: ['A doll', 'A pink bicycle', 'A coloring set', 'A wristwatch'],
+                            ar: ['دمية', 'دراجة وردية', 'مجموعة تلوين', 'ساعة يد']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Who gave Layan the small gift?', ar: 'من الذي أعطى ليان الهدية الصغيرة؟' },
+                        options: {
+                            en: ['Her mother', 'Her father', 'Her brother Omar', 'Her friend'],
+                            ar: ['أمها', 'أبوها', 'أخوها عمر', 'صديقتها']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What color was the wristwatch she got?', ar: 'ما لون ساعة اليد التي حصلت عليها؟' },
+                        options: {
+                            en: ['Pink', 'Blue', 'White', 'Gold'],
+                            ar: ['وردي', 'أزرق', 'أبيض', 'ذهبي']
+                        },
+                        correct: 2
+                    }
+                ]
+            }
+        ];
+        
+        // KG Stories - Simpler, shorter stories for kindergarten
+        const kgStories = [
+            {
+                id: 'kg_rabbit',
+                icon: '🐰',
+                title: {
+                    en: 'The Hungry Rabbit',
+                    ar: 'الأرنب الجائع'
+                },
+                text: {
+                    en: 'The white rabbit saw a big carrot under the tree. The rabbit ate the carrot and then drank some cold water. The rabbit slept in his small house.',
+                    ar: 'رأى الأرنب الأبيض جزرة كبيرة تحت الشجرة. أكل الأرنب الجزرة ثم شرب ماءً بارداً. نام الأرنب في بيته الصغير.'
+                },
+                questions: [
+                    {
+                        text: { en: 'What color is the rabbit?', ar: 'ما لون الأرنب؟' },
+                        options: {
+                            en: ['Brown', 'White', 'Black', 'Gray'],
+                            ar: ['بني', 'أبيض', 'أسود', 'رمادي']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did the rabbit find under the tree?', ar: 'ماذا وجد الأرنب تحت الشجرة؟' },
+                        options: {
+                            en: ['An apple', 'A carrot', 'A ball', 'A flower'],
+                            ar: ['تفاحة', 'جزرة', 'كرة', 'زهرة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did the rabbit drink?', ar: 'ماذا شرب الأرنب؟' },
+                        options: {
+                            en: ['Milk', 'Juice', 'Water', 'Tea'],
+                            ar: ['حليب', 'عصير', 'ماء', 'شاي']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Where did the rabbit sleep?', ar: 'أين نام الأرنب؟' },
+                        options: {
+                            en: ['Under the tree', 'In his house', 'On the grass', 'In the garden'],
+                            ar: ['تحت الشجرة', 'في بيته', 'على العشب', 'في الحديقة']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'kg_balloon',
+                icon: '🎈',
+                title: {
+                    en: 'The Red Balloon',
+                    ar: 'البالون الأحمر'
+                },
+                text: {
+                    en: 'Bassem bought a red balloon. The balloon flew high in the air. Dad caught the balloon and gave it to Bassem. Bassem laughed and said, "Thank you."',
+                    ar: 'اشترى باسم بالوناً أحمر. طار البالون عالياً في الهواء. أمسك الأب بالبالون وأعطاه لباسم. ضحك باسم وقال: شكراً.'
+                },
+                questions: [
+                    {
+                        text: { en: 'What color was the balloon?', ar: 'ما لون البالون؟' },
+                        options: {
+                            en: ['Blue', 'Red', 'Yellow', 'Green'],
+                            ar: ['أزرق', 'أحمر', 'أصفر', 'أخضر']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Where did the balloon fly?', ar: 'أين طار البالون؟' },
+                        options: {
+                            en: ['On the ground', 'High in the air', 'In the water', 'Under the table'],
+                            ar: ['على الأرض', 'عالياً في الهواء', 'في الماء', 'تحت الطاولة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Who caught the balloon?', ar: 'من الذي أمسك بالبالون؟' },
+                        options: {
+                            en: ['Mom', 'Dad', 'Sister', 'Brother'],
+                            ar: ['الأم', 'الأب', 'الأخت', 'الأخ']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did Bassem say to his dad?', ar: 'ماذا قال باسم لأبيه؟' },
+                        options: {
+                            en: ['Goodbye', 'Thank you', 'Hello', 'Sorry'],
+                            ar: ['مع السلامة', 'شكراً', 'مرحبا', 'آسف']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'kg_fish',
+                icon: '🐟',
+                title: {
+                    en: 'Fish in the Water',
+                    ar: 'السمكة في الماء'
+                },
+                text: {
+                    en: 'In the sea, there is a small yellow fish. The fish swims next to a big rock. The fish saw her friend, the blue fish, and they played together in the sand.',
+                    ar: 'في البحر سمكة صفراء صغيرة. تسبح السمكة بجانب صخرة كبيرة. رأت السمكة صديقتها السمكة الزرقاء ولعبتا معاً في الرمل.'
+                },
+                questions: [
+                    {
+                        text: { en: 'What color is the small fish?', ar: 'ما لون السمكة الصغيرة؟' },
+                        options: {
+                            en: ['Red', 'Blue', 'Yellow', 'Green'],
+                            ar: ['أحمر', 'أزرق', 'أصفر', 'أخضر']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Where was the fish swimming?', ar: 'أين كانت تسبح السمكة؟' },
+                        options: {
+                            en: ['Next to a tree', 'Next to a rock', 'Next to a house', 'Next to a flower'],
+                            ar: ['بجانب شجرة', 'بجانب صخرة', 'بجانب بيت', 'بجانب زهرة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Who did the fish see in the water?', ar: 'من رأت السمكة في الماء؟' },
+                        options: {
+                            en: ['A red fish', 'A blue fish', 'A green fish', 'A big fish'],
+                            ar: ['سمكة حمراء', 'سمكة زرقاء', 'سمكة خضراء', 'سمكة كبيرة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Where did the two fish play together?', ar: 'أين لعبت السمكتان معاً؟' },
+                        options: {
+                            en: ['In the rock', 'In the sand', 'On the water', 'Under the tree'],
+                            ar: ['في الصخرة', 'في الرمل', 'فوق الماء', 'تحت الشجرة']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'kg_fruit',
+                icon: '🍌',
+                title: {
+                    en: 'The Fruit Snack',
+                    ar: 'وجبة الفاكهة'
+                },
+                text: {
+                    en: "Mom put a banana and an apple on Khaled's plate. Khaled ate the banana first, then he ate the apple. Khaled washed his hands with water and soap.",
+                    ar: 'وضعت ماما موزة وتفاحة في صحن خالد. أكل خالد الموزة أولاً ثم أكل التفاحة. غسل خالد يديه بالماء والصابون.'
+                },
+                questions: [
+                    {
+                        text: { en: 'What did Mom put on the plate?', ar: 'ماذا وضعت ماما في الصحن؟' },
+                        options: {
+                            en: ['Cake and cookies', 'Banana and apple', 'Orange and grapes', 'Bread and cheese'],
+                            ar: ['كعك وبسكويت', 'موزة وتفاحة', 'برتقال وعنب', 'خبز وجبنة']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'Who ate the fruit?', ar: 'من الذي أكل الفاكهة؟' },
+                        options: {
+                            en: ['Mom', 'Dad', 'Khaled', 'Sister'],
+                            ar: ['ماما', 'بابا', 'خالد', 'الأخت']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'What did Khaled eat first?', ar: 'ماذا أكل خالد أولاً؟' },
+                        options: {
+                            en: ['Apple', 'Banana', 'Orange', 'Grapes'],
+                            ar: ['التفاحة', 'الموزة', 'البرتقال', 'العنب']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did Khaled wash his hands with?', ar: 'بماذا غسل خالد يديه؟' },
+                        options: {
+                            en: ['Just water', 'Water and soap', 'Juice', 'Milk'],
+                            ar: ['ماء فقط', 'الماء والصابون', 'عصير', 'حليب']
+                        },
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 'kg_bird',
+                icon: '🐦',
+                title: {
+                    en: 'The Little Bird',
+                    ar: 'العصفور الصغير'
+                },
+                text: {
+                    en: 'A beautiful bird stood on the window. The bird was singing a lovely tune. The bird flew to his nest on top of the palm tree. The bird put a feather in the nest.',
+                    ar: 'وقف عصفور جميل على النافذة. كان العصفور يغني لحناً لطيفاً. طار العصفور إلى عشه فوق النخلة. وضع العصفور ريشة في العش.'
+                },
+                questions: [
+                    {
+                        text: { en: 'Where did the bird stand?', ar: 'أين وقف العصفور؟' },
+                        options: {
+                            en: ['On the tree', 'On the window', 'On the ground', 'On the roof'],
+                            ar: ['على الشجرة', 'على النافذة', 'على الأرض', 'على السطح']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What was the bird doing on the window?', ar: 'ماذا كان يفعل العصفور على النافذة؟' },
+                        options: {
+                            en: ['Sleeping', 'Eating', 'Singing', 'Playing'],
+                            ar: ['ينام', 'يأكل', 'يغني', 'يلعب']
+                        },
+                        correct: 2
+                    },
+                    {
+                        text: { en: 'Where did the bird fly to?', ar: 'إلى أين طار العصفور؟' },
+                        options: {
+                            en: ['To the garden', 'To his nest', 'To the house', 'To the sea'],
+                            ar: ['إلى الحديقة', 'إلى عشه', 'إلى البيت', 'إلى البحر']
+                        },
+                        correct: 1
+                    },
+                    {
+                        text: { en: 'What did the bird put in the nest?', ar: 'ماذا وضع العصفور في العش؟' },
+                        options: {
+                            en: ['A leaf', 'A feather', 'A flower', 'A stone'],
+                            ar: ['ورقة', 'ريشة', 'زهرة', 'حجر']
+                        },
+                        correct: 1
+                    }
+                ]
+            }
+        ];
+        
+        // Get stories based on grade level
+        function getStoriesForGrade() {
+            const gradeLevel = GameUtils.getGradeLevel();
+            return gradeLevel === 'kg' ? kgStories : stories;
+        }
+        
+        // Game state
+        let currentStory = null;
+        let currentQuestionIndex = 0;
+        let storyCorrectAnswers = 0;
+        let totalScore = 0;
+        let storiesCompleted = 0;
+        let userAnswers = [];
+        let storyScores = {};
+        let readingTimer = null;
+        let readingTimeLeft = 30;
+        
+        // Get current language
+        function getLang() {
+            return (typeof I18n !== 'undefined' && I18n.currentLang === 'ar') ? 'ar' : 'en';
+        }
+        
+        // Initialize story selection
+        function initStorySelect() {
+            const storySelect = document.getElementById('storySelect');
+            storySelect.innerHTML = '';
+            
+            const currentStories = getStoriesForGrade();
+            document.getElementById('totalStories').textContent = currentStories.length;
+            
+            currentStories.forEach(story => {
+                const card = document.createElement('div');
+                card.className = 'story-card' + (storyScores[story.id] !== undefined ? ' completed' : '');
+                card.innerHTML = `
+                    <div class="story-icon">${story.icon}</div>
+                    <div class="story-title">${story.title[getLang()]}</div>
+                    ${storyScores[story.id] !== undefined ? `<div class="story-score">✓ ${storyScores[story.id]}/4</div>` : ''}
+                `;
+                card.onclick = () => selectStory(story);
+                storySelect.appendChild(card);
+            });
+        }
+        
+        // Select a story
+        function selectStory(story) {
+            currentStory = story;
+            currentQuestionIndex = 0;
+            storyCorrectAnswers = 0;
+            userAnswers = [];
+            
+            showScreen('storyScreen');
+            displayStory();
+        }
+        
+        // Display story text
+        function displayStory() {
+            document.getElementById('storyName').textContent = currentStory.title[getLang()];
+            document.getElementById('storyIconLarge').textContent = currentStory.icon;
+            document.getElementById('storyText').textContent = currentStory.text[getLang()];
+            
+            // Start reading timer (shorter for KG stories)
+            const gradeLevel = GameUtils.getGradeLevel();
+            const maxTime = gradeLevel === 'kg' ? 20 : 30;
+            readingTimeLeft = maxTime;
+            updateTimerDisplay(maxTime);
+            
+            readingTimer = setInterval(() => {
+                readingTimeLeft--;
+                updateTimerDisplay(maxTime);
+                
+                if (readingTimeLeft <= 0) {
+                    clearInterval(readingTimer);
+                }
+            }, 1000);
+        }
+        
+        // Update timer display
+        function updateTimerDisplay(maxTime = 30) {
+            const progress = (readingTimeLeft / maxTime) * 100;
+            document.getElementById('timerProgress').style.width = progress + '%';
+            
+            const timeText = typeof I18n !== 'undefined' 
+                ? I18n.t('storyGame.timeLeft', { time: readingTimeLeft })
+                : `${readingTimeLeft} seconds left`;
+            document.getElementById('timerText').textContent = timeText;
+        }
+        
+        // Ready button clicked
+        document.getElementById('readyBtn').onclick = () => {
+            clearInterval(readingTimer);
+            showScreen('questionScreen');
+            displayQuestion();
+        };
+        
+        // Display current question
+        function displayQuestion() {
+            const question = currentStory.questions[currentQuestionIndex];
+            
+            // Update progress dots
+            const progressDiv = document.getElementById('questionProgress');
+            progressDiv.innerHTML = '';
+            currentStory.questions.forEach((q, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'question-dot';
+                if (i < currentQuestionIndex) {
+                    dot.classList.add(userAnswers[i].correct ? 'answered' : 'wrong');
+                } else if (i === currentQuestionIndex) {
+                    dot.classList.add('current');
+                }
+                progressDiv.appendChild(dot);
+            });
+            
+            // Display question
+            document.getElementById('questionText').textContent = question.text[getLang()];
+            
+            // Display options
+            const optionsDiv = document.getElementById('answerOptions');
+            optionsDiv.innerHTML = '';
+            
+            question.options[getLang()].forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-option';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsDiv.appendChild(btn);
+            });
+        }
+        
+        // Select an answer
+        function selectAnswer(selectedIndex) {
+            const question = currentStory.questions[currentQuestionIndex];
+            const isCorrect = selectedIndex === question.correct;
+            
+            // Store user answer
+            userAnswers.push({
+                questionIndex: currentQuestionIndex,
+                selected: selectedIndex,
+                correct: isCorrect
+            });
+            
+            if (isCorrect) {
+                storyCorrectAnswers++;
+                GameUtils.playSound('correct');
+            } else {
+                GameUtils.playSound('wrong');
+            }
+            
+            // Highlight selected answer
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach((opt, i) => {
+                opt.style.pointerEvents = 'none';
+                if (i === selectedIndex) {
+                    opt.classList.add(isCorrect ? 'correct' : 'wrong');
+                }
+                if (i === question.correct && !isCorrect) {
+                    setTimeout(() => opt.classList.add('show-correct'), 500);
+                }
+            });
+            
+            // Move to next question or results
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentStory.questions.length) {
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+        
+        // Show results
+        function showResults() {
+            showScreen('resultsScreen');
+            
+            // Update scores
+            storyScores[currentStory.id] = storyCorrectAnswers;
+            totalScore += storyCorrectAnswers * 25;
+            storiesCompleted = Object.keys(storyScores).length;
+            
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('storiesCompleted').textContent = storiesCompleted;
+            
+            // Display score
+            document.getElementById('scoreNumber').textContent = `${storyCorrectAnswers}/4`;
+            
+            // Set emoji and title based on score
+            const emoji = storyCorrectAnswers === 4 ? '🏆' : 
+                         storyCorrectAnswers >= 3 ? '🎉' : 
+                         storyCorrectAnswers >= 2 ? '⭐' : '💪';
+            document.getElementById('resultsEmoji').textContent = emoji;
+            
+            const titleKey = storyCorrectAnswers === 4 ? 'storyGame.perfect' :
+                            storyCorrectAnswers >= 3 ? 'storyGame.greatJob' :
+                            storyCorrectAnswers >= 2 ? 'storyGame.goodJob' : 'storyGame.keepTrying';
+            const defaultTitle = storyCorrectAnswers === 4 ? 'Perfect! 🌟' :
+                                storyCorrectAnswers >= 3 ? 'Great Job!' :
+                                storyCorrectAnswers >= 2 ? 'Good Job!' : 'Keep Trying!';
+            document.getElementById('resultsTitle').textContent = 
+                typeof I18n !== 'undefined' ? I18n.t(titleKey) : defaultTitle;
+            
+            // Build review list
+            const reviewList = document.getElementById('reviewList');
+            reviewList.innerHTML = '';
+            
+            currentStory.questions.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer.correct;
+                
+                const item = document.createElement('div');
+                item.className = 'review-item ' + (isCorrect ? 'correct' : 'wrong');
+                
+                const questionText = question.text[getLang()];
+                const userAnswerText = question.options[getLang()][userAnswer.selected];
+                const correctAnswerText = question.options[getLang()][question.correct];
+                
+                item.innerHTML = `
+                    <div class="review-question">${index + 1}. ${questionText}</div>
+                    <div class="review-answer user-answer">
+                        <span class="icon">${isCorrect ? '✓' : '✗'}</span>
+                        <span>${typeof I18n !== 'undefined' ? I18n.t('storyGame.yourAnswer') : 'Your answer'}: ${userAnswerText}</span>
+                    </div>
+                    ${!isCorrect ? `
+                        <div class="review-answer correct-answer">
+                            <span class="icon">✓</span>
+                            <span>${typeof I18n !== 'undefined' ? I18n.t('storyGame.correctAnswer') : 'Correct'}: ${correctAnswerText}</span>
+                        </div>
+                    ` : ''}
+                `;
+                
+                reviewList.appendChild(item);
+            });
+            
+            // Save high score
+            GameUtils.saveHighScore(GAME_KEY, totalScore, GameUtils.getPlayerName());
+            loadHighScore();
+            
+            // Play sound based on score
+            if (storyCorrectAnswers === 4) {
+                GameUtils.playSound('levelUp');
+            }
+        }
+        
+        // Show specific screen
+        function showScreen(screenId) {
+            document.getElementById('storySelectScreen').classList.add('hidden');
+            document.getElementById('storyScreen').classList.add('hidden');
+            document.getElementById('questionScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+        
+        // Next story button
+        document.getElementById('nextStoryBtn').onclick = () => {
+            // Find next incomplete story
+            const currentStories = getStoriesForGrade();
+            const nextStory = currentStories.find(s => storyScores[s.id] === undefined);
+            if (nextStory) {
+                selectStory(nextStory);
+            } else {
+                showScreen('storySelectScreen');
+                initStorySelect();
+            }
+        };
+        
+        // Back to select button
+        document.getElementById('backToSelectBtn').onclick = () => {
+            showScreen('storySelectScreen');
+            initStorySelect();
+        };
+        
+        // Load high score
+        function loadHighScore() {
+            const saved = GameUtils.getHighScore(GAME_KEY);
+            if (saved > 0) {
+                const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
+                const highScoreText = typeof I18n !== 'undefined' 
+                    ? I18n.t('game.highScorePoints', { score: saved, player: bestPlayer })
+                    : `🏆 Best: ${saved} points by ${bestPlayer}`;
+                document.getElementById('bestScoreDisplay').innerHTML = highScoreText;
+            }
+        }
+        
+        // Initialize
+        GameUtils.initSoundToggle();
+        loadHighScore();
+        initStorySelect();
+        
+        // Listen for language changes
+        window.addEventListener('languageChanged', () => {
+            initStorySelect();
+            if (currentStory && !document.getElementById('storySelectScreen').classList.contains('hidden')) {
+                // Already on select screen, just refresh
+            } else if (currentStory) {
+                // Refresh current view
+                displayStory();
+            }
+        });
+    </script>
+    <script>
+        // Add language toggle button
+        if (typeof I18n !== 'undefined') {
+            const langBtn = I18n.createLanguageToggle();
+            document.body.appendChild(langBtn);
+        }
+    </script>
+</body>
+</html>

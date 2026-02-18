@@ -50,7 +50,7 @@ const I18n = {
             "btn.readAloud": "Read aloud",
             "btn.addFavorite": "Add to favorites",
             "games.title": "🎮 Fun Games!",
-            "games.subtitle": "18 games to play!",
+            "games.subtitle": "19 games to play!",
             "games.score": "Score",
             "games.level": "Level",
             "games.lives": "Lives",
@@ -103,6 +103,8 @@ const I18n = {
             "game.sortingFunDesc": "Sort items into categories",
             "game.oddOneOut": "Odd One Out",
             "game.oddOneOutDesc": "Find the item that doesn't belong",
+            "game.storyComprehension": "Story Time",
+            "game.storyComprehensionDesc": "Read stories and answer questions",
             "result.greatJob": "🎉 Great Job!",
             "result.amazing": "🎉 Amazing!",
             "result.goodTry": "⭐ Good Try!",
@@ -713,7 +715,26 @@ const I18n = {
 
             // Time display
             "game.timeSeconds": "{time}s",
-            "game.secondsShort": "s"
+            "game.secondsShort": "s",
+
+            // Story Comprehension Game
+            "storyGame.title": "Story Time",
+            "storyGame.selectStory": "Choose a story to read!",
+            "storyGame.storiesCompleted": "Stories",
+            "storyGame.readCarefully": "📚 Read the story carefully!",
+            "storyGame.imReady": "✓ I'm Ready!",
+            "storyGame.timeLeft": "{time} seconds left",
+            "storyGame.correctAnswers": "Correct Answers",
+            "storyGame.reviewAnswers": "📝 Review Your Answers",
+            "storyGame.yourAnswer": "Your answer",
+            "storyGame.correctAnswer": "Correct",
+            "storyGame.nextStory": "📖 Next Story",
+            "storyGame.chooseAnother": "Choose Another",
+            "storyGame.instruction": "Read stories and answer questions!",
+            "storyGame.perfect": "Perfect! 🌟",
+            "storyGame.greatJob": "Great Job!",
+            "storyGame.goodJob": "Good Job!",
+            "storyGame.keepTrying": "Keep Trying!"
         },
         ar: {
             "app.title": "كلمات سعيدة للأطفال! 🌟",
@@ -749,7 +770,7 @@ const I18n = {
             "btn.readAloud": "اقرأ بصوت عالٍ",
             "btn.addFavorite": "أضف للمفضلة",
             "games.title": "🎮 ألعاب ممتعة!",
-            "games.subtitle": "١٨ لعبة للعب!",
+            "games.subtitle": "١٩ لعبة للعب!",
             "games.score": "النقاط",
             "games.level": "المستوى",
             "games.lives": "الأرواح",
@@ -802,6 +823,8 @@ const I18n = {
             "game.sortingFunDesc": "صنف العناصر في فئات",
             "game.oddOneOut": "الغريب بينهم",
             "game.oddOneOutDesc": "ابحث عن العنصر المختلف",
+            "game.storyComprehension": "وقت القصة",
+            "game.storyComprehensionDesc": "اقرأ القصص وأجب على الأسئلة",
             "result.greatJob": "🎉 أحسنت!",
             "result.amazing": "🎉 رائع!",
             "result.goodTry": "⭐ محاولة جيدة!",
@@ -1412,7 +1435,26 @@ const I18n = {
 
             // Time display (عرض الوقت)
             "game.timeSeconds": "{time} ثانية",
-            "game.secondsShort": " ثانية"
+            "game.secondsShort": " ثانية",
+
+            // Story Comprehension Game (لعبة فهم القصة)
+            "storyGame.title": "وقت القصة",
+            "storyGame.selectStory": "اختر قصة لتقرأها!",
+            "storyGame.storiesCompleted": "القصص",
+            "storyGame.readCarefully": "📚 اقرأ القصة بعناية!",
+            "storyGame.imReady": "✓ أنا جاهز!",
+            "storyGame.timeLeft": "{time} ثانية متبقية",
+            "storyGame.correctAnswers": "الإجابات الصحيحة",
+            "storyGame.reviewAnswers": "📝 راجع إجاباتك",
+            "storyGame.yourAnswer": "إجابتك",
+            "storyGame.correctAnswer": "الصحيح",
+            "storyGame.nextStory": "📖 القصة التالية",
+            "storyGame.chooseAnother": "اختر قصة أخرى",
+            "storyGame.instruction": "اقرأ القصص وأجب على الأسئلة!",
+            "storyGame.perfect": "ممتاز! 🌟",
+            "storyGame.greatJob": "أحسنت!",
+            "storyGame.goodJob": "جيد!",
+            "storyGame.keepTrying": "استمر بالمحاولة!"
         }
     },
 

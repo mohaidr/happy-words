@@ -1,4 +1,4 @@
-const CACHE_NAME = 'happy-words-v43';
+const CACHE_NAME = 'happy-words-v45';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -40,6 +40,7 @@ const urlsToCache = [
   '/games/shape-spotter.html',
   '/games/sight-words.html',
   '/games/sorting-fun.html',
+  '/games/story-comprehension.html',
   '/games/word-builder.html'
 ];
 
