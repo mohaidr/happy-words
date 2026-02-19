@@ -121,6 +121,25 @@
             border-radius: 10px;
             margin-top: 5px;
         }
+        
+        .btn-stop {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255,107,107,0.4);
+            margin-top: 10px;
+        }
+        
+        .btn-stop:hover {
+            transform: scale(1.05);
+            background: linear-gradient(145deg, #ff5252, #e04040);
+        }
     </style>
 </head>
 <body>
@@ -158,10 +177,13 @@
         <p>🏆 <span data-i18n="game.highScore">High Score</span>: <span id="highScore">0</span></p>
         <p><span data-i18n="emojiFeelings.feelingsLearned">Feelings Learned</span>: <span id="feelingsLearned">0</span></p>
         <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
-        <a href="../index.html" class="home-link" data-i18n="game.backToHome">← Back to Home</a>
+        <a href="../index.html" class="home-link" data-i18n="game.backHome">← Back to Home</a>
     </div>
     
     <p class="info" data-i18n="emojiFeelings.instruction">Match the feeling word to the right emoji!</p>
+    
+    <button class="btn-stop" id="stopBtn" onclick="endGame()" data-i18n="game.stop">🛑 Stop Game</button>
+    
     <p class="info" id="bestScoreDisplay">🏆 Best: --</p>
 
     <script src="../js/game-utils.js"></script>
@@ -180,7 +202,7 @@
             { emoji: '🤩', key: 'excited' },
             { emoji: '😌', key: 'calm' },
             { emoji: '😟', key: 'worried' },
-            { emoji: '😤', key: 'frustrated' },
+            { emoji: '😫', key: 'frustrated' },
             { emoji: '🤗', key: 'loving' },
             { emoji: '😎', key: 'proud' },
             { emoji: '😳', key: 'embarrassed' },
@@ -336,6 +358,7 @@
             document.getElementById('level').textContent = level;
             document.getElementById('lives').textContent = lives;
             document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
             
             generateQuestion();
         }
@@ -357,6 +380,9 @@
         }
         
         function endGame() {
+            document.getElementById('stopBtn').style.display = 'none';
+            canAnswer = false;
+            
             const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             if (isNewHigh) highScore = score;
             
@@ -364,9 +390,15 @@
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            
+            const byLabel = typeof I18n !== 'undefined' ? I18n.t('game.by') : 'by';
+            document.getElementById('highScore').textContent = `${bestScore} ${byLabel} ${bestPlayer}`;
             document.getElementById('feelingsLearned').textContent = questionsAnswered;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            
+            const playerGameText = typeof I18n !== 'undefined' 
+                ? I18n.t('game.playerGame', { name: playerName })
+                : playerName + "'s Game";
+            document.getElementById('playerDisplay').textContent = playerGameText;
             document.getElementById('gameOver').style.display = 'block';
             loadHighScore();
         }

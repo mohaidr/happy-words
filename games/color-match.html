@@ -38,9 +38,22 @@
         .colors-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            max-width: 350px;
+            gap: 12px;
+            max-width: 400px;
             margin-bottom: 20px;
+        }
+        
+        .colors-grid.grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 450px;
+        }
+        
+        .level-indicator {
+            font-size: 14px;
+            padding: 5px 15px;
+            background: rgba(255,215,0,0.3);
+            border-radius: 15px;
+            margin-bottom: 10px;
         }
         
         .color-btn {
@@ -116,6 +129,25 @@
         .lives {
             font-size: 24px;
         }
+        
+        .btn-stop {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255,107,107,0.4);
+            margin-top: 10px;
+        }
+        
+        .btn-stop:hover {
+            transform: scale(1.05);
+            background: linear-gradient(145deg, #ff5252, #e04040);
+        }
     </style>
 </head>
 <body>
@@ -127,7 +159,7 @@
     
     <div class="stats">
         <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
-        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span>/10</div>
+        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span></div>
         <div class="lives">❤️ <span id="lives">3</span></div>
     </div>
     
@@ -135,9 +167,13 @@
     
     <div class="instruction" data-i18n="colorMatch.instruction">Tap the color that matches the word!</div>
     
+    <div class="level-indicator" id="levelIndicator">Level 1 - Easy</div>
+    
     <div class="colors-grid" id="colorsGrid"></div>
     
     <div class="message" id="message"></div>
+    
+    <button class="btn-stop" id="stopBtn" onclick="endGame()" data-i18n="game.stop">🛑 Stop Game</button>
     
     <div class="high-score" id="highScoreDisplay">Best: -- points</div>
     
@@ -150,17 +186,52 @@
 
     <script src="../js/game-utils.js"></script>
     <script>
-        const colors = [
+        // Basic colors (for beginners)
+        const basicColors = [
             { name: 'Red', key: 'color.red', hex: '#ff4444' },
             { name: 'Blue', key: 'color.blue', hex: '#4444ff' },
             { name: 'Green', key: 'color.green', hex: '#44aa44' },
             { name: 'Yellow', key: 'color.yellow', hex: '#ffdd00' },
             { name: 'Orange', key: 'color.orange', hex: '#ff8800' },
             { name: 'Purple', key: 'color.purple', hex: '#aa44aa' },
+        ];
+        
+        // Intermediate colors
+        const intermediateColors = [
             { name: 'Pink', key: 'color.pink', hex: '#ff69b4' },
             { name: 'Brown', key: 'color.brown', hex: '#8b4513' },
             { name: 'Black', key: 'color.black', hex: '#222222' },
+            { name: 'White', key: 'color.white', hex: '#f5f5f5' },
+            { name: 'Gray', key: 'color.gray', hex: '#808080' },
+            { name: 'Gold', key: 'color.gold', hex: '#ffd700' },
         ];
+        
+        // Advanced colors
+        const advancedColors = [
+            { name: 'Cyan', key: 'color.cyan', hex: '#00CED1' },
+            { name: 'Magenta', key: 'color.magenta', hex: '#FF00FF' },
+            { name: 'Lime', key: 'color.lime', hex: '#32CD32' },
+            { name: 'Navy', key: 'color.navy', hex: '#000080' },
+            { name: 'Teal', key: 'color.teal', hex: '#008080' },
+            { name: 'Maroon', key: 'color.maroon', hex: '#800000' },
+        ];
+        
+        // Expert colors (similar/tricky shades)
+        const expertColors = [
+            { name: 'Coral', key: 'color.coral', hex: '#FF7F50' },
+            { name: 'Crimson', key: 'color.crimson', hex: '#DC143C' },
+            { name: 'Indigo', key: 'color.indigo', hex: '#4B0082' },
+            { name: 'Turquoise', key: 'color.turquoise', hex: '#40E0D0' },
+            { name: 'Olive', key: 'color.olive', hex: '#808000' },
+            { name: 'Silver', key: 'color.silver', hex: '#C0C0C0' },
+            { name: 'Lavender', key: 'color.lavender', hex: '#E6E6FA' },
+            { name: 'Beige', key: 'color.beige', hex: '#F5F5DC' },
+            { name: 'Salmon', key: 'color.salmon', hex: '#FA8072' },
+            { name: 'Violet', key: 'color.violet', hex: '#EE82EE' },
+        ];
+        
+        // All colors combined
+        const allColors = [...basicColors, ...intermediateColors, ...advancedColors, ...expertColors];
         
         // Helper to get translated color name
         function getColorName(color) {
@@ -170,7 +241,8 @@
         let score = 0;
         let round = 0;
         let lives = 3;
-        let totalRounds = 10;
+        let level = 1;
+        let streak = 0;
         
         let currentColor = null;
         let gameRunning = false;
@@ -191,11 +263,65 @@
             }
         }
         
-        function getColorsForGrade() {
+        // Get colors based on current difficulty level
+        function getColorsForLevel() {
             if (gradeLevel === 'kg') {
-                return colors.slice(0, 6); // Basic colors only
+                // KG always gets basic colors only
+                if (level <= 2) return basicColors.slice(0, 4);
+                if (level <= 4) return basicColors;
+                return [...basicColors, ...intermediateColors.slice(0, 2)];
             }
-            return colors; // All colors
+            
+            // Progressive color unlock based on level
+            if (level <= 2) return basicColors;
+            if (level <= 4) return [...basicColors, ...intermediateColors];
+            if (level <= 6) return [...basicColors, ...intermediateColors, ...advancedColors];
+            return allColors;
+        }
+        
+        // Calculate level based on rounds completed
+        function calculateLevel() {
+            if (round <= 5) return 1;
+            if (round <= 12) return 2;
+            if (round <= 20) return 3;
+            if (round <= 30) return 4;
+            if (round <= 45) return 5;
+            if (round <= 60) return 6;
+            return 7;
+        }
+        
+        // Get Stroop effect probability based on level
+        function getStroopProbability() {
+            if (gradeLevel === 'kg') return 0;
+            const baseProbability = gradeLevel === 'g3-6' ? 0.3 : 0.15;
+            return Math.min(baseProbability + (level - 1) * 0.08, 0.7);
+        }
+        
+        // Get number of color buttons based on level
+        function getButtonCount() {
+            if (gradeLevel === 'kg') {
+                return level <= 2 ? 4 : 6;
+            }
+            if (level <= 2) return 6;
+            if (level <= 4) return 8;
+            return 9;
+        }
+        
+        // Update level indicator
+        function updateLevelIndicator() {
+            const levelNames = {
+                1: { en: 'Easy', ar: 'سهل' },
+                2: { en: 'Getting Harder', ar: 'أصعب قليلاً' },
+                3: { en: 'Medium', ar: 'متوسط' },
+                4: { en: 'Challenging', ar: 'تحدي' },
+                5: { en: 'Hard', ar: 'صعب' },
+                6: { en: 'Expert', ar: 'خبير' },
+                7: { en: 'Master', ar: 'محترف' },
+            };
+            const lang = typeof I18n !== 'undefined' && I18n.currentLang === 'ar' ? 'ar' : 'en';
+            const levelLabel = lang === 'ar' ? 'المستوى' : 'Level';
+            const levelName = levelNames[level] ? levelNames[level][lang] : levelNames[7][lang];
+            document.getElementById('levelIndicator').textContent = `${levelLabel} ${level} - ${levelName}`;
         }
         
         function shuffle(arr) {
@@ -212,7 +338,20 @@
             document.getElementById('round').textContent = round;
             canClick = true;
             
-            const availableColors = getColorsForGrade();
+            // Update level based on progress
+            const newLevel = calculateLevel();
+            if (newLevel !== level) {
+                level = newLevel;
+                updateLevelIndicator();
+                // Bonus for reaching new level
+                if (level > 1) {
+                    score += level * 5;
+                    document.getElementById('score').textContent = score;
+                    GameUtils.playSound('levelUp');
+                }
+            }
+            
+            const availableColors = getColorsForLevel();
             
             // Pick target color
             currentColor = availableColors[Math.floor(Math.random() * availableColors.length)];
@@ -221,11 +360,13 @@
             const wordEl = document.getElementById('colorWord');
             wordEl.textContent = getColorName(currentColor).toUpperCase();
             
-            // For KG: show word in matching color (easier)
-            // For harder grades, sometimes show the word in a different color (Stroop effect)
+            // Apply Stroop effect based on level and grade
+            const stroopProbability = getStroopProbability();
             if (gradeLevel === 'kg') {
+                // KG: show word in matching color (easier)
                 wordEl.style.color = currentColor.hex;
-            } else if (gradeLevel === 'g3-6' && Math.random() < 0.4) {
+            } else if (Math.random() < stroopProbability) {
+                // Stroop effect: show word in different color
                 const trickColors = availableColors.filter(c => c.name !== currentColor.name);
                 const trickColor = trickColors[Math.floor(Math.random() * trickColors.length)];
                 wordEl.style.color = trickColor.hex;
@@ -237,11 +378,20 @@
             const grid = document.getElementById('colorsGrid');
             grid.innerHTML = '';
             
+            const numButtons = getButtonCount();
+            
+            // Adjust grid layout based on button count
+            if (numButtons > 6) {
+                grid.classList.add('grid-4');
+            } else {
+                grid.classList.remove('grid-4');
+            }
+            
             // Select colors to show (always include correct answer)
             let displayColors = [currentColor];
             const others = shuffle(availableColors.filter(c => c.name !== currentColor.name));
             
-            const numButtons = gradeLevel === 'kg' ? 4 : 6;
+            // For higher levels, include similar colors as distractors
             displayColors = displayColors.concat(others.slice(0, numButtons - 1));
             displayColors = shuffle(displayColors);
             
@@ -249,6 +399,11 @@
                 const btn = document.createElement('div');
                 btn.className = 'color-btn';
                 btn.style.backgroundColor = color.hex;
+                // Smaller buttons for larger grids
+                if (numButtons > 6) {
+                    btn.style.width = '80px';
+                    btn.style.height = '80px';
+                }
                 btn.onclick = () => checkAnswer(color, btn);
                 btn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -266,22 +421,31 @@
             
             if (color.name === currentColor.name) {
                 // Correct!
-                score += 10;
+                streak++;
+                // Bonus points for streaks and higher levels
+                const basePoints = 10;
+                const levelBonus = level * 2;
+                const streakBonus = streak >= 5 ? Math.floor(streak / 5) * 5 : 0;
+                const pointsEarned = basePoints + levelBonus + streakBonus;
+                
+                score += pointsEarned;
                 document.getElementById('score').textContent = score;
-                document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('game.correct') : '✓ Correct!';
+                
+                let message = typeof I18n !== 'undefined' ? I18n.t('game.correct') : '✓ Correct!';
+                if (streakBonus > 0) {
+                    message += ` 🔥 ${streak}`;
+                }
+                document.getElementById('message').textContent = message;
                 btn.classList.add('correct');
                 GameUtils.playSound('correct');
                 
                 setTimeout(() => {
                     btn.classList.remove('correct');
-                    if (round < totalRounds) {
-                        loadRound();
-                    } else {
-                        endGame();
-                    }
+                    loadRound();
                 }, 600);
             } else {
                 // Wrong
+                streak = 0;
                 lives--;
                 document.getElementById('lives').textContent = lives;
                 document.getElementById('message').textContent = typeof I18n !== 'undefined' ? I18n.t('game.wrong') : '✗ Try again!';
@@ -302,18 +466,23 @@
         function startGame() {
             score = 0;
             round = 0;
-            lives = GameUtils.getMaxLives({kg: 6, 'g1-3': 4, default: 3});
+            level = 1;
+            streak = 0;
+            lives = GameUtils.getMaxLives({kg: 6, 'g1-3': 5, default: 4});
             gameRunning = true;
             
             document.getElementById('score').textContent = '0';
             document.getElementById('lives').textContent = lives;
             document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            updateLevelIndicator();
             
             loadRound();
         }
         
         function endGame() {
             gameRunning = false;
+            document.getElementById('stopBtn').style.display = 'none';
             
             const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);
             loadHighScore();

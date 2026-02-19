@@ -133,7 +133,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>        <a href="category-fun.html" class="category-btn" data-i18n="nav.fun">🎉 Fun</a>        <h1>🔷 Shape Spotter</h1>
+        <a href="../index.html" class="home-btn" data-i18n="game.home">← Home</a>        <a href="category-fun.html" class="category-btn" data-i18n="nav.fun">🎉 Fun</a>        <h1 data-i18n="shapeSpotter.title">🔷 Shape Spotter</h1>
     </div>
     
     <div class="stats">
@@ -165,7 +165,7 @@
     <div id="gameOver">
         <h2 data-i18n="shapeSpotter.result">🔷 Great Spotting!</h2>
         <p><span data-i18n="game.score">Score</span>: <span id="finalScore">0</span></p>
-        <p><span data-i18n="shapeSpotter.shapesFound">Shapes Found</span>: <span id="totalFound">0</span></p>
+                <p><span data-i18n="shapeSpotter.shapesFound">Shapes Found</span>: <span id="totalFound">0</span></p>
         <p id="highScoreMsg"></p>
         <button class="btn" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
     </div>
@@ -173,19 +173,23 @@
     <script src="../js/game-utils.js"></script>
     <script>
         const shapes = [
-            { emoji: '⭐', name: 'Stars' },
-            { emoji: '❤️', name: 'Hearts' },
-            { emoji: '🔵', name: 'Circles' },
-            { emoji: '🟢', name: 'Green Circles' },
-            { emoji: '🔴', name: 'Red Circles' },
-            { emoji: '🟡', name: 'Yellow Circles' },
-            { emoji: '🔷', name: 'Diamonds' },
-            { emoji: '🔶', name: 'Orange Diamonds' },
-            { emoji: '🟥', name: 'Red Squares' },
-            { emoji: '🟦', name: 'Blue Squares' },
-            { emoji: '🟩', name: 'Green Squares' },
-            { emoji: '🔺', name: 'Triangles' },
+            { emoji: '⭐', key: 'shape.stars' },
+            { emoji: '❤️', key: 'shape.hearts' },
+            { emoji: '🔵', key: 'shape.circles' },
+            { emoji: '🟢', key: 'shape.greenCircles' },
+            { emoji: '🔴', key: 'shape.redCircles' },
+            { emoji: '🟡', key: 'shape.yellowCircles' },
+            { emoji: '🔷', key: 'shape.diamonds' },
+            { emoji: '🔶', key: 'shape.orangeDiamonds' },
+            { emoji: '🟥', key: 'shape.redSquares' },
+            { emoji: '🟦', key: 'shape.blueSquares' },
+            { emoji: '🟩', key: 'shape.greenSquares' },
+            { emoji: '🔺', key: 'shape.triangles' },
         ];
+        
+        function getShapeName(shape) {
+            return typeof I18n !== 'undefined' ? I18n.t(shape.key) : shape.key.split('.')[1];
+        }
         
         let score = 0;
         let round = 0;
@@ -237,7 +241,7 @@
             // Pick target shape
             targetShape = availableShapes[Math.floor(Math.random() * availableShapes.length)];
             document.getElementById('targetShape').textContent = targetShape.emoji;
-            document.getElementById('targetName').textContent = targetShape.name;
+            document.getElementById('targetName').textContent = getShapeName(targetShape);
             
             // Determine counts based on grade
             targetCount = gradeLevel === 'kg' ? 3 : (gradeLevel === 'g1-3' ? 4 : 5);
