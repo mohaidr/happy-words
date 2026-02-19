@@ -501,18 +501,18 @@
             bird: ['blue', 'red', 'yellow', 'green', 'brown', 'orange'],
             
             // Clothing & accessories
-            coat: ['red', 'blue', 'green', 'black', 'brown', 'gray', 'purple', 'pink'],
-            umbrella: ['red', 'blue', 'green', 'yellow', 'purple', 'black', 'pink', 'orange'],
+            coat: ['red', 'blue', 'green', 'black', 'brown', 'gray', 'purple', 'orange'],
+            umbrella: ['red', 'blue', 'green', 'yellow', 'purple', 'black', 'orange'],
             
             // Objects - most man-made items can be any color
             tent: ['red', 'blue', 'green', 'yellow', 'orange'],
-            backpack: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange', 'black'],
-            lunchbox: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange'],
-            bike: ['red', 'blue', 'green', 'yellow', 'black', 'purple', 'orange', 'pink'],
-            watch: ['red', 'blue', 'green', 'yellow', 'black', 'purple', 'orange', 'pink', 'white'],
-            card: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange', 'white'],
-            balloon: ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange'],
-            wool: ['blue', 'pink', 'yellow', 'red', 'green', 'white', 'purple', 'orange']
+            backpack: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'black'],
+            lunchbox: ['red', 'blue', 'green', 'yellow', 'purple', 'orange'],
+            bike: ['red', 'blue', 'green', 'yellow', 'black', 'purple', 'orange'],
+            watch: ['red', 'blue', 'green', 'yellow', 'black', 'purple', 'orange', 'white'],
+            card: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'white'],
+            balloon: ['red', 'blue', 'green', 'yellow', 'purple', 'orange'],
+            wool: ['blue', 'yellow', 'red', 'green', 'white', 'purple', 'orange']
         };
         
         // Number dictionary for dynamic number replacement
@@ -797,7 +797,7 @@
                 ],
                 text: {
                     en: 'Amin went to the public library on Tuesday. He borrowed a book about dinosaurs and a short story about space. He put the two books in his backpack, but he lost his {cardColor} card near the science bookshelf. The security guard found it and gave it back to him at the door.',
-                    ar: 'ذهب أمين إلى المكتبة العامة يوم الثلاثاء. استعار كتاباً عن الديناصورات وقصة قصيرة عن الفضاء. وضع الكتابين في ظهره، لكنه أضاع بطاقته {cardColor_fem} عند رف الكتب العلمية. وجدها الحارس وأعادها له عند الباب.'
+                    ar: 'ذهب أمين إلى المكتبة العامة يوم الثلاثاء. استعار كتاباً عن الديناصورات وقصة قصيرة عن الفضاء. وضع الكتابين في ظهره، لكنه أضاع بطاقته ال{cardColor_fem} عند رف الكتب العلمية. وجدها الحارس وأعادها له عند الباب.'
                 },
                 questions: [
                     {
@@ -853,7 +853,7 @@
                         colorFeminine: false
                     },
                     {
-                        text: { en: 'What happened to the {umbrellaColor} umbrella?', ar: 'ماذا حدث للمظلة {umbrellaColor_fem}؟' },
+                        text: { en: 'What happened to the {umbrellaColor} umbrella?', ar: 'ماذا حدث للمظلة ال{umbrellaColor_fem}؟' },
                         options: {
                             en: ['It broke', 'The wind flipped it', 'He lost it', 'It flew away'],
                             ar: ['انكسرت', 'قلبها الهواء', 'أضاعها', 'طارت بعيداً']
