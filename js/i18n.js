@@ -1208,7 +1208,7 @@ const I18n = {
             "balloonMath.instruction": "فرقع البالون بالإجابة الصحيحة!",
             "balloonMath.hint": "فرقع الإجابة الصحيحة!",
             "balloonMath.questionsCorrect": "الأسئلة الصحيحة",
-            "balloonMath.result": "🎈 تفريقع رائع!",
+            "balloonMath.result": "🎈 فرقعة رائعة!",
 
             // Greater Less Game (لعبة أكبر وأصغر)
             "greaterLess.title": "⚖️ أكبر أو أصغر",
