@@ -361,6 +361,19 @@ footer {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.name-input-container input.shake {
+    animation: shake 0.5s ease;
+    border-color: #f87171;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+}
+
 .start-button {
     background: linear-gradient(135deg, #10b981, #059669);
     border: none;

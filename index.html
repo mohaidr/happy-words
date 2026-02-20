@@ -47,127 +47,22 @@
                     <button class="gender-btn" data-gender="f" onclick="selectGender('f')" data-i18n="onboarding.girl">👧 Girl</button>
                 </div>
                 
-                <label for="gradeLevel" class="grade-label" data-i18n="onboarding.askGrade">What grade are you in? 📚</label>
+                <label for="gradeLevel" class="grade-label" data-i18n="onboarding.askGrade">What's your level? 📚</label>
                 <div class="grade-selector">
-                    <button class="grade-btn active" data-grade="kg" onclick="selectGrade('kg')" data-i18n="onboarding.gradeKG">🌟 KG</button>
-                    <button class="grade-btn" data-grade="g1-3" onclick="selectGrade('g1-3')" data-i18n="onboarding.grade13">📖 Grade 1-3</button>
-                    <button class="grade-btn" data-grade="g3-6" onclick="selectGrade('g3-6')" data-i18n="onboarding.grade36">🎓 Grade 3-6</button>
+                    <button class="grade-btn active" data-grade="kg" onclick="selectGrade('kg')" data-i18n="onboarding.gradeKG">🌟 Little Learner</button>
+                    <button class="grade-btn" data-grade="g1-3" onclick="selectGrade('g1-3')" data-i18n="onboarding.grade13">📖 Growing Learner</button>
+                    <button class="grade-btn" data-grade="g3-6" onclick="selectGrade('g3-6')" data-i18n="onboarding.grade36">🎓 Big Kid</button>
                 </div>
                 
                 <button class="start-button" onclick="startApp()" data-i18n="onboarding.letsGo">Let's Go! 🚀</button>
             </div>
-
-            <!-- Category Filter -->
-            <div class="category-filter hidden" id="categoryFilter">
-                <button class="category-btn" data-category="all" onclick="setCategory('all')" data-i18n="category.all">✨ All</button>
-                <button class="category-btn active" data-category="praise" onclick="setCategory('praise')" data-i18n="category.praise">🌟 Praise</button>
-                <button class="category-btn" data-category="growth" onclick="setCategory('growth')" data-i18n="category.growth">🌱 Growth</button>
-                <button class="category-btn" data-category="kindness" onclick="setCategory('kindness')" data-i18n="category.kindness">💝 Kindness</button>
-                <button class="category-btn" data-category="ican" onclick="setCategory('ican')" data-i18n="category.ican">💪 I Can!</button>
-                <button class="category-btn" data-category="calm" onclick="setCategory('calm')" data-i18n="category.calm">🧘 Calm</button>
-                <button class="category-btn" data-category="gratitude" onclick="setCategory('gratitude')" data-i18n="category.gratitude">🙏 Gratitude</button>
-            </div>
-
-            <div class="word-display hidden" id="wordDisplay">
-                <div class="word-actions">
-                    <button class="action-btn" id="favoriteBtn" onclick="toggleFavorite()" data-i18n-title="btn.addFavorite" title="Add to favorites">🤍</button>
-                    <button class="action-btn" onclick="speakCurrentMessage()" data-i18n-title="btn.readAloud" title="Read aloud">🔊</button>
-                </div>
-                <span class="emoji" id="emoji"></span>
-                <span class="word" id="word">You are AMAZING!</span>
-            </div>
-
-            <!-- Controls Container -->
-            <div class="controls-container hidden" id="controlsContainer">
-                <button class="control-btn" onclick="showFavorites()" title="View Favorites">
-                    💖 <span id="favoritesCount">0</span>
-                </button>
-                <button class="control-btn" onclick="printCertificate()" title="Print Certificate">
-                    🏆 <span data-i18n="btn.print">Print</span>
-                </button>
-            </div>
-
-            <button class="magic-button hidden" id="magicButton" onclick="generateHappyWord()">
-                <span class="button-text" data-i18n="btn.showMagic">🎉 Inspire Me! 🎉</span>
-            </button>
-
-            <button class="back-button hidden" id="backButton" onclick="goBack()" data-i18n="btn.switchPlayer">
-                👤 Switch Player
-            </button>
-
-            <!-- Games Section -->
-            <div class="games-section hidden" id="gamesSection">
-                <h2 class="games-title" data-i18n="games.title">🎮 Fun Games!</h2>
-                <p class="games-subtitle" data-i18n="games.subtitle">19 games to play!</p>
-                
-                <div class="category-grid">
-                    <a href="games/category-fun.html" class="category-card category-fun">
-                        <span class="category-icon">🎮</span>
-                        <span class="category-name" data-i18n="category.fun">Fun</span>
-                        <span class="category-count">4 <span data-i18n="stats.gamesCount">games</span></span>
-                    </a>
-                    <a href="games/category-math.html" class="category-card category-math">
-                        <span class="category-icon">🔢</span>
-                        <span class="category-name" data-i18n="category.math">Math Games</span>
-                        <span class="category-count">5 <span data-i18n="stats.gamesCount">games</span></span>
-                    </a>
-                    <a href="games/category-reading.html" class="category-card category-reading">
-                        <span class="category-icon">📚</span>
-                        <span class="category-name" data-i18n="category.reading">Reading</span>
-                        <span class="category-count">6 <span data-i18n="stats.gamesCount">games</span></span>
-                    </a>
-                    <a href="games/category-logic.html" class="category-card category-logic">
-                        <span class="category-icon">🧠</span>
-                        <span class="category-name" data-i18n="category.logic">Logic</span>
-                        <span class="category-count">4 <span data-i18n="stats.gamesCount">games</span></span>
-                    </a>
-                </div>
-            </div>
         </main>
-
-        <!-- Car Game Container -->
-        <div class="game-container hidden" id="gameContainer">
-            <div class="game-header">
-                <div class="game-score">Score: <span id="gameScore">0</span></div>
-                <div class="game-speed">Speed: <span id="gameSpeed">1</span>x</div>
-                <button class="game-close-btn" onclick="exitCarGame()">✕</button>
-            </div>
-            <div class="game-road" id="gameRoad">
-                <div class="road-line"></div>
-                <div class="road-line"></div>
-                <div class="road-line"></div>
-                <div class="car" id="playerCar">🚗</div>
-            </div>
-            <div class="game-controls">
-                <button class="game-control-btn" ontouchstart="moveCarLeft()" onmousedown="moveCarLeft()">⬅️</button>
-                <button class="game-control-btn" ontouchstart="moveCarRight()" onmousedown="moveCarRight()">➡️</button>
-            </div>
-            <div class="game-instructions">Use ← → arrow keys or buttons to move!</div>
-        </div>
-
-        <!-- Game Over Modal -->
-        <div class="game-over-modal hidden" id="gameOverModal">
-            <div class="game-over-content">
-                <h2>🏁 Game Over! 🏁</h2>
-                <div class="final-score">
-                    <span class="score-emoji">⭐</span>
-                    <span id="finalScore">0</span>
-                    <span class="score-emoji">⭐</span>
-                </div>
-                <p class="high-score">🏆 Best: <span id="highScore">0</span></p>
-                <div class="game-over-buttons">
-                    <button class="play-again-btn" onclick="restartCarGame()">🔄 Play Again!</button>
-                    <button class="exit-game-btn" onclick="exitCarGame()">👋 Exit</button>
-                </div>
-            </div>
-        </div>
 
         <div class="decorations">
             <span class="star star1">⭐</span>
             <span class="star star2">🌟</span>
             <span class="star star3">✨</span>
             <span class="star star4">💫</span>
-
         </div>
 
         <footer>

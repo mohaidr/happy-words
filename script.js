@@ -199,10 +199,14 @@ let soundEnabled = true;
 let audioContext = null;
 
 function getAudioContext() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    try {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioContext;
+    } catch (e) {
+        return null;
     }
-    return audioContext;
 }
 
 function playSound(type) {
@@ -210,6 +214,13 @@ function playSound(type) {
     
     try {
         const ctx = getAudioContext();
+        if (!ctx) return;
+        
+        // Resume context if suspended (required by Firefox)
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+        
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
         
@@ -378,30 +389,37 @@ function selectGender(gender) {
 
 function startApp() {
     const nameInput = document.getElementById('studentName');
-    const nameContainer = document.getElementById('nameContainer');
-    const wordDisplay = document.getElementById('wordDisplay');
-    const magicButton = document.getElementById('magicButton');
 
     // Get the name or use default
     studentName = nameInput.value.trim() || "Friend";
     // Capitalize first letter
     studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
     
-    // Save player name for games to use
+    // Save player data to localStorage
     localStorage.setItem('happyWordsPlayerName', studentName);
     localStorage.setItem('happyWordsGradeLevel', currentGrade);
     localStorage.setItem('happyWordsGender', currentGender);
 
-    // Hide name input, show the main app
-    nameContainer.classList.add('hidden');
-    wordDisplay.classList.remove('hidden');
-    magicButton.classList.remove('hidden');
-    document.getElementById('backButton').classList.remove('hidden');
-    document.getElementById('controlsContainer').classList.remove('hidden');
-    document.getElementById('categoryFilter').classList.remove('hidden');
-    document.getElementById('gamesSection').classList.remove('hidden');
+    try {
+        playSound('magic');
+    } catch (e) {
+        // Ignore audio errors
+    }
+    
+    // Redirect to home page
+    window.location.href = 'home.html';
+}
 
-    playSound('magic');
+// Initialize home page (called from home.html)
+function initHomePage() {
+    // Load saved data
+    loadSavedData();
+    updateFavoritesCount();
+    
+    // Get player name from localStorage
+    studentName = localStorage.getItem('happyWordsPlayerName') || 'Friend';
+    currentGrade = localStorage.getItem('happyWordsGradeLevel') || 'kg';
+    currentGender = localStorage.getItem('happyWordsGender') || 'm';
     
     // Generate first happy word
     generateHappyWord();
@@ -587,27 +605,8 @@ style.textContent = `
 document.head.appendChild(style);
 
 function goBack() {
-    const nameContainer = document.getElementById('nameContainer');
-    const wordDisplay = document.getElementById('wordDisplay');
-    const magicButton = document.getElementById('magicButton');
-    const backButton = document.getElementById('backButton');
-    const controlsContainer = document.getElementById('controlsContainer');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const gamesSection = document.getElementById('gamesSection');
-
-    // Show name input, hide main app
-    nameContainer.classList.remove('hidden');
-    wordDisplay.classList.add('hidden');
-    magicButton.classList.add('hidden');
-    backButton.classList.add('hidden');
-    if (controlsContainer) controlsContainer.classList.add('hidden');
-    if (categoryFilter) categoryFilter.classList.add('hidden');
-    if (gamesSection) gamesSection.classList.add('hidden');
-
-    // Focus on the input
-    document.getElementById('studentName').focus();
-    
-    playSound('click');
+    // Redirect to index.html (form page) to switch player
+    window.location.href = 'index.html';
 }
 
 function showFavorites() {
@@ -832,32 +831,20 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Initialize app
+// Initialize app (index.html - form page)
 document.addEventListener('DOMContentLoaded', () => {
-    loadSavedData();
-    updateFavoritesCount();
+    // Only run index.html initialization if we're on the form page
+    const nameInput = document.getElementById('studentName');
+    if (!nameInput) return; // Not on index.html
     
-    // Listen for language changes to update displayed message
-    window.addEventListener('languageChanged', () => {
-        const wordElement = document.getElementById('word');
-        const wordDisplay = document.getElementById('wordDisplay');
-        if (wordElement && wordDisplay && wordDisplay.dataset.currentMessage) {
-            try {
-                const message = JSON.parse(wordDisplay.dataset.currentMessage);
-                const origIdx = happyMessages.findIndex(m => m.word === message.word && m.emoji === message.emoji);
-                if (origIdx >= 0) {
-                    wordElement.textContent = getMessageText(message, origIdx);
-                }
-            } catch (e) {}
-        }
-    });
+    loadSavedData();
     
     // Load voices for speech synthesis
     if ('speechSynthesis' in window) {
         speechSynthesis.getVoices();
     }
     
-    // Check if user already has a name saved - auto-login
+    // Check saved data to pre-fill form
     const savedName = localStorage.getItem('happyWordsPlayerName');
     const savedGrade = localStorage.getItem('happyWordsGradeLevel');
     const savedGender = localStorage.getItem('happyWordsGender');
@@ -875,20 +862,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Pre-fill saved data
     if (savedName) {
-        // Pre-fill the name input
-        document.getElementById('studentName').value = savedName;
-        
-        // Set the grade level
-        if (savedGrade) {
-            currentGrade = savedGrade;
-            document.querySelectorAll('.grade-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.grade === savedGrade);
-            });
-        }
-        
-        // Auto-start the app (skip name entry)
-        startApp();
+        nameInput.value = savedName;
+    }
+    
+    if (savedGrade) {
+        currentGrade = savedGrade;
+        document.querySelectorAll('.grade-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.grade === savedGrade);
+        });
     }
     
     // Register Service Worker for PWA

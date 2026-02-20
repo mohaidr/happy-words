@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Words for Kids! 🌟</title>
+    
+    <!-- Google Analytics -->
+    <script src="js/analytics.js"></script>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Happy Words">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+Bhaijaan+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/i18n.js"></script>
+</head>
+<body>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">عربي</button>
+    <div class="container">
+        <header>
+            <button class="global-sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle Sound">🔊</button>
+        </header>
+
+        <main>
+            <!-- Category Filter -->
+            <div class="category-filter" id="categoryFilter">
+                <button class="category-btn" data-category="all" onclick="setCategory('all')" data-i18n="category.all">✨ All</button>
+                <button class="category-btn active" data-category="praise" onclick="setCategory('praise')" data-i18n="category.praise">🌟 Praise</button>
+                <button class="category-btn" data-category="growth" onclick="setCategory('growth')" data-i18n="category.growth">🌱 Growth</button>
+                <button class="category-btn" data-category="kindness" onclick="setCategory('kindness')" data-i18n="category.kindness">💝 Kindness</button>
+                <button class="category-btn" data-category="ican" onclick="setCategory('ican')" data-i18n="category.ican">💪 I Can!</button>
+                <button class="category-btn" data-category="calm" onclick="setCategory('calm')" data-i18n="category.calm">🧘 Calm</button>
+                <button class="category-btn" data-category="gratitude" onclick="setCategory('gratitude')" data-i18n="category.gratitude">🙏 Gratitude</button>
+            </div>
+
+            <div class="word-display" id="wordDisplay">
+                <div class="word-actions">
+                    <button class="action-btn" id="favoriteBtn" onclick="toggleFavorite()" data-i18n-title="btn.addFavorite" title="Add to favorites">🤍</button>
+                    <button class="action-btn" onclick="speakCurrentMessage()" data-i18n-title="btn.readAloud" title="Read aloud">🔊</button>
+                </div>
+                <span class="emoji" id="emoji"></span>
+                <span class="word" id="word">You are AMAZING!</span>
+            </div>
+
+            <!-- Controls Container -->
+            <div class="controls-container" id="controlsContainer">
+                <button class="control-btn" onclick="showFavorites()" title="View Favorites">
+                    💖 <span id="favoritesCount">0</span>
+                </button>
+                <button class="control-btn" onclick="printCertificate()" title="Print Certificate">
+                    🏆 <span data-i18n="btn.print">Print</span>
+                </button>
+            </div>
+
+            <button class="magic-button" id="magicButton" onclick="generateHappyWord()">
+                <span class="button-text" data-i18n="btn.showMagic">🎉 Inspire Me! 🎉</span>
+            </button>
+
+            <a href="index.html" class="back-button" id="backButton" data-i18n="btn.switchPlayer">
+                👤 Switch Player
+            </a>
+
+            <!-- Games Section -->
+            <div class="games-section" id="gamesSection">
+                <h2 class="games-title" data-i18n="games.title">🎮 Fun Games!</h2>
+                <p class="games-subtitle" data-i18n="games.subtitle">19 games to play!</p>
+                
+                <div class="category-grid">
+                    <a href="games/category-fun.html" class="category-card category-fun">
+                        <span class="category-icon">🎮</span>
+                        <span class="category-name" data-i18n="category.fun">Fun</span>
+                        <span class="category-count">4 <span data-i18n="stats.gamesCount">games</span></span>
+                    </a>
+                    <a href="games/category-math.html" class="category-card category-math">
+                        <span class="category-icon">🔢</span>
+                        <span class="category-name" data-i18n="category.math">Math Games</span>
+                        <span class="category-count">5 <span data-i18n="stats.gamesCount">games</span></span>
+                    </a>
+                    <a href="games/category-reading.html" class="category-card category-reading">
+                        <span class="category-icon">📚</span>
+                        <span class="category-name" data-i18n="category.reading">Reading</span>
+                        <span class="category-count">6 <span data-i18n="stats.gamesCount">games</span></span>
+                    </a>
+                    <a href="games/category-logic.html" class="category-card category-logic">
+                        <span class="category-icon">🧠</span>
+                        <span class="category-name" data-i18n="category.logic">Logic</span>
+                        <span class="category-count">4 <span data-i18n="stats.gamesCount">games</span></span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Car Game Container -->
+        <div class="game-container hidden" id="gameContainer">
+            <div class="game-header">
+                <div class="game-score">Score: <span id="gameScore">0</span></div>
+                <div class="game-speed">Speed: <span id="gameSpeed">1</span>x</div>
+                <button class="game-close-btn" onclick="exitCarGame()">✕</button>
+            </div>
+            <div class="game-road" id="gameRoad">
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="car" id="playerCar">🚗</div>
+            </div>
+            <div class="game-controls">
+                <button class="game-control-btn" ontouchstart="moveCarLeft()" onmousedown="moveCarLeft()">⬅️</button>
+                <button class="game-control-btn" ontouchstart="moveCarRight()" onmousedown="moveCarRight()">➡️</button>
+            </div>
+            <div class="game-instructions">Use ← → arrow keys or buttons to move!</div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="game-over-modal hidden" id="gameOverModal">
+            <div class="game-over-content">
+                <h2>🏁 Game Over! 🏁</h2>
+                <div class="final-score">
+                    <span class="score-emoji">⭐</span>
+                    <span id="finalScore">0</span>
+                    <span class="score-emoji">⭐</span>
+                </div>
+                <p class="high-score">🏆 Best: <span id="highScore">0</span></p>
+                <div class="game-over-buttons">
+                    <button class="play-again-btn" onclick="restartCarGame()">🔄 Play Again!</button>
+                    <button class="exit-game-btn" onclick="exitCarGame()">👋 Exit</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="decorations">
+            <span class="star star1">⭐</span>
+            <span class="star star2">🌟</span>
+            <span class="star star3">✨</span>
+            <span class="star star4">💫</span>
+        </div>
+
+        <footer>
+            <p data-i18n="app.footer">Made with 💖 for awesome kids!</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user has a saved name, if not redirect to index
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('happyWordsPlayerName');
+            if (!savedName) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Listen for language changes to update displayed message
+            window.addEventListener('languageChanged', () => {
+                const wordElement = document.getElementById('word');
+                const wordDisplay = document.getElementById('wordDisplay');
+                if (wordElement && wordDisplay && wordDisplay.dataset.currentMessage) {
+                    try {
+                        const message = JSON.parse(wordDisplay.dataset.currentMessage);
+                        const origIdx = happyMessages.findIndex(m => m.word === message.word && m.emoji === message.emoji);
+                        if (origIdx >= 0) {
+                            wordElement.textContent = getMessageText(message, origIdx);
+                        }
+                    } catch (e) {}
+                }
+            });
+            
+            // Initialize the home page
+            initHomePage();
+        });
+    </script>
+</body>
+</html>
