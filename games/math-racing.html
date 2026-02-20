@@ -163,6 +163,7 @@
         let speed = 2;
         
         let gameRunning = false;
+        let isProcessingAnswer = false; // Prevent double-clicks
         let obstacles = [];
         let gameLoop;
         let currentAnswer = 0;
@@ -241,13 +242,21 @@
         rightBtn.addEventListener('mouseup', stopHold);
         rightBtn.addEventListener('mouseleave', stopHold);
         
-        // Answer button touch support
+        // Answer button touch support - use only one event type to prevent double-fire
         document.querySelectorAll('.answer-btn').forEach((btn, index) => {
+            let touched = false;
             btn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                touched = true;
                 checkAnswer(index);
             }, { passive: false });
-            btn.addEventListener('click', () => checkAnswer(index));
+            btn.addEventListener('click', (e) => {
+                // Only process click if it wasn't a touch event
+                if (!touched) {
+                    checkAnswer(index);
+                }
+                touched = false;
+            });
         });
         
         // Swipe controls on game area
@@ -298,8 +307,9 @@
         }
         
         function checkAnswer(index) {
-            if (!gameRunning) return;
+            if (!gameRunning || isProcessingAnswer) return;
             
+            isProcessingAnswer = true;
             const buttons = answersEl.querySelectorAll('.answer-btn');
             const selectedValue = parseInt(buttons[index].dataset.value);
             
@@ -318,11 +328,15 @@
                 setTimeout(() => {
                     buttons[index].classList.remove('correct-flash');
                     generateQuestion();
+                    isProcessingAnswer = false;
                 }, 300);
             } else {
                 buttons[index].classList.add('wrong-flash');
                 GameUtils.playSound('wrong');
-                setTimeout(() => buttons[index].classList.remove('wrong-flash'), 300);
+                setTimeout(() => {
+                    buttons[index].classList.remove('wrong-flash');
+                    isProcessingAnswer = false;
+                }, 300);
                 
                 // Reduce lives on wrong answer
                 lives--;
@@ -404,6 +418,7 @@
             score = 0;
             lives = GameUtils.getMaxLives({kg: 10, 'g1-3': 8, default: 6});
             speed = 2;
+            isProcessingAnswer = false;
             
             gameWidth = gameArea.offsetWidth;
             gameHeight = gameArea.offsetHeight;
@@ -445,6 +460,7 @@
         
         function endGame() {
             gameRunning = false;
+            isProcessingAnswer = false;
             clearInterval(gameLoop);
             
             const isNewHigh = GameUtils.saveHighScore(GAME_KEY, score, playerName);

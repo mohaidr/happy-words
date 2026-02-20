@@ -105,7 +105,8 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            transition: left 0.08s ease-out, bottom 0.08s ease-out;
+            transition: left 0.05s linear, bottom 0.05s linear;
+            will-change: left, bottom;
             background: linear-gradient(180deg, #ff6b6b 0%, #ee5a5a 20%, #cc4444 50%, #ee5a5a 80%, #ff6b6b 100%);
         }
         
@@ -291,6 +292,58 @@
         const speedDisplay = document.getElementById('speedDisplay');
         
         const moveStep = 25;
+        const smoothMoveSpeed = 4; // pixels per frame for smooth movement
+        
+        // Track pressed keys for smooth continuous movement
+        const keysPressed = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            ArrowUp: false,
+            ArrowDown: false
+        };
+        let movementRAF = null;
+        
+        function updateCarPosition() {
+            if (!gameRunning) return;
+            
+            let moved = false;
+            
+            if (keysPressed.ArrowLeft) {
+                carX = Math.max(30, carX - smoothMoveSpeed);
+                moved = true;
+            }
+            if (keysPressed.ArrowRight) {
+                carX = Math.min(270, carX + smoothMoveSpeed);
+                moved = true;
+            }
+            if (keysPressed.ArrowUp) {
+                carY = Math.min(400, carY + smoothMoveSpeed);
+                moved = true;
+            }
+            if (keysPressed.ArrowDown) {
+                carY = Math.max(20, carY - smoothMoveSpeed);
+                moved = true;
+            }
+            
+            if (moved) {
+                car.style.left = carX + 'px';
+                car.style.bottom = carY + 'px';
+                car.style.transform = 'translateX(-50%)';
+            }
+            
+            // Continue loop if any key is pressed
+            if (Object.values(keysPressed).some(v => v)) {
+                movementRAF = requestAnimationFrame(updateCarPosition);
+            } else {
+                movementRAF = null;
+            }
+        }
+        
+        function startMovementLoop() {
+            if (!movementRAF) {
+                movementRAF = requestAnimationFrame(updateCarPosition);
+            }
+        }
         
         function moveLeft() {
             if (!gameRunning) return;
@@ -319,63 +372,115 @@
         }
         
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') moveLeft();
-            if (e.key === 'ArrowRight') moveRight();
-            if (e.key === 'ArrowUp') { e.preventDefault(); moveUp(); }
-            if (e.key === 'ArrowDown') { e.preventDefault(); moveDown(); }
+            if (e.key in keysPressed) {
+                e.preventDefault();
+                if (!keysPressed[e.key]) {
+                    keysPressed[e.key] = true;
+                    startMovementLoop();
+                }
+            }
         });
         
-        // Smooth touch controls
+        document.addEventListener('keyup', (e) => {
+            if (e.key in keysPressed) {
+                keysPressed[e.key] = false;
+            }
+        });
+        
+        // Smooth touch controls - direct position tracking
         let touchStartX = 0;
         let touchStartY = 0;
-        let lastMoveX = 0;
-        let lastMoveY = 0;
+        let carStartX = 0;
+        let carStartY = 0;
+        let isTouching = false;
         
         gameArea.addEventListener('touchstart', (e) => {
+            if (!gameRunning) return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
-            lastMoveX = touchStartX;
-            lastMoveY = touchStartY;
+            carStartX = carX;
+            carStartY = carY;
+            isTouching = true;
         }, { passive: true });
         
-        // Continuous movement while dragging
+        // Direct position mapping while dragging (1:1 movement)
         gameArea.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (!gameRunning) return;
+            if (!gameRunning || !isTouching) return;
             
             const touchX = e.touches[0].clientX;
             const touchY = e.touches[0].clientY;
             
-            const diffX = touchX - lastMoveX;
-            const diffY = touchY - lastMoveY;
+            // Direct mapping: car follows finger movement 1:1
+            const diffX = touchX - touchStartX;
+            const diffY = touchStartY - touchY; // Inverted because Y is bottom-based
             
-            const threshold = 15;
+            // Apply movement with smooth clamping
+            carX = Math.max(30, Math.min(270, carStartX + diffX));
+            carY = Math.max(20, Math.min(400, carStartY + diffY));
             
-            if (Math.abs(diffX) > threshold) {
-                if (diffX > 0) moveRight();
-                else moveLeft();
-                lastMoveX = touchX;
-            }
-            
-            if (Math.abs(diffY) > threshold) {
-                if (diffY > 0) moveDown();
-                else moveUp();
-                lastMoveY = touchY;
-            }
+            car.style.left = carX + 'px';
+            car.style.bottom = carY + 'px';
+            car.style.transform = 'translateX(-50%)';
         }, { passive: false });
         
-        // Touch-hold support for D-pad buttons
-        let holdInterval = null;
+        gameArea.addEventListener('touchend', () => {
+            isTouching = false;
+        }, { passive: true });
+        
+        gameArea.addEventListener('touchcancel', () => {
+            isTouching = false;
+        }, { passive: true });
+        
+        // Touch-hold support for D-pad buttons with smooth movement
+        let holdRAF = null;
+        let holdAction = null;
+        let lastHoldTime = 0;
+        
+        function holdLoop(timestamp) {
+            if (!holdAction || !gameRunning) return;
+            
+            // Throttle to ~60 moves per second for smooth feel
+            if (timestamp - lastHoldTime >= 16) {
+                // Use smaller step for smooth button hold
+                const origStep = moveStep;
+                const actionName = holdAction.name;
+                
+                if (actionName === 'moveLeft') {
+                    carX = Math.max(30, carX - smoothMoveSpeed);
+                    car.style.left = carX + 'px';
+                    car.style.transform = 'translateX(-50%)';
+                } else if (actionName === 'moveRight') {
+                    carX = Math.min(270, carX + smoothMoveSpeed);
+                    car.style.left = carX + 'px';
+                    car.style.transform = 'translateX(-50%)';
+                } else if (actionName === 'moveUp') {
+                    carY = Math.min(400, carY + smoothMoveSpeed);
+                    car.style.bottom = carY + 'px';
+                } else if (actionName === 'moveDown') {
+                    carY = Math.max(20, carY - smoothMoveSpeed);
+                    car.style.bottom = carY + 'px';
+                }
+                
+                lastHoldTime = timestamp;
+            }
+            
+            holdRAF = requestAnimationFrame(holdLoop);
+        }
         
         function startHold(action) {
-            action();
-            holdInterval = setInterval(action, 80);
+            if (!gameRunning) return;
+            action(); // Initial move
+            holdAction = action;
+            lastHoldTime = 0;
+            holdRAF = requestAnimationFrame(holdLoop);
         }
         
         function stopHold() {
-            if (holdInterval) {
-                clearInterval(holdInterval);
-                holdInterval = null;
+            holdAction = null;
+            if (holdRAF) {
+                cancelAnimationFrame(holdRAF);
+                holdRAF = null;
             }
         }
         
@@ -475,6 +580,14 @@
         function endGame() {
             gameRunning = false;
             clearInterval(gameLoop);
+            
+            // Stop any ongoing movement
+            stopHold();
+            if (movementRAF) {
+                cancelAnimationFrame(movementRAF);
+                movementRAF = null;
+            }
+            Object.keys(keysPressed).forEach(k => keysPressed[k] = false);
             
             // Play crash sound
             GameUtils.playSound('wrong');
