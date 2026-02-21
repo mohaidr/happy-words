@@ -77,7 +77,8 @@ header h1 {
 .global-sound-toggle {
     position: fixed;
     top: 15px;
-    right: 15px;
+    left: 15px;
+    right: auto;
     background: #fff;
     border: 2px solid #e2e8f0;
     border-radius: 50%;
@@ -91,6 +92,11 @@ header h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+body.rtl .global-sound-toggle {
+    left: auto;
+    right: 15px;
 }
 
 .global-sound-toggle:hover {
@@ -192,6 +198,7 @@ header h1 {
     gap: 8px;
     justify-content: flex-start;
     margin-bottom: 15px;
+    margin-top: 55px;
     overflow-x: auto;
     padding: 5px 10px;
     -webkit-overflow-scrolling: touch;
@@ -1303,39 +1310,36 @@ body.rtl .category-card::after {
 .lang-toggle {
     position: fixed;
     top: 15px;
-    left: 15px;
-    background: #fff;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
+    right: 15px;
+    left: auto;
+    background: linear-gradient(145deg, #6366f1, #8b5cf6);
+    border: 3px solid #fff;
+    border-radius: 16px;
+    padding: 5px 15px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     z-index: 1000;
     font-family: inherit;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    animation: langPulse 2s ease-in-out infinite;
+}
+
+@keyframes langPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6); }
 }
 
 .lang-toggle:hover {
-    background: #f8fafc;
-    color: #6366f1;
-    border-color: #c7d2fe;
+    background: linear-gradient(145deg, #4f46e5, #7c3aed);
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+    animation: none;
 }
 
 body.rtl .lang-toggle {
-    left: auto;
-    right: 15px;
-}
-
-/* Adjust sound toggle position for language toggle */
-.global-sound-toggle {
-    right: 15px;
-    left: auto;
-}
-
-body.rtl .global-sound-toggle {
     right: auto;
     left: 15px;
 }

@@ -4,7 +4,7 @@
  */
 
 const I18n = {
-    currentLang: 'en',
+    currentLang: 'ar',
     translations: {},
     isLoaded: false,
 
@@ -1542,12 +1542,18 @@ const I18n = {
 
     // Get saved language or detect from browser
     getSavedLanguage() {
+        // One-time migration to Arabic default (v2)
+        const migrated = localStorage.getItem('happyWords_lang_v2');
+        if (!migrated) {
+            localStorage.removeItem('happyWords_language');
+            localStorage.setItem('happyWords_lang_v2', 'true');
+        }
+        
         const saved = localStorage.getItem('happyWords_language');
         if (saved && this.languages[saved]) return saved;
         
-        // Detect from browser
-        const browserLang = navigator.language.split('-')[0];
-        return this.languages[browserLang] ? browserLang : 'en';
+        // Default to Arabic
+        return 'ar';
     },
 
     // Initialize i18n
@@ -1561,7 +1567,7 @@ const I18n = {
 
     // Load translations for a language (from embedded data)
     loadTranslations(lang) {
-        this.translations = this.locales[lang] || this.locales.en;
+        this.translations = this.locales[lang] || this.locales.ar;
         this.currentLang = lang;
     },
 

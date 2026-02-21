@@ -823,27 +823,36 @@ body.rtl .tip {
 .lang-toggle {
     position: fixed;
     top: 10px;
-    left: 10px;
-    background: rgba(255,255,255,0.95);
-    border: none;
-    border-radius: 10px;
-    padding: 6px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
+    right: 60px;
+    left: auto;
+    background: linear-gradient(145deg, #6366f1, #8b5cf6);
+    border: 3px solid #fff;
+    border-radius: 16px;
+    padding: 5px 15px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     z-index: 1000;
     font-family: inherit;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    animation: langPulse 2s ease-in-out infinite;
+}
+
+@keyframes langPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6); }
 }
 
 .lang-toggle:hover {
-    background: #fff;
-    color: #6366f1;
+    background: linear-gradient(145deg, #4f46e5, #7c3aed);
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+    animation: none;
 }
 
 body.rtl .lang-toggle {
-    left: auto;
-    right: 10px;
+    right: auto;
+    left: 60px;
 }
