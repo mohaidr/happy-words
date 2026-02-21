@@ -37,6 +37,23 @@
   "games.subtitle": "19 games to play!",
   "games.score": "Score",
   "games.level": "Level",
+  
+  "game.finalScore": "Final Score",
+  "game.highScore": "High Score",
+  "game.accuracy": "Accuracy",
+  "game.score": "Score",
+  "game.round": "Round",
+  "game.home": "← Home",
+  "game.playAgain": "🎮 Play Again",
+  "game.streak": "Streak",
+  
+  "nav.reading": "📚 Reading",
+  
+  "rhymeTime.title": "🎵 Rhyme Time",
+  "rhymeTime.instruction": "Find the word that rhymes with:",
+  "rhymeTime.hint": "Words that rhyme sound alike at the end!",
+  "rhymeTime.result": "🎉 Great Job!",
+  
   "games.lives": "Lives",
   "games.moves": "Moves",
   "games.pairs": "Pairs",

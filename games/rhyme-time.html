@@ -131,14 +131,14 @@
     
     <div class="stats">
         <div><span data-i18n="game.score">Score</span>: <span id="score">0</span></div>
-        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span>/10</div>
+        <div><span data-i18n="game.round">Round</span>: <span id="round">1</span><span id="totalRounds">/10</span></div>
     </div>
     
     <div class="progress">
         <div class="progress-fill" id="progressFill" style="width: 10%"></div>
     </div>
     
-    <div class="streak-display">🔥 Streak: <span id="streak">0</span></div>
+    <div class="streak-display">🔥 <span data-i18n="game.streak">Streak</span>: <span id="streak">0</span></div>
     
     <p class="instruction" data-i18n="rhymeTime.instruction">Find the word that rhymes with:</p>
     
@@ -156,11 +156,11 @@
     <div id="gameOver" class="light-theme">
         <h2 data-i18n="rhymeTime.result">🎉 Great Job!</h2>
         <p id="playerDisplay"></p>
-        <p>Final Score: <span id="finalScore">0</span></p>
-        <p>🏆 High Score: <span id="highScore">0</span></p>
-        <p>Accuracy: <span id="accuracy">0</span>%</p>
+        <p><span data-i18n="game.finalScore">Final Score</span>: <span id="finalScore">0</span></p>
+        <p>🏆 <span data-i18n="game.highScore">High Score</span>: <span id="highScore">0</span></p>
+        <p><span data-i18n="game.accuracy">Accuracy</span>: <span id="accuracy">0</span>%</p>
         <button class="btn" style="margin-top: 15px;" onclick="startGame()" data-i18n="game.playAgain">Play Again</button>
-        <a href="../home.html" class="home-link">← Back to Home</a>
+        <a href="../home.html" class="home-link" data-i18n="btn.back">← Back to Home</a>
     </div>
 
     <script src="../js/game-utils.js"></script>
@@ -200,25 +200,35 @@
             // وزن فَعِيل - تنتهي بـ (-يد)
             ['فريد', 'مجيد', 'سعيد', 'بعيد', 'شهيد', 'عنيد'],
             // وزن أَفْعَال - تنتهي بـ (-ام)
-            ['أحلام', 'أوهام', 'أقلام', 'أعلام', 'هيام', 'غرام', 'سلام', 'وئام'],
+            ['أحلام', 'أيام', 'أقلام', 'أعلام', 'أعوام', 'أقدام', 'أفلام', 'أرقام'],
+            // وزن فَعَال - تنتهي بـ (-ام)
+            ['سلام', 'كلام', 'طعام', 'حمام', 'منام'],
             // وزن أَفْعَال - تنتهي بـ (-ار)
             ['أسرار', 'أبرار', 'أنهار', 'أزهار', 'أنوار', 'أقطار', 'أخبار', 'آثار', 'أمطار', 'أسفار', 'أقمار', 'أوتار'],
             // وزن أَفْعَال - تنتهي بـ (-ان)
-            ['أوطان', 'ألحان', 'أشجان', 'أزمان', 'ألوان', 'أغصان'],
+            ['أوطان', 'ألحان', 'أوزان', 'أزمان', 'ألوان', 'أغصان'],
             // وزن أَفْعَال - تنتهي بـ (-اب)
-            ['أبواب', 'أسباب', 'أصحاب', 'أحباب', 'كتاب', 'سحاب', 'خطاب', 'عذاب'],
+            ['أبواب', 'أسباب', 'أصحاب', 'أحباب', 'أثواب', 'أنياب'],
+            // وزن فِعَال - تنتهي بـ (-اب)
+            ['كتاب', 'خطاب', 'حساب'],
             // وزن أَفْعَال - تنتهي بـ (-اق)
-            ['آفاق', 'أشواق', 'أوراق', 'أعماق'],
+            ['آفاق', 'أسواق', 'أوراق', 'أعماق'],
             // وزن فُعُول - تنتهي بـ (-وب)
-            ['قلوب', 'دروب', 'ذنوب', 'غيوب'],
+            ['قلوب', 'دروب', 'جيوب', 'عيوب'],
             // وزن فُعُول - تنتهي بـ (-ون)
-            ['سكون', 'ظنون', 'جنون', 'فنون'],
+            ['سكون', 'ظنون', 'عيون', 'فنون'],
             // وزن فُعُول - تنتهي بـ (-وح)
-            ['وضوح', 'طموح', 'جروح', 'صروح', 'مفتوح', 'مجروح', 'مسموح', 'مطروح'],
+            ['وضوح', 'طموح', 'سطوح', 'صروح'],
+            // وزن مَفْعُول - تنتهي بـ (-وح)
+            ['مفتوح', 'مسطوح', 'مسموح', 'مطروح'],
             // وزن فُعُول - تنتهي بـ (-ور)
-            ['زهور', 'عطور', 'سرور', 'بحور', 'نور', 'حبور', 'طيور', 'قصور', 'منصور', 'مكسور', 'مشكور', 'مأجور'],
+            ['زهور', 'عطور', 'سرور', 'بحور', 'نور', 'حبور', 'طيور', 'قصور'],
+            // وزن مَفْعُول - تنتهي بـ (-ور)
+            ['منصور', 'مكسور', 'مشكور', 'مأجور'],
             // وزن فُعُول - تنتهي بـ (-ود)
-            ['صمود', 'حدود', 'عهود', 'وعود', 'وجود', 'جود', 'موعود', 'موجود', 'محمود', 'مسعود'],
+            ['صمود', 'حدود', 'عهود', 'وعود', 'وجود', 'جود'],
+            // وزن مَفْعُول - تنتهي بـ (-ود)
+            ['موعود', 'موجود', 'محمود', 'مسعود'],
             // كلمات تنتهي بـ (-اية)
             ['بداية', 'حكاية', 'نهاية', 'رواية', 'كفاية', 'حماية', 'رعاية', 'هداية', 'غاية', 'راية', 'آية'],
             // كلمات تنتهي بـ (-يدة)
@@ -230,7 +240,7 @@
             // كلمات قصيرة - تنتهي بـ (-حر)
             ['بحر', 'سحر'],
             // وزن مَفْعُول - تنتهي بـ (-وم)
-            ['مرسوم', 'معلوم', 'مظلوم', 'مهزوم', 'هموم', 'غيوم', 'نجوم', 'سموم'],
+            ['مرسوم', 'معلوم', 'مظلوم', 'مهزوم', 'هموم', 'غيوم', 'نجوم', 'رسوم'],
             // وزن مَفْعُول - تنتهي بـ (-ول)
             ['مقبول', 'مجهول', 'منقول', 'معقول'],
             // كلمات تنتهي بـ (-اء)
@@ -256,25 +266,25 @@
         // KG-level Arabic rhymes (كلمات بسيطة للروضة) - من قائمة الـ 100 كلمة
         const rhymeGroupsArKG = [
             // كلمات سهلة تنتهي بـ (-يل)
-            ['جميل', 'طويل', 'قليل', 'نبيل'],
+            ['نبيل','جميل', 'طويل', 'قليل'],
             // كلمات سهلة تنتهي بـ (-ير)
-            ['كبير', 'صغير', 'خبير', 'منير'],
+            ['كبير', 'صغير', 'خبير'],
             // كلمات سهلة تنتهي بـ (-يد)
             ['سعيد', 'بعيد', 'عنيد', 'فريد'],
             // كلمات سهلة تنتهي بـ (-اب)
-            ['كتاب', 'سحاب', 'خطاب', 'عذاب'],
-            // كلمات سهلة تنتهي بـ (-ام)
-            ['سلام', 'وئام', 'أحلام', 'أعلام'],
+            ['كتاب', 'خطاب', 'حساب'],
+            // كلمات سهلة تنتهي بـ (-ام) - وزن فَعَال
+            ['سلام', 'كلام', 'طعام', 'حمام'],
             // كلمات سهلة تنتهي بـ (-ور)
-            ['نور', 'زهور', 'طيور', 'عطور'],
+            ['زهور', 'طيور', 'عطور'],
             // كلمات سهلة تنتهي بـ (-وب)
-            ['قلوب', 'دروب', 'ذنوب', 'غيوب'],
+            ['قلوب', 'دروب', 'جيوب', 'عيوب'],
             // كلمات سهلة تنتهي بـ (-اء)
             ['سماء', 'صفاء', 'وفاء', 'عطاء'],
             // كلمات سهلة تنتهي بـ (-ال)
-            ['جبال', 'جمال', 'خيال', 'رمال'],
+            ['جبال', 'جمال', 'رمال'],
             // كلمات سهلة تنتهي بـ (-اح)
-            ['صباح', 'نجاح', 'سماح', 'كفاح'],
+            ['صباح', 'نجاح', 'سماح'],
             // كلمات قصيرة تنتهي بـ (-َر)
             ['قمر', 'شجر', 'مطر', 'حجر'],
             // كلمات سهلة تنتهي بـ (-يم)
@@ -290,7 +300,7 @@
         let gameRunning = false;
         let currentMainWord = '';
         let correctAnswerIndex = -1;
-        let usedPairs = [];
+        let usedMainWords = [];
         
         // Game key for high scores
         const GAME_KEY = 'rhymeTime';
@@ -341,6 +351,7 @@
         const streakEl = document.getElementById('streak');
         const progressFill = document.getElementById('progressFill');
         const gameOverEl = document.getElementById('gameOver');
+        const choiceButtons = choicesEl.querySelectorAll('.choice');
         
         function getRandomFromArray(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
@@ -364,9 +375,9 @@
                 mainWord = shuffled[0];
                 rhymeWord = shuffled[1];
                 attempts++;
-            } while (usedPairs.includes(mainWord + rhymeWord) && attempts < 50);
+            } while (usedMainWords.includes(mainWord) && attempts < 50);
             
-            usedPairs.push(mainWord + rhymeWord);
+            usedMainWords.push(mainWord);
             currentMainWord = mainWord;
             const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
             mainWordEl.textContent = lang === 'ar' ? mainWord : mainWord.toUpperCase();
@@ -399,8 +410,7 @@
             }
             
             // Update buttons
-            const buttons = choicesEl.querySelectorAll('.choice');
-            buttons.forEach((btn, i) => {
+            choiceButtons.forEach((btn, i) => {
                 btn.textContent = lang === 'ar' ? options[i] : options[i].toUpperCase();
                 btn.className = 'choice';
                 btn.disabled = false;
@@ -409,36 +419,37 @@
         
         function checkAnswer(index) {
             if (!gameRunning) return;
+            gameRunning = false; // Prevent double-clicks immediately
             
-            const buttons = choicesEl.querySelectorAll('.choice');
-            buttons.forEach(btn => btn.disabled = true);
+            const isCorrect = index === correctAnswerIndex;
             
-            if (index === correctAnswerIndex) {
-                // Correct!
-                buttons[index].classList.add('correct');
-                score += 10 + (streak * 2);
-                streak++;
-                correctAnswers++;
-                
-                if (streak > bestStreak) bestStreak = streak;
-                
-                scoreEl.textContent = score;
-                streakEl.textContent = streak;
-                
-                // Play correct sound
-                GameUtils.playSound('correct');
-            } else {
-                // Wrong!
-                buttons[index].classList.add('wrong');
-                buttons[correctAnswerIndex].classList.add('correct');
-                streak = 0;
-                streakEl.textContent = streak;
-                
-                // Play wrong sound
-                GameUtils.playSound('wrong');
+            // Immediate visual feedback
+            choiceButtons.forEach(btn => btn.disabled = true);
+            choiceButtons[index].classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) {
+                choiceButtons[correctAnswerIndex].classList.add('correct');
             }
             
+            // Defer score updates and sound to next frame
+            requestAnimationFrame(() => {
+                if (isCorrect) {
+                    score += 10 + (streak * 2);
+                    streak++;
+                    correctAnswers++;
+                    if (streak > bestStreak) bestStreak = streak;
+                    scoreEl.textContent = score;
+                    streakEl.textContent = streak;
+                } else {
+                    streak = 0;
+                    streakEl.textContent = streak;
+                }
+                
+                // Play sound async
+                setTimeout(() => GameUtils.playSound(isCorrect ? 'correct' : 'wrong'), 0);
+            });
+            
             setTimeout(() => {
+                gameRunning = true;
                 if (round >= totalRounds) {
                     endGame();
                 } else {
@@ -453,18 +464,30 @@
             gradeLevel = GameUtils.getGradeLevel();
             highScore = GameUtils.getHighScore(GAME_KEY);
             
+            // Set rounds based on grade level
+            if (gradeLevel === 'kg') {
+                totalRounds = 10;
+            } else if (gradeLevel === 'g1-3') {
+                totalRounds = 20;
+            } else {
+                totalRounds = 30;
+            }
+            
             score = 0;
             round = 0;
             streak = 0;
             bestStreak = 0;
             correctAnswers = 0;
-            usedPairs = [];
+            usedMainWords = [];
             gameRunning = true;
             
             scoreEl.textContent = '0';
             streakEl.textContent = '0';
             progressFill.style.width = '0%';
             gameOverEl.style.display = 'none';
+            
+            // Update round display
+            document.getElementById('totalRounds').textContent = '/' + totalRounds;
             
             loadRound();
         }
@@ -482,10 +505,14 @@
             const bestScore = Math.max(score, highScore);
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
+            const lang = typeof I18n !== 'undefined' ? I18n.currentLang : 'en';
+            const byText = lang === 'ar' ? 'بواسطة' : 'by';
+            const gameText = lang === 'ar' ? 'لعبة' : "'s Game";
+            
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            document.getElementById('highScore').textContent = `${bestScore} ${byText} ${bestPlayer}`;
             document.getElementById('accuracy').textContent = accuracy;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            document.getElementById('playerDisplay').textContent = lang === 'ar' ? `${gameText} ${playerName}` : `${playerName}${gameText}`;
             gameOverEl.style.display = 'block';
             
             // Play level up sound for completing the game
