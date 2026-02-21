@@ -332,9 +332,21 @@
             const bestPlayer = GameUtils.getHighScorePlayerName(GAME_KEY);
             
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('highScore').textContent = `${bestScore} by ${bestPlayer}`;
+            
+            // Use localized high score display
+            const highScoreText = typeof I18n !== 'undefined' 
+                ? I18n.t('game.scoreBy', { score: bestScore, player: bestPlayer })
+                : `${bestScore} by ${bestPlayer}`;
+            document.getElementById('highScore').textContent = highScoreText;
+            
             document.getElementById('correctCount').textContent = correctCount;
-            document.getElementById('playerDisplay').textContent = playerName + "'s Game";
+            
+            // Use localized player game display
+            const playerGameText = typeof I18n !== 'undefined' 
+                ? I18n.t('game.playerGame', { name: playerName })
+                : playerName + "'s Game";
+            document.getElementById('playerDisplay').textContent = playerGameText;
+            
             gameOverEl.style.display = 'block';
             loadHighScore();
         }

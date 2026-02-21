@@ -243,6 +243,7 @@
         let lives = 3;
         let level = 1;
         let streak = 0;
+        let recentColors = []; // Track recently used colors to avoid repetition
         
         let currentColor = null;
         let gameRunning = false;
@@ -353,8 +354,24 @@
             
             const availableColors = getColorsForLevel();
             
-            // Pick target color
-            currentColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+            // Pick target color, avoiding recently used ones
+            let eligibleColors = availableColors.filter(c => !recentColors.includes(c.name));
+            
+            // If all colors were recently used, reset (keep only the last one to avoid immediate repeat)
+            if (eligibleColors.length === 0) {
+                const lastColor = recentColors[recentColors.length - 1];
+                recentColors = lastColor ? [lastColor] : [];
+                eligibleColors = availableColors.filter(c => !recentColors.includes(c.name));
+            }
+            
+            currentColor = eligibleColors[Math.floor(Math.random() * eligibleColors.length)];
+            
+            // Track this color as recently used (keep last 3-5 depending on available pool)
+            recentColors.push(currentColor.name);
+            const maxRecent = Math.min(Math.floor(availableColors.length / 2), 5);
+            if (recentColors.length > maxRecent) {
+                recentColors.shift();
+            }
             
             // Display the word
             const wordEl = document.getElementById('colorWord');
@@ -468,6 +485,7 @@
             round = 0;
             level = 1;
             streak = 0;
+            recentColors = [];
             lives = GameUtils.getMaxLives({kg: 6, 'g1-3': 5, default: 4});
             gameRunning = true;
             

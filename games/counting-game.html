@@ -180,6 +180,7 @@
         let currentCount = 0;
         let gameRunning = false;
         let canClick = true;
+        let usedCounts = [];
         
         const playerName = GameUtils.getPlayerName();
         const gradeLevel = GameUtils.getGradeLevel();
@@ -214,11 +215,20 @@
             document.getElementById('round').textContent = round;
             canClick = true;
             
-            // Pick random emoji and count
+            // Pick random emoji
             const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-            const maxCount = getMaxCount();
-            const minCount = gradeLevel === 'kg' ? 1 : 2;
-            currentCount = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+            
+            // Generate available counts (1-10) that haven't been used
+            const availableCounts = [];
+            for (let i = 1; i <= 10; i++) {
+                if (!usedCounts.includes(i)) {
+                    availableCounts.push(i);
+                }
+            }
+            
+            // Pick a random count from available ones
+            currentCount = availableCounts[Math.floor(Math.random() * availableCounts.length)];
+            usedCounts.push(currentCount);
             
             // Display objects
             const container = document.getElementById('objectsContainer');
@@ -290,7 +300,20 @@
                 const bonus = streak > 2 ? streak * 5 : 0;
                 score += 10 + bonus;
                 document.getElementById('score').textContent = score;
-                document.getElementById('message').textContent = streak > 2 ? `✨ Correct! +${bonus} streak bonus!` : '✨ Correct!';
+                
+                // Use localized messages
+                let correctMsg;
+                if (streak > 2) {
+                    correctMsg = typeof I18n !== 'undefined' 
+                        ? I18n.t('countingGame.correctBonus', { bonus: bonus })
+                        : `✨ Correct! +${bonus} streak bonus!`;
+                } else {
+                    correctMsg = typeof I18n !== 'undefined' 
+                        ? I18n.t('countingGame.correct')
+                        : '✨ Correct!';
+                }
+                document.getElementById('message').textContent = correctMsg;
+                
                 btn.classList.add('correct');
                 GameUtils.playSound('correct');
                 
@@ -306,7 +329,13 @@
                 // Wrong
                 streak = 0;
                 document.getElementById('streak').textContent = '0';
-                document.getElementById('message').textContent = `❌ It was ${currentCount}!`;
+                
+                // Use localized message
+                const wrongMsg = typeof I18n !== 'undefined' 
+                    ? I18n.t('countingGame.itWas', { count: currentCount })
+                    : `❌ It was ${currentCount}!`;
+                document.getElementById('message').textContent = wrongMsg;
+                
                 btn.classList.add('wrong');
                 GameUtils.playSound('wrong');
                 
@@ -335,6 +364,7 @@
             round = 0;
             streak = 0;
             bestStreak = 0;
+            usedCounts = [];
             gameRunning = true;
             
             document.getElementById('score').textContent = '0';

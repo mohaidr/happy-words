@@ -319,6 +319,7 @@ const I18n = {
             "game.accuracy": "Accuracy",
             "game.backHome": "← Back to Home",
             "game.playerGame": "{name}'s Game",
+            "game.scoreBy": "{score} by {player}",
             "game.info.fewestMoves": "Score is based on fewest moves",
 
             // Level names
@@ -468,6 +469,7 @@ const I18n = {
             "countingGame.title": "🔢 Counting Fun",
             "countingGame.instruction": "How many do you see?",
             "countingGame.result": "🎉 Great Counting!",
+            "countingGame.bestStreak": "Best Streak",
 
             // Math Racing Game
             "mathRacing.title": "🏎️ Math Racing",
@@ -729,6 +731,9 @@ const I18n = {
 
             // Dynamic game text templates
             "countingGame.howMany": "How many {emoji} do you see?",
+            "countingGame.correct": "✨ Correct!",
+            "countingGame.correctBonus": "✨ Correct! +{bonus} streak bonus!",
+            "countingGame.itWas": "❌ It was {count}!",
             "game.highScorePoints": "🏆 Best: {score} points by {player}",
             "game.highScoreMoves": "🏆 Best: {score} moves by {player}",
             "game.defaultHighScore": "Best: -- points",
@@ -1075,6 +1080,7 @@ const I18n = {
             "game.accuracy": "الدقة",
             "game.backHome": "العودة للرئيسية →",
             "game.playerGame": "لعبة {name}",
+            "game.scoreBy": "{score} بواسطة {player}",
             "game.info.fewestMoves": "النتيجة بناءً على أقل عدد حركات",
 
             // Level names (مستويات)
@@ -1224,6 +1230,7 @@ const I18n = {
             "countingGame.title": "🔢 متعة العد",
             "countingGame.instruction": "كم عدد ما تراه؟",
             "countingGame.result": "🎉 عد رائع!",
+            "countingGame.bestStreak": "أفضل تتابع",
 
             // Math Racing Game (لعبة سباق الرياضيات)
             "mathRacing.title": "🏎️ سباق الرياضيات",
@@ -1485,6 +1492,9 @@ const I18n = {
 
             // Dynamic game text templates (قوالب النص الديناميكي)
             "countingGame.howMany": "كم {emoji} ترى/ي؟",
+            "countingGame.correct": "✨ صحيح!",
+            "countingGame.correctBonus": "✨ صحيح! +{bonus} مكافأة الأجوبة الصحيحة المتتالية!",
+            "countingGame.itWas": "❌ كان الجواب {count}!",
             "game.highScorePoints": "🏆 الأفضل: {score} نقطة بواسطة {player}",
             "game.highScoreMoves": "🏆 الأفضل: {score} حركة بواسطة {player}",
             "game.defaultHighScore": "الأفضل: -- نقطة",

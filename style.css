@@ -486,8 +486,10 @@ footer {
     font-weight: 500;
     color: #ffffff;
     cursor: pointer;
-    margin-top: 16px;
+    margin-top: 24px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .back-button:hover {
