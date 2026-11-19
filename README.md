@@ -1,6 +1,6 @@
 # Happy Words for Kids! 🌟
 
-A fun, colorful web app that generates positive and encouraging words for 2nd-grade students to make them feel happy and optimistic!
+(Happy Words)[https://happy-words.netlify.app/] is a fun, colorful web app that generates positive and encouraging words for 2nd-grade students to make them feel happy and optimistic!
 
 ## Features
 
